@@ -1,0 +1,88 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\justn\\code\\rustbucket\\rustTech\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{5788A504-6283-487A-B26F-D9E505DDB790}|rusttech.client\\rustytech.client.esproj|c:\\users\\justn\\code\\rustbucket\\rusttech\\rusttech.client\\src\\app.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{5788A504-6283-487A-B26F-D9E505DDB790}|rusttech.client\\rustytech.client.esproj|solutionrelative:rusttech.client\\src\\app.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5788A504-6283-487A-B26F-D9E505DDB790}|rusttech.client\\rustytech.client.esproj|c:\\users\\justn\\code\\rustbucket\\rusttech\\rusttech.client\\src\\app.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
+      "RelativeMoniker": "D:0:0:{5788A504-6283-487A-B26F-D9E505DDB790}|rusttech.client\\rustytech.client.esproj|solutionrelative:rusttech.client\\src\\app.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5788A504-6283-487A-B26F-D9E505DDB790}|rusttech.client\\rustytech.client.esproj|c:\\users\\justn\\code\\rustbucket\\rusttech\\rusttech.client\\.vscode\\launch.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{5788A504-6283-487A-B26F-D9E505DDB790}|rusttech.client\\rustytech.client.esproj|solutionrelative:rusttech.client\\.vscode\\launch.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF970A64-138F-4F60-B546-3178D2C9274F}|rustTech.Server\\RustyTech.Server.csproj|c:\\users\\justn\\code\\rustbucket\\rusttech\\rusttech.server\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF970A64-138F-4F60-B546-3178D2C9274F}|rustTech.Server\\RustyTech.Server.csproj|solutionrelative:rusttech.server\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "App.tsx",
+              "DocumentMoniker": "C:\\Users\\justn\\code\\rustbucket\\rustTech\\rusttech.client\\src\\App.tsx",
+              "RelativeDocumentMoniker": "rusttech.client\\src\\App.tsx",
+              "ToolTip": "C:\\Users\\justn\\code\\rustbucket\\rustTech\\rusttech.client\\src\\App.tsx",
+              "RelativeToolTip": "rusttech.client\\src\\App.tsx",
+              "ViewState": "AQIAAAYAAAAAAAAAAAAuwAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2024-04-11T04:56:56.294Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "App.css",
+              "DocumentMoniker": "C:\\Users\\justn\\code\\rustbucket\\rustTech\\rusttech.client\\src\\App.css",
+              "RelativeDocumentMoniker": "rusttech.client\\src\\App.css",
+              "ToolTip": "C:\\Users\\justn\\code\\rustbucket\\rustTech\\rusttech.client\\src\\App.css",
+              "RelativeToolTip": "rusttech.client\\src\\App.css",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2024-04-11T04:56:57.112Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "launch.json",
+              "DocumentMoniker": "C:\\Users\\justn\\code\\rustbucket\\rustTech\\rusttech.client\\.vscode\\launch.json",
+              "RelativeDocumentMoniker": "rusttech.client\\.vscode\\launch.json",
+              "ToolTip": "C:\\Users\\justn\\code\\rustbucket\\rustTech\\rusttech.client\\.vscode\\launch.json",
+              "RelativeToolTip": "rusttech.client\\.vscode\\launch.json",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2024-04-11T04:56:48.723Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\justn\\code\\rustbucket\\rustTech\\rustTech.Server\\Program.cs",
+              "RelativeDocumentMoniker": "rustTech.Server\\Program.cs",
+              "ToolTip": "C:\\Users\\justn\\code\\rustbucket\\rustTech\\rustTech.Server\\Program.cs",
+              "RelativeToolTip": "rustTech.Server\\Program.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-04-11T04:55:23.37Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
