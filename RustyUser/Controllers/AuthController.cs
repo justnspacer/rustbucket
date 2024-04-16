@@ -68,7 +68,7 @@ namespace RustyUser.Controllers
             return Ok(result);
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpPost("manage/2fa")]
         public async Task<IActionResult> Enable2faAsync(string userId)
         {
@@ -76,7 +76,7 @@ namespace RustyUser.Controllers
             return Ok(result);
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpGet("manage/info")]
         public async Task<IActionResult> GetInfoAsync(string userId)
         {

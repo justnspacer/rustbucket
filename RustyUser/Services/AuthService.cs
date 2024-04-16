@@ -8,7 +8,6 @@ using System.Security.Claims;
 using System.Text;
 using RustyUser.Models.Auth;
 using RustyUser.Models.User;
-using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace RustyUser.Services
 {
@@ -47,7 +46,7 @@ namespace RustyUser.Services
         {
             if (string.IsNullOrWhiteSpace(model.Email) || string.IsNullOrWhiteSpace(model.Password))
             {
-                return CreateFailureResult();
+                return CreateFailureResult("EmailRequired");
             }
 
             var user = new User
@@ -64,7 +63,7 @@ namespace RustyUser.Services
 
             return result.Succeeded ? 
                 IdentityResult.Success : 
-                IdentityResult.Failed(result.Errors.Select(x => new IdentityError { Description = x.Description }).ToArray());
+                IdentityResult.Failed(result.Errors.Select(x => new IdentityError { Code = x.Code, Description = x.Description }).ToArray());
         }
 
         /// <summary>
@@ -74,21 +73,20 @@ namespace RustyUser.Services
         /// <returns>The result of the login operation.</returns>
         public async Task<AuthResult> LoginAsync([FromBody] UserLogin model)
         {
-            // Check if email, password, and application name are provided
             if (string.IsNullOrWhiteSpace(model.Email) || string.IsNullOrWhiteSpace(model.Password) || string.IsNullOrWhiteSpace(model.ApplicationName))
             {
                 _logger.LogInformation($"login failed for {model.Email}");
-                return new AuthResult { Succeeded = false, Errors = new List<string> { "Authentication failed" }, Token = null };
+                return CreateFailureResult();
             }
 
             var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
             if (result.Succeeded)
             {
-                await AddLoginRecordAsync(model.Email, model.ApplicationName);
+                await AddLoginRecordAsync(model.Email, model.ApplicationName, model.LoginProvider, model.ProviderKey);
                 var token = GenerateJwtToken(model.Email);
                 return new AuthResult { Succeeded = true, Token = token, Errors = null };
             }
-            return new AuthResult { Succeeded = false, Errors = new List<string> { "Authentication failed" }, Token = null };
+            return CreateFailureResult();
         }
 
         /// <summary>
@@ -96,22 +94,23 @@ namespace RustyUser.Services
         /// </summary>
         /// <param name="email">The user's email.</param>
         /// <param name="applicationName">The name of the application.</param>
+        /// <param name="loginProvider">Login provider of login attempt.</param>
+        /// <param name="providerKey">Provider key for user.</param>
         /// <returns>The result of the add login record operation.</returns>
-        public async Task<IdentityResult> AddLoginRecordAsync(string email, string applicationName)
+        public async Task<IdentityResult> AddLoginRecordAsync(string email, string? applicationName, string loginProvider, string providerKey)
         {
-            // Check if email is provided
             if (string.IsNullOrEmpty(email))
             {
-                return CreateFailureResult();
+                return CreateFailureResult("EmailRequired");
             }
 
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
             {
-                return CreateFailureResult();
+                return CreateFailureResult("UserNotFound");
             }
 
-            var login = new UserLoginInfo(applicationName, Guid.NewGuid().ToString(), applicationName);
+            var login = new UserLoginInfo(loginProvider, providerKey, applicationName);
             var identityuserlogin = new IdentityUserLogin<string>
             {
                 UserId = user.Id,
@@ -131,26 +130,25 @@ namespace RustyUser.Services
         /// <returns>The result of the confirm email operation.</returns>
         public async Task<IdentityResult> ConfirmEmailAsync(ConfirmEmailRequest model)
         {
-            // Check if id and token are provided
             if (string.IsNullOrWhiteSpace(model.Id) || string.IsNullOrWhiteSpace(model.Token))
             {
-                return CreateFailureResult();
+                return CreateFailureResult("IdOrTokenRequired");
             }
 
             var decodedToken = WebUtility.UrlDecode(model.Token);
             if (decodedToken == null)
             {
-                return CreateFailureResult();
+                return CreateFailureResult("TokenFailure");
             }
 
             var user = await _userManager.FindByIdAsync(model.Id);
             if (user == null)
             {
-                return CreateFailureResult();
+                return CreateFailureResult("UserNotFound");
             }
 
             var result = await _userManager.ConfirmEmailAsync(user, decodedToken);
-            return result.Succeeded ? IdentityResult.Success : CreateFailureResult();
+            return result.Succeeded ? IdentityResult.Success : CreateFailureResult("ConfirmEmailFailure");
         }
 
         /// <summary>
@@ -162,13 +160,13 @@ namespace RustyUser.Services
         {
             if (string.IsNullOrEmpty(email))
             {
-                return CreateFailureResult();
+                return CreateFailureResult("EmailRequired");
             }
 
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
             {
-                return CreateFailureResult();
+                return CreateFailureResult("UserNotFound");
             }
 
             if (user.Email != null)
@@ -187,16 +185,15 @@ namespace RustyUser.Services
         /// <returns>The result of the forgot password operation.</returns>
         public async Task<IdentityResult> ForgotPasswordAsync(string email)
         {
-            // Check if email is provided
             if (string.IsNullOrEmpty(email))
             {
-                return CreateFailureResult();
+                return CreateFailureResult("EmailRequired");
             }
 
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
             {
-                return CreateFailureResult();
+                return CreateFailureResult("UserNotFound");
             }
 
             var token = await GeneratePasswordToken(user);
@@ -214,38 +211,40 @@ namespace RustyUser.Services
         /// <summary>
         /// Updates a user asynchronously.
         /// </summary>
-        /// <param name="UserUpdate">UserUpdate obj to update user.</param>
+        /// <param name="id">UserId.</param>
+        /// <param name="userUpdateDto">User update object</param>
         /// <returns>An IdentityResult indicating the success or failure of the update operation.</returns>
-        public async Task<IdentityResult> UpdateUserAsync(string id, UserUpdate newUserData)
+        public async Task<IdentityResult> UpdateUserAsync(string id, UserUpdate userUpdateDto)
         {
             if (string.IsNullOrEmpty(id))
             {
-                return CreateFailureResult();
+                return CreateFailureResult("IdRequired");
             }
             var user = await _userManager.FindByIdAsync(id);
             if (user == null)
             {
-                return CreateFailureResult();
+                return CreateFailureResult("UserNotFound");
             }
-
-            var currentUserId = _userManager.GetUserId(_httpContextAccessor.HttpContext.User);
-            bool isCurrentUser = user.Id == currentUserId;
-            bool isAdmin = await _userManager.IsInRoleAsync(user, "Admin"); //optional
-            if (isCurrentUser || isAdmin)
+            if(userUpdateDto.Email != null)
             {
-                user.Email = newUserData.Email;
+                user.Email = userUpdateDto.Email;
                 user.EmailConfirmed = false;
-                var result = await _userManager.UpdateAsync(user);
 
-                if(user.Email != null)
+                if (user.Email != null)
                 {
                     var token = await GenerateEmailToken(user);
                     SendConfirmationEmail(user.Email, user.Id, token);
                     _logger.LogInformation($"reconfirm new email sent");
                 }
-                return result;
             }
-            return CreateFailureResult();
+            if (userUpdateDto.UserName != null)
+            {
+                user.UserName = userUpdateDto.UserName;
+                user.NormalizedUserName = userUpdateDto.UserName?.ToUpper();
+            }
+            var result = await _userManager.UpdateAsync(user);
+            _context.SaveChanges();            
+            return result;
         }
 
         /// <summary>
@@ -259,18 +258,18 @@ namespace RustyUser.Services
             if (string.IsNullOrEmpty(model.Email) || string.IsNullOrEmpty(model.NewPassword) ||
                 string.IsNullOrEmpty(model.ResetCode))
             {
-                return CreateFailureResult();
+                return CreateFailureResult("EmailRequired");
             }
 
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
             {
-                return CreateFailureResult();
+                return CreateFailureResult("UserNotFound");
             }
 
             var decodedCode = WebUtility.UrlDecode(model.ResetCode);
             var result = await _userManager.ResetPasswordAsync(user, decodedCode, model.NewPassword);
-            return result.Succeeded ? IdentityResult.Success : CreateFailureResult();
+            return result.Succeeded ? IdentityResult.Success : CreateFailureResult("ResetPasswordFailure");
         }
 
         /// <summary>
@@ -283,17 +282,17 @@ namespace RustyUser.Services
             // Check if ID is provided
             if (string.IsNullOrEmpty(id))
             {
-                return CreateFailureResult();
+                return CreateFailureResult("IdRequired");
             }
 
             var user = await _userManager.FindByIdAsync(id);
             if (user == null)
             {
-                return CreateFailureResult();
+                return CreateFailureResult("UserNotFound");
             }
 
             var result = await _userManager.SetTwoFactorEnabledAsync(user, true);
-            return result.Succeeded ? IdentityResult.Success : CreateFailureResult();
+            return result.Succeeded ? IdentityResult.Success : CreateFailureResult("Enable2faFailure");
         }
 
         /// <summary>
@@ -330,17 +329,17 @@ namespace RustyUser.Services
             if (string.IsNullOrWhiteSpace(model.Email) ||
                 string.IsNullOrWhiteSpace(model.OldPassword) || string.IsNullOrWhiteSpace(model.NewPassword))
             {
-                return CreateFailureResult();
+                return CreateFailureResult("EmailRequired");
             }
 
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
             {
-                return CreateFailureResult();
+                return CreateFailureResult("UserNotFound");
             }
 
             var result = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
-            return result.Succeeded ? IdentityResult.Success : CreateFailureResult();
+            return result.Succeeded ? IdentityResult.Success : CreateFailureResult("ChangePasswordFailure");
         }
 
         /// <summary>
@@ -360,23 +359,27 @@ namespace RustyUser.Services
 
             var claims = new List<Claim>
                 {
-                    new Claim(JwtRegisteredClaimNames.Sub, email),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                    new Claim(ClaimTypes.Email, email)
                 };
 
             var token = new JwtSecurityToken(
-                issuer: null,
-                audience: null,
-                claims: new List<Claim>(),
-                expires: DateTime.Now.AddHours(1), //jwt expiration time
+                issuer: _configuration["Jwt:Issuer"],
+                audience: _configuration["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.Now.AddMinutes(int.Parse(_configuration["Jwt:ExpiresInMinutes"])),
                 signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        private IdentityResult CreateFailureResult()
+        private IdentityResult CreateFailureResult(string code)
         {
-            return IdentityResult.Failed(new IdentityError { Description = Constants.Message.InvalidRequest });
+            return IdentityResult.Failed(new IdentityError { Code = code, Description = Constants.Message.InvalidRequest });
+        }
+
+        private AuthResult CreateFailureResult()
+        {
+            return new AuthResult { Succeeded = false, Errors = new List<string> { "Authentication failed" }, Token = null };
         }
 
         private string CreateConfirmEmailBody(string id, string token)
@@ -412,6 +415,6 @@ namespace RustyUser.Services
                 Body = CreateConfirmEmailBody(id, token)
             };
             _emailService.SendEmailAsync(emailRequest);
-        }   
+        }
     }
 }

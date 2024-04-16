@@ -22,7 +22,7 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(builder =>
     {
-        builder.WithOrigins("https://localhost:5173/") // rustTech
+        builder.WithOrigins("https://localhost:5173/") // RustyTech
         .AllowAnyMethod()
         .AllowAnyHeader();
     });

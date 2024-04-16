@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RustyUser.Models.Role;
-using RustyUser.Models.User;
 using RustyUser.Services;
 
 namespace RustyUser.Controllers
