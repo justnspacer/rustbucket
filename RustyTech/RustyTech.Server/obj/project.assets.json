@@ -465,11 +465,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\justn\\code\\rustbucket\\rustTech\\rustTech.Server\\RustyTech.Server.csproj",
+      "projectUniqueName": "C:\\Users\\justn\\code\\rustbucket\\RustyTech\\RustyTech.Server\\RustyTech.Server.csproj",
       "projectName": "RustyTech.Server",
-      "projectPath": "C:\\Users\\justn\\code\\rustbucket\\rustTech\\rustTech.Server\\RustyTech.Server.csproj",
+      "projectPath": "C:\\Users\\justn\\code\\rustbucket\\RustyTech\\RustyTech.Server\\RustyTech.Server.csproj",
       "packagesPath": "C:\\Users\\justn\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\justn\\code\\rustbucket\\rustTech\\rustTech.Server\\obj\\",
+      "outputPath": "C:\\Users\\justn\\code\\rustbucket\\RustyTech\\RustyTech.Server\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

@@ -1,1 +1,2 @@
 C:\Users\justn\code\rustbucket\rustTech\rusttech.client\obj\Debug\rustytech.client.esproj.CoreCompileInputs.cache
+C:\Users\justn\code\rustbucket\RustyTech\rustytech.client\obj\Debug\rustytech.client.esproj.CoreCompileInputs.cache
