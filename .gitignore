@@ -8,3 +8,10 @@ obj/
 
 # Ignore environment files
 *.env
+
+# Ignore node modules in React project
+node_modules/
+
+# Ignore build output for React
+/build/
+/dist/
