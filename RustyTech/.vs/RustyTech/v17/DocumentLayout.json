@@ -35,7 +35,7 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "RustyTech.Server",
+              "Title": "RustyTech.Server.csproj",
               "DocumentMoniker": "C:\\Users\\justn\\code\\rustbucket\\RustyTech\\RustyTech.Server\\RustyTech.Server.csproj",
               "RelativeDocumentMoniker": "RustyTech.Server\\RustyTech.Server.csproj",
               "ToolTip": "C:\\Users\\justn\\code\\rustbucket\\RustyTech\\RustyTech.Server\\RustyTech.Server.csproj",
@@ -55,17 +55,16 @@
               "RelativeToolTip": "RustyTech.Server\\Services\\UserService.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAgAAAAFAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-04-22T04:37:53.058Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-04-22T04:37:53.058Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
               "Title": "vite.config.ts",
-              "DocumentMoniker": "C:\\Users\\justn\\code\\rustbucket\\RustyTech\\rustytech.client\\vite.config.ts",
-              "RelativeDocumentMoniker": "rustytech.client\\vite.config.ts",
-              "ToolTip": "C:\\Users\\justn\\code\\rustbucket\\RustyTech\\rustytech.client\\vite.config.ts",
-              "RelativeToolTip": "rustytech.client\\vite.config.ts",
+              "DocumentMoniker": "C:\\Users\\justn\\code\\rustbucket\\RustyTech\\RustyTech.Client\\vite.config.ts",
+              "RelativeDocumentMoniker": "RustyTech.Client\\vite.config.ts",
+              "ToolTip": "C:\\Users\\justn\\code\\rustbucket\\RustyTech\\RustyTech.Client\\vite.config.ts",
+              "RelativeToolTip": "RustyTech.Client\\vite.config.ts",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAYAAAAaAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
               "WhenOpened": "2024-04-22T04:37:44.287Z"
@@ -86,10 +85,10 @@
               "$type": "Document",
               "DocumentIndex": 3,
               "Title": "index.d.ts",
-              "DocumentMoniker": "C:\\Users\\justn\\code\\rustbucket\\RustyTech\\rustytech.client\\node_modules\\vite\\dist\\node\\index.d.ts",
-              "RelativeDocumentMoniker": "rustytech.client\\node_modules\\vite\\dist\\node\\index.d.ts",
-              "ToolTip": "C:\\Users\\justn\\code\\rustbucket\\RustyTech\\rustytech.client\\node_modules\\vite\\dist\\node\\index.d.ts",
-              "RelativeToolTip": "rustytech.client\\node_modules\\vite\\dist\\node\\index.d.ts",
+              "DocumentMoniker": "C:\\Users\\justn\\code\\rustbucket\\RustyTech\\RustyTech.Client\\node_modules\\vite\\dist\\node\\index.d.ts",
+              "RelativeDocumentMoniker": "RustyTech.Client\\node_modules\\vite\\dist\\node\\index.d.ts",
+              "ToolTip": "C:\\Users\\justn\\code\\rustbucket\\RustyTech\\RustyTech.Client\\node_modules\\vite\\dist\\node\\index.d.ts",
+              "RelativeToolTip": "RustyTech.Client\\node_modules\\vite\\dist\\node\\index.d.ts",
               "ViewState": "AQIAAAsAAAAAAAAAAAAhwBsAAAAZAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
               "WhenOpened": "2024-04-22T04:37:26.612Z"
