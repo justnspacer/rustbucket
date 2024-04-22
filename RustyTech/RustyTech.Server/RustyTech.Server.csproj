@@ -29,4 +29,8 @@
     <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="8.0.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\RustyTech.Client\rustytech.client.esproj" />
+  </ItemGroup>
+
 </Project>
