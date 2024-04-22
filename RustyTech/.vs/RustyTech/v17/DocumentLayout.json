@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "C:\\Users\\justn\\code\\rustbucket\\RustyTech\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{DC44BB42-0C0E-4794-AA2B-5219EF0DF397}|RustyTech.Server\\RustyTech.Server.csproj|c:\\users\\justn\\code\\rustbucket\\rustytech\\rustytech.server\\.gitignore||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{DC44BB42-0C0E-4794-AA2B-5219EF0DF397}|RustyTech.Server\\RustyTech.Server.csproj|solutionrelative:rustytech.server\\.gitignore||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{DC44BB42-0C0E-4794-AA2B-5219EF0DF397}|RustyTech.Server\\RustyTech.Server.csproj|c:\\users\\justn\\code\\rustbucket\\rustytech\\rustytech.server\\rustytech.server.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
       "RelativeMoniker": "D:0:0:{DC44BB42-0C0E-4794-AA2B-5219EF0DF397}|RustyTech.Server\\RustyTech.Server.csproj|solutionrelative:rustytech.server\\rustytech.server.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
     },
@@ -31,6 +35,19 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": ".gitignore",
+              "DocumentMoniker": "C:\\Users\\justn\\code\\rustbucket\\RustyTech\\RustyTech.Server\\.gitignore",
+              "RelativeDocumentMoniker": "RustyTech.Server\\.gitignore",
+              "ToolTip": "C:\\Users\\justn\\code\\rustbucket\\RustyTech\\RustyTech.Server\\.gitignore",
+              "RelativeToolTip": "RustyTech.Server\\.gitignore",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAkAAAAFAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2024-04-22T20:08:48.449Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
               "Title": "RustyTech.Server.csproj",
               "DocumentMoniker": "C:\\Users\\justn\\code\\rustbucket\\RustyTech\\RustyTech.Server\\RustyTech.Server.csproj",
               "RelativeDocumentMoniker": "RustyTech.Server\\RustyTech.Server.csproj",
@@ -43,7 +60,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "UserService.cs",
               "DocumentMoniker": "C:\\Users\\justn\\code\\rustbucket\\RustyTech\\RustyTech.Server\\Services\\UserService.cs",
               "RelativeDocumentMoniker": "RustyTech.Server\\Services\\UserService.cs",
@@ -55,7 +72,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "AuthService.cs",
               "DocumentMoniker": "C:\\Users\\justn\\code\\rustbucket\\RustyTech\\RustyTech.Server\\Services\\AuthService.cs",
               "RelativeDocumentMoniker": "RustyTech.Server\\Services\\AuthService.cs",
@@ -67,7 +84,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "index.d.ts",
               "DocumentMoniker": "C:\\Users\\justn\\code\\rustbucket\\RustyTech\\RustyTech.Client\\node_modules\\vite\\dist\\node\\index.d.ts",
               "RelativeDocumentMoniker": "RustyTech.Client\\node_modules\\vite\\dist\\node\\index.d.ts",

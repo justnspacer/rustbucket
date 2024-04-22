@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("RustyTech.Server")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f171ecc944badf55bb741de5fcca094a98e5a16f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2650f5948648815a3f321a766c747597ac722a76")]
 [assembly: System.Reflection.AssemblyProductAttribute("RustyTech.Server")]
 [assembly: System.Reflection.AssemblyTitleAttribute("RustyTech.Server")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
