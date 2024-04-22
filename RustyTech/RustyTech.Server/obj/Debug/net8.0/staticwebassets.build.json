@@ -1,11 +1,23 @@
 {
   "Version": 1,
-  "Hash": "8R7oHazGgUWq6ZOPxzf11XDZvmq8OMjgXs4Lky0lLSc=",
+  "Hash": "oaxswJLqV4emcegcjBTQS1Kiwfz3C8+VDvO//fckUjk=",
   "Source": "RustyTech.Server",
   "BasePath": "_content/RustyTech.Server",
   "Mode": "Default",
   "ManifestType": "Build",
-  "ReferencedProjectsConfiguration": [],
+  "ReferencedProjectsConfiguration": [
+    {
+      "Identity": "C:\\Users\\justn\\code\\rustbucket\\RustyTech\\rustytech.client\\RustyTech.Client.esproj",
+      "Version": 2,
+      "Source": "RustyTech.Client",
+      "GetPublishAssetsTargets": "GetCurrentProjectPublishStaticWebAssetItems",
+      "AdditionalPublishProperties": "Configuration=Debug;Platform=AnyCPU",
+      "AdditionalPublishPropertiesToRemove": "WebPublishProfileFile;TargetFramework;RuntimeIdentifier;SelfContained",
+      "GetBuildAssetsTargets": "GetCurrentProjectBuildStaticWebAssetItems",
+      "AdditionalBuildProperties": "Configuration=Debug;Platform=AnyCPU",
+      "AdditionalBuildPropertiesToRemove": "WebPublishProfileFile;TargetFramework;RuntimeIdentifier;SelfContained"
+    }
+  ],
   "DiscoveryPatterns": [],
   "Assets": []
 }

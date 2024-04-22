@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace rustTech.Server.Controllers
+namespace RustyTech.Server.Controllers
 {
     [ApiController]
     [Route("[controller]")]

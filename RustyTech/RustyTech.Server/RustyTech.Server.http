@@ -1,6 +1,6 @@
-@rustTech.Server_HostAddress = http://localhost:5008
+@RustyTech.Server_HostAddress = http://localhost:5008
 
-GET {{rustTech.Server_HostAddress}}/weatherforecast/
+GET {{RustyTech.Server_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###

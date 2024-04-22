@@ -1,4 +1,4 @@
-namespace rustTech.Server
+namespace RustyTech.Server
 {
     public class WeatherForecast
     {

@@ -5,7 +5,7 @@ VisualStudioVersion = 17.8.34525.116
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RustyTech.Server", "RustyTech.Server\RustyTech.Server.csproj", "{DC44BB42-0C0E-4794-AA2B-5219EF0DF397}"
 EndProject
-Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "rustytech.client", "rustytech.client\rustytech.client.esproj", "{FF2672FE-ED11-45B1-8F24-1F9A759AAF5B}"
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "RustyTech.Client", "rustytech.client\RustyTech.Client.esproj", "{FF2672FE-ED11-45B1-8F24-1F9A759AAF5B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
