@@ -13,6 +13,7 @@ function App() {
 
     useEffect(() => {
         populateWeatherData();
+        populateapiData();
     }, []);
 
     const contents = forecasts === undefined
@@ -50,6 +51,13 @@ function App() {
         const response = await fetch('weatherforecast');
         const data = await response.json();
         setForecasts(data);
+    }
+
+    async function populateapiData() {
+        await fetch('http://localhost:5000/api/user/get/all')
+            .then(response => response.json())
+            .then(data => console.log(data))
+            .catch(error => console.error('Error:', error));
     }
 }
 

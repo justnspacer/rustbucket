@@ -112,6 +112,7 @@ namespace RustyTech.Server.Services
             }
 
             var login = new UserLoginInfo(loginProvider, providerKey, applicationName);
+            /*
             var identityuserlogin = new IdentityUserLogin<string>
             {
                 UserId = user.Id,
@@ -119,7 +120,8 @@ namespace RustyTech.Server.Services
                 LoginProvider = login.LoginProvider,
                 ProviderKey = login.ProviderKey,
             };
-            _context.UserLogins.Add(identityuserlogin);
+            */
+            //_context.UserLogins.Add(identityuserlogin);
             _context.SaveChanges();
             return IdentityResult.Success;
         }
@@ -229,7 +231,7 @@ namespace RustyTech.Server.Services
             if(userUpdateDto.Email != null)
             {
                 user.Email = userUpdateDto.Email;
-                user.EmailConfirmed = false;
+                user.VerifiedAt = null;
 
                 if (user.Email != null)
                 {
@@ -241,7 +243,6 @@ namespace RustyTech.Server.Services
             if (userUpdateDto.UserName != null)
             {
                 user.UserName = userUpdateDto.UserName;
-                user.NormalizedUserName = userUpdateDto.UserName?.ToUpper();
             }
             var result = await _userManager.UpdateAsync(user);
             _context.SaveChanges();            
@@ -383,12 +384,12 @@ namespace RustyTech.Server.Services
             return new AuthResult { Succeeded = false, Errors = new List<string> { "Authentication failed" }, Token = null };
         }
 
-        private string CreateConfirmEmailBody(string id, string token)
+        private string CreateConfirmEmailBody(Guid id, string token)
         {
             return $"<a href='{_configuration["ConfirmEmailUrl"]}id={id}&token={token}'>Confirm your email</a>";
         }
 
-        private string CreateRestPasswordBody(string id, string token)
+        private string CreateRestPasswordBody(Guid id, string token)
         {
             return $"<a href='{_configuration["ResetPasswordUrl"]}id={id}&token={token}'>Reset your password</a>";
         }
@@ -407,7 +408,7 @@ namespace RustyTech.Server.Services
             return encodedToken;
         }
 
-        private void SendConfirmationEmail(string email, string id, string token)
+        private void SendConfirmationEmail(string email, Guid id, string token)
         {
             var emailRequest = new EmailRequest
             {

@@ -1,18 +1,33 @@
+global using Microsoft.EntityFrameworkCore;
+global using RustyTech.Server.Models.User;
+global using RustyTech.Server.Data;
+
 using AspNetCoreRateLimit;
 using Microsoft.AspNetCore.Identity;
 using NLog.Extensions.Logging;
-using RustyTech.Server.Data;
-using RustyTech.Server.Models.User;
 using RustyTech.Server.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 builder.Services.AddMemoryCache();
 builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimiting"));
 builder.Services.Configure<IpRateLimitPolicies>(builder.Configuration.GetSection("IpRateLimitPolicies"));
 builder.Services.AddInMemoryRateLimiting();
+
+// Add CORS policy
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("MyCorsPolicy", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000")  // React's URL
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
 
 builder.Services.AddControllers();
 
@@ -20,14 +35,8 @@ builder.Services.AddAuthorization();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddRouting(options => options.LowercaseUrls = true);
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<DataContext>();
-builder.Services.AddIdentityCore<User>(options => options.SignIn.RequireConfirmedEmail = true)
-    .AddRoles<IdentityRole>().AddEntityFrameworkStores<DataContext>().AddApiEndpoints();
-
-builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
 builder.Services.AddScoped<AuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
@@ -37,7 +46,7 @@ builder.Logging.AddNLog();
 
 var app = builder.Build();
 
-app.UseCors();
+app.UseCors("MyCorsPolicy");
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
@@ -88,7 +97,7 @@ using (var scope = app.Services.CreateScope())
         var user = new User();
         user.UserName = email;
         user.Email = email;
-        user.EmailConfirmed = true;
+        user.VerifiedAt = DateTime.UtcNow;
         await userManger.CreateAsync(user, password);
         await userManger.AddToRoleAsync(user, "Admin");
     }
