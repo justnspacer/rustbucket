@@ -38,16 +38,16 @@ namespace RustyTech.Server.Services
             _httpContextAccessor = httpContextAccessor;
         }
 
-        /// <summary>
-        /// Registers a new user.
-        /// </summary>
-        /// <param name="model">The user registration model.</param>
-        /// <returns>The result of the registration operation.</returns>
-        public async Task<IdentityResult> RegisterAsync([FromBody] UserRegister model)
+        public async Task<(bool IsSuccess, string Message, User? User)> RegisterAsync([FromBody] UserRegister model)
         {
             if (string.IsNullOrWhiteSpace(model.Email) || string.IsNullOrWhiteSpace(model.Password))
             {
-                return CreateFailureResult("EmailRequired");
+                return (false, "Email/Password required.", null);
+            }
+            var existingUser = await _userManager.FindByEmailAsync(model.Email);
+            if (existingUser != null)
+            {
+                return (false, "User already exists.", null);
             }
 
             var user = new User
@@ -56,60 +56,46 @@ namespace RustyTech.Server.Services
                 Email = model.Email
             };
 
-            var result = await _userManager.CreateAsync(user, model.Password);
+            //user.PasswordHash = _userManager.PasswordHasher.HashPassword(user, user.PasswordHash);
+
+            var result = await _userManager.CreateAsync(user);
+            if (!result.Succeeded)
+            {
+                return (false, string.Join(", ", result.Errors.Select(e => e.Description)), null);
+            }
 
             var token = await GenerateEmailToken(user);
             SendConfirmationEmail(user.Email, user.Id, token);
             _logger.LogInformation($"register email sent");
 
-            return result.Succeeded ? 
-                IdentityResult.Success : 
-                IdentityResult.Failed(result.Errors.Select(x => new IdentityError { Code = x.Code, Description = x.Description }).ToArray());
+            return (true, "User registered successfully.", user);
         }
 
-        /// <summary>
-        /// Logs in a user.
-        /// </summary>
-        /// <param name="model">The user login model.</param>
-        /// <returns>The result of the login operation.</returns>
-        public async Task<AuthResult> LoginAsync([FromBody] UserLogin model)
+        public async Task<(bool IsAuthenticated, User? User, string? token, string Message)> LoginAsync([FromBody] UserLogin model)
         {
             if (string.IsNullOrWhiteSpace(model.Email) || string.IsNullOrWhiteSpace(model.Password) || string.IsNullOrWhiteSpace(model.ApplicationName))
             {
                 _logger.LogInformation($"login failed for {model.Email}");
-                return CreateFailureResult();
+                return (false, null, null, "Invalid credentials.");
             }
 
-            var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
-            if (result.Succeeded)
+            var user = await _userManager.FindByEmailAsync(model.Email);
+
+            if (user == null || !await _userManager.CheckPasswordAsync(user, model.Password))
             {
-                await AddLoginRecordAsync(model.Email, model.ApplicationName, model.LoginProvider, model.ProviderKey);
-                var token = GenerateJwtToken(model.Email);
-                return new AuthResult { Succeeded = true, Token = token, Errors = null };
+                return (false, null, null, "Invalid credentials.");
             }
-            return CreateFailureResult();
+
+            AddLoginRecordAsync(model.Email, model.ApplicationName, model.LoginProvider, model.ProviderKey);
+            var token = GenerateJwtToken(model.Email);
+
+            return (true, user, token, "Login successful.");
         }
 
-        /// <summary>
-        /// Adds a login record for a user.
-        /// </summary>
-        /// <param name="email">The user's email.</param>
-        /// <param name="applicationName">The name of the application.</param>
-        /// <param name="loginProvider">Login provider of login attempt.</param>
-        /// <param name="providerKey">Provider key for user.</param>
-        /// <returns>The result of the add login record operation.</returns>
-        public async Task<IdentityResult> AddLoginRecordAsync(string email, string? applicationName, string loginProvider, string providerKey)
+        public async void AddLoginRecordAsync(string email, string? applicationName, string loginProvider, string providerKey)
         {
-            if (string.IsNullOrEmpty(email))
-            {
-                return CreateFailureResult("EmailRequired");
-            }
-
             var user = await _userManager.FindByEmailAsync(email);
-            if (user == null)
-            {
-                return CreateFailureResult("UserNotFound");
-            }
+
 
             var login = new UserLoginInfo(loginProvider, providerKey, applicationName);
             /*
@@ -123,7 +109,6 @@ namespace RustyTech.Server.Services
             */
             //_context.UserLogins.Add(identityuserlogin);
             _context.SaveChanges();
-            return IdentityResult.Success;
         }
 
         /// <summary>
