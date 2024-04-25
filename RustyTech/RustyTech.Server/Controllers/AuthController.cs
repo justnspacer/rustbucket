@@ -19,7 +19,7 @@ namespace RustyTech.Server.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> RegisterAsync([FromBody] UserRegister model)
+        public async Task<IActionResult> RegisterAsync(UserRegister model)
         {
             var result = await _authService.RegisterAsync(model);
             return Ok(result);
@@ -32,10 +32,10 @@ namespace RustyTech.Server.Controllers
             return Ok(result);
         }
 
-        [HttpPost("confirmEmail")]
-        public async Task<IActionResult> ConfirmEmailAsync(ConfirmEmailRequest model)
+        [HttpPost("verifyEmail")]
+        public async Task<IActionResult> VerifyEmail(ConfirmEmailRequest model)
         {
-            var result = await _authService.ConfirmEmailAsync(model);
+            var result = await _authService.VerifyEmail(model);
             return Ok(result);
         }
 
@@ -70,15 +70,15 @@ namespace RustyTech.Server.Controllers
 
         //[Authorize]
         [HttpPost("manage/2fa")]
-        public async Task<IActionResult> Enable2faAsync(string userId)
+        public async Task<IActionResult> Enable2faAsync(Guid userId)
         {
-            var result = await _authService.Enable2faAsync(userId);
+            var result = await _authService.EnableTwoFactorAuthenticationAsync(userId);
             return Ok(result);
         }
 
         //[Authorize]
         [HttpGet("manage/info")]
-        public async Task<IActionResult> GetInfoAsync(string userId)
+        public async Task<IActionResult> GetInfoAsync(Guid userId)
         {
             var result = await _authService.GetInfoAsync(userId);
             return Ok(result);

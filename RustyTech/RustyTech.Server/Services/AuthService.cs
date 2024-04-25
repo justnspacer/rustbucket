@@ -9,12 +9,10 @@ using System.Text;
 using RustyTech.Server.Models.Auth;
 using RustyTech.Server.Models.User;
 using RustyTech.Server.Data;
+using System.Security.Cryptography;
 
 namespace RustyTech.Server.Services
 {
-    /// <summary>
-    /// Service class for handling authentication and authorization operations.
-    /// </summary>
     public class AuthService
     {
         private readonly UserManager<User> _userManager;
@@ -23,11 +21,10 @@ namespace RustyTech.Server.Services
         private readonly IConfiguration _configuration;
         private readonly ILogger<UserService> _logger;
         private readonly DataContext _context;
-        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public AuthService(UserManager<User> user, IEmailService emailService,
             SignInManager<User> signInManager, IConfiguration configuration,
-            ILogger<UserService> logger, DataContext context, IHttpContextAccessor httpContextAccessor)
+            ILogger<UserService> logger, DataContext context)
         {
             _userManager = user;
             _emailService = emailService;
@@ -35,126 +32,136 @@ namespace RustyTech.Server.Services
             _configuration = configuration;
             _logger = logger;
             _context = context;
-            _httpContextAccessor = httpContextAccessor;
         }
+        //updated
 
-        public async Task<(bool IsSuccess, string Message, User? User)> RegisterAsync([FromBody] UserRegister model)
+        public async Task<(bool IsSuccess, string Message, User? User)> RegisterAsync(UserRegister request)
         {
-            if (string.IsNullOrWhiteSpace(model.Email) || string.IsNullOrWhiteSpace(model.Password))
-            {
-                return (false, "Email/Password required.", null);
-            }
-            var existingUser = await _userManager.FindByEmailAsync(model.Email);
-            if (existingUser != null)
+            if (_context.Users.Any(user => user.Email == request.Email))
             {
                 return (false, "User already exists.", null);
             }
 
+            CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
+
             var user = new User
             {
-                UserName = model.Email,
-                Email = model.Email
+                UserName = request.Email,
+                Email = request.Email,
+                PasswordHash = passwordHash,
+                PasswordSalt = passwordSalt,
+                VerificationToken = CreateRandomToken()
             };
 
-            //user.PasswordHash = _userManager.PasswordHasher.HashPassword(user, user.PasswordHash);
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
 
-            var result = await _userManager.CreateAsync(user);
-            if (!result.Succeeded)
-            {
-                return (false, string.Join(", ", result.Errors.Select(e => e.Description)), null);
-            }
 
-            var token = await GenerateEmailToken(user);
-            SendConfirmationEmail(user.Email, user.Id, token);
+            var emailToken = await GenerateEmailToken(user);
+            SendConfirmationEmail(user.Email, user.Id, emailToken);
             _logger.LogInformation($"register email sent");
 
             return (true, "User registered successfully.", user);
         }
+        //updated
 
-        public async Task<(bool IsAuthenticated, User? User, string? token, string Message)> LoginAsync([FromBody] UserLogin model)
+        private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
-            if (string.IsNullOrWhiteSpace(model.Email) || string.IsNullOrWhiteSpace(model.Password) || string.IsNullOrWhiteSpace(model.ApplicationName))
+            using (var hmac = new HMACSHA512())
             {
-                _logger.LogInformation($"login failed for {model.Email}");
-                return (false, null, null, "Invalid credentials.");
+                passwordSalt = hmac.Key;
+                passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
             }
-
-            var user = await _userManager.FindByEmailAsync(model.Email);
-
-            if (user == null || !await _userManager.CheckPasswordAsync(user, model.Password))
-            {
-                return (false, null, null, "Invalid credentials.");
-            }
-
-            AddLoginRecordAsync(model.Email, model.ApplicationName, model.LoginProvider, model.ProviderKey);
-            var token = GenerateJwtToken(model.Email);
-
-            return (true, user, token, "Login successful.");
         }
+        //updated
 
-        public async void AddLoginRecordAsync(string email, string? applicationName, string loginProvider, string providerKey)
+        private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
         {
-            var user = await _userManager.FindByEmailAsync(email);
-
-
-            var login = new UserLoginInfo(loginProvider, providerKey, applicationName);
-            /*
-            var identityuserlogin = new IdentityUserLogin<string>
+            using (var hmac = new HMACSHA512(passwordSalt))
             {
-                UserId = user.Id,
-                ProviderDisplayName = login.ProviderDisplayName,
-                LoginProvider = login.LoginProvider,
-                ProviderKey = login.ProviderKey,
+                var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
+                return computedHash.SequenceEqual(passwordHash);
+            }
+        }
+        //updated
+
+        private string CreateRandomToken()
+        {
+            return Convert.ToHexString(RandomNumberGenerator.GetBytes(64));
+        }
+        //updated
+
+        public async Task<(bool IsAuthenticated, User? User, string? token, string Message)> LoginAsync(UserLogin request)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(user => user.Email == request.Email);
+            if (user == null || !await _userManager.CheckPasswordAsync(user, request.Password))
+            {
+                return (false, null, null, "Invalid credentials");
+            }
+
+            if (user.VerifiedAt == null)
+            {
+                return (false, null, null, "Not verified");
+            }
+
+            if (!VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt))
+            {
+                return (false, null, null, "Invalid credentials");
+            }
+            await AddLoginRecordAsync(user.Id, "RustyTech", "Email", string.Empty);
+            var token = GenerateJwtToken(request.Email);
+            return (true, user, token, "Login successful");
+        }
+        //updated
+
+        public async Task AddLoginRecordAsync(Guid userId, string? applicationName, string loginProvider, string providerKey)
+        {
+            var loginInfo = new LoginInfo
+            {
+                UserId = userId,
+                LoginProvider = loginProvider,
+                ProviderKey = providerKey,
+                ApplicationName = applicationName,
+                LoginTime = DateTime.UtcNow,
             };
-            */
-            //_context.UserLogins.Add(identityuserlogin);
-            _context.SaveChanges();
+
+            _context.Logins.Add(loginInfo);
+            await _context.SaveChangesAsync();
         }
+        //updated
 
-        /// <summary>
-        /// Confirms a user's email.
-        /// </summary>
-        /// <param name="model">The confirm email request model.</param>
-        /// <returns>The result of the confirm email operation.</returns>
-        public async Task<IdentityResult> ConfirmEmailAsync(ConfirmEmailRequest model)
+        public async Task<string> VerifyEmail(ConfirmEmailRequest request)
         {
-            if (string.IsNullOrWhiteSpace(model.Id) || string.IsNullOrWhiteSpace(model.Token))
-            {
-                return CreateFailureResult("IdOrTokenRequired");
-            }
-
-            var decodedToken = WebUtility.UrlDecode(model.Token);
-            if (decodedToken == null)
-            {
-                return CreateFailureResult("TokenFailure");
-            }
-
-            var user = await _userManager.FindByIdAsync(model.Id);
+            var user = await _context.Users.FirstOrDefaultAsync(user => user.VerificationToken == request.Token);
             if (user == null)
             {
-                return CreateFailureResult("UserNotFound");
+                return "Invalid token";
+            }
+            //address
+            var decodedToken = WebUtility.UrlDecode(request.Token);
+            if (decodedToken == null)
+            {
+                return "TokenFailure";
             }
 
-            var result = await _userManager.ConfirmEmailAsync(user, decodedToken);
-            return result.Succeeded ? IdentityResult.Success : CreateFailureResult("ConfirmEmailFailure");
-        }
+            user.VerifiedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
 
-        /// <summary>
-        /// Resends the confirmation email for a user.
-        /// </summary>
-        /// <param name="email">The user's email.</param>
-        /// <returns>The result of the resend email operation.</returns>
-        public async Task<IdentityResult> ResendEmailAsync(string email)
+            return $"User verified at: {user.VerifiedAt}";
+        }
+        //updated
+
+        public async Task<string> ResendEmailAsync(string email)
         {
             if (string.IsNullOrEmpty(email))
             {
-                return CreateFailureResult("EmailRequired");
+                return "Email is required";
             }
 
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
             {
-                return CreateFailureResult("UserNotFound");
+                return "User not found";
             }
 
             if (user.Email != null)
@@ -163,55 +170,45 @@ namespace RustyTech.Server.Services
                 SendConfirmationEmail(user.Email, user.Id, token);
                 _logger.LogInformation($"resent confirmation email");
             }
-            return IdentityResult.Success;
+            return "Resent confirmation email with new token";
         }
+        //updated
 
-        /// <summary>
-        /// Sends a password reset email to a user.
-        /// </summary>
-        /// <param name="email">The user's email.</param>
-        /// <returns>The result of the forgot password operation.</returns>
-        public async Task<IdentityResult> ForgotPasswordAsync(string email)
+        public async Task<string> ForgotPasswordAsync(string email)
         {
-            if (string.IsNullOrEmpty(email))
-            {
-                return CreateFailureResult("EmailRequired");
-            }
-
-            var user = await _userManager.FindByEmailAsync(email);
+            var user = await _context.Users.FirstOrDefaultAsync(user => user.Email == email);
             if (user == null)
             {
-                return CreateFailureResult("UserNotFound");
+                return "User not found";
             }
 
-            var token = await GeneratePasswordToken(user);
+            user.PasswordResetToken = await GeneratePasswordToken(user);
+            user.ResetTokenExpires = DateTime.UtcNow.AddDays(1);
+            await _context.SaveChangesAsync();
+
             var emailRequest = new EmailRequest
             {
                 To = user.Email,
                 Subject = "Reset Password",
-                Body = CreateRestPasswordBody(user.Id, token)
+                Body = CreateResetPasswordBody(user.Id, user.PasswordResetToken)
             };
+
             await _emailService.SendEmailAsync(emailRequest);
             _logger.LogInformation($"forgot password email sent");
-            return IdentityResult.Success;
+            return "You may reset your password";
         }
+        //updated
 
-        /// <summary>
-        /// Updates a user asynchronously.
-        /// </summary>
-        /// <param name="id">UserId.</param>
-        /// <param name="userUpdateDto">User update object</param>
-        /// <returns>An IdentityResult indicating the success or failure of the update operation.</returns>
-        public async Task<IdentityResult> UpdateUserAsync(string id, UserUpdate userUpdateDto)
+        public async Task<string> UpdateUserAsync(string id, UserUpdate userUpdateDto)
         {
             if (string.IsNullOrEmpty(id))
             {
-                return CreateFailureResult("IdRequired");
+                return "Id is required";
             }
             var user = await _userManager.FindByIdAsync(id);
             if (user == null)
             {
-                return CreateFailureResult("UserNotFound");
+                return "User not found";
             }
             if(userUpdateDto.Email != null)
             {
@@ -231,114 +228,87 @@ namespace RustyTech.Server.Services
             }
             var result = await _userManager.UpdateAsync(user);
             _context.SaveChanges();            
-            return result;
+            return $"User {user.Email} updated";
         }
-
-        /// <summary>
-        /// Resets a user's password.
-        /// </summary>
-        /// <param name="model">The reset password request model.</param>
-        /// <returns>The result of the reset password operation.</returns>
-        public async Task<IdentityResult> ResetPasswordAsync([FromBody] ResetPasswordRequest model)
+        //updated
+        public async Task<string> ResetPasswordAsync(ResetPasswordRequest request)
         {
             // Check if email, new password, and reset code are provided
-            if (string.IsNullOrEmpty(model.Email) || string.IsNullOrEmpty(model.NewPassword) ||
-                string.IsNullOrEmpty(model.ResetCode))
+            if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.NewPassword) ||
+                string.IsNullOrEmpty(request.ResetCode))
             {
-                return CreateFailureResult("EmailRequired");
+                return "Email is required";
             }
 
-            var user = await _userManager.FindByEmailAsync(model.Email);
+            var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
             {
-                return CreateFailureResult("UserNotFound");
+                return "user not found";
             }
 
-            var decodedCode = WebUtility.UrlDecode(model.ResetCode);
-            var result = await _userManager.ResetPasswordAsync(user, decodedCode, model.NewPassword);
-            return result.Succeeded ? IdentityResult.Success : CreateFailureResult("ResetPasswordFailure");
+            var decodedCode = WebUtility.UrlDecode(request.ResetCode);
+            var result = await _userManager.ResetPasswordAsync(user, decodedCode, request.NewPassword);
+            return result.Succeeded ? "password reset" : "password reset failed";
         }
 
-        /// <summary>
-        /// Enables two-factor authentication for a user.
-        /// </summary>
-        /// <param name="id">The user's ID.</param>
-        /// <returns>The result of the enable 2FA operation.</returns>
-        public async Task<IdentityResult> Enable2faAsync(string id)
+        public async Task<bool> EnableTwoFactorAuthenticationAsync(Guid id)
         {
-            // Check if ID is provided
-            if (string.IsNullOrEmpty(id))
-            {
-                return CreateFailureResult("IdRequired");
-            }
+            var user = await _context.Users.FirstOrDefaultAsync(user => user.Id == id);
 
-            var user = await _userManager.FindByIdAsync(id);
-            if (user == null)
-            {
-                return CreateFailureResult("UserNotFound");
-            }
-
-            var result = await _userManager.SetTwoFactorEnabledAsync(user, true);
-            return result.Succeeded ? IdentityResult.Success : CreateFailureResult("Enable2faFailure");
-        }
-
-        /// <summary>
-        /// Gets the two-factor authentication status for a user.
-        /// </summary>
-        /// <param name="id">The user's ID.</param>
-        /// <returns>True if two-factor authentication is enabled, otherwise false.</returns>
-        public async Task<bool> GetInfoAsync(string id)
-        {
-            // Check if ID is provided
-            if (string.IsNullOrEmpty(id))
-            {
-                return false;
-            }
-
-            var user = await _userManager.FindByIdAsync(id);
             if (user == null)
             {
                 return false;
             }
 
-            var result = await _userManager.GetTwoFactorEnabledAsync(user);
-            return result;
+            user.TwoFactorEnabled = true;
+            await _context.SaveChangesAsync();
+
+            return true;
         }
 
-        /// <summary>
-        /// Changes a user's password.
-        /// </summary>
-        /// <param name="model">The change password request model.</param>
-        /// <returns>The result of the change password operation.</returns>
-        public async Task<IdentityResult> ChangePasswordAsync([FromBody] ChangePasswordRequest model)
+        //updated
+        public async Task<bool> GetInfoAsync(Guid id)
         {
-            // Check if email, old password, and new password are provided
-            if (string.IsNullOrWhiteSpace(model.Email) ||
-                string.IsNullOrWhiteSpace(model.OldPassword) || string.IsNullOrWhiteSpace(model.NewPassword))
+
+            if (id == Guid.Empty)
             {
-                return CreateFailureResult("EmailRequired");
+                return false;
             }
 
-            var user = await _userManager.FindByEmailAsync(model.Email);
+            var user = await _context.Users.FirstOrDefaultAsync(user => user.Id == id);
             if (user == null)
             {
-                return CreateFailureResult("UserNotFound");
+                return false;
+            }
+            return user.TwoFactorEnabled;
+        }
+        //updated
+        public async Task<string> ChangePasswordAsync(ChangePasswordRequest request)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(user => user.PasswordResetToken == request.Token);
+            if (user == null || user.ResetTokenExpires < DateTime.UtcNow)
+            {
+                return "Invalid token";
             }
 
-            var result = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
-            return result.Succeeded ? IdentityResult.Success : CreateFailureResult("ChangePasswordFailure");
+            CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
+            user.PasswordHash = passwordHash;
+            user.PasswordSalt = passwordSalt;
+            user.PasswordResetToken = null;
+            user.ResetTokenExpires = null;
+
+            await _context.SaveChangesAsync();
+
+            return "Password changed";
         }
 
-        /// <summary>
-        /// Logs out the current user.
-        /// </summary>
-        /// <returns>The result of the logout operation.</returns>
-        public async Task<IdentityResult> LogoutAsync()
+        //updated
+        public async Task<(bool IsAuthenticated, User? User, string? token, string Message)> LogoutAsync()
         {
-            await _signInManager.SignOutAsync().ConfigureAwait(false);
-            return IdentityResult.Success;
+            return (false, null, null, "User should be logged out");
         }
 
+        //updated
         private string GenerateJwtToken(string email)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
@@ -346,7 +316,8 @@ namespace RustyTech.Server.Services
 
             var claims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.Email, email)
+                    new Claim(ClaimTypes.Email, email),
+                    new Claim(ClaimTypes.Role, "User"),
                 };
 
             var token = new JwtSecurityToken(
@@ -359,22 +330,12 @@ namespace RustyTech.Server.Services
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        private IdentityResult CreateFailureResult(string code)
-        {
-            return IdentityResult.Failed(new IdentityError { Code = code, Description = Constants.Message.InvalidRequest });
-        }
-
-        private AuthResult CreateFailureResult()
-        {
-            return new AuthResult { Succeeded = false, Errors = new List<string> { "Authentication failed" }, Token = null };
-        }
-
         private string CreateConfirmEmailBody(Guid id, string token)
         {
             return $"<a href='{_configuration["ConfirmEmailUrl"]}id={id}&token={token}'>Confirm your email</a>";
         }
 
-        private string CreateRestPasswordBody(Guid id, string token)
+        private string CreateResetPasswordBody(Guid id, string token)
         {
             return $"<a href='{_configuration["ResetPasswordUrl"]}id={id}&token={token}'>Reset your password</a>";
         }
