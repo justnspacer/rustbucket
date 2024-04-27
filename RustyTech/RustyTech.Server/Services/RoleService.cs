@@ -1,17 +1,14 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using RustyTech.Server.Models.Role;
-using System.Linq;
 
 namespace RustyTech.Server.Services
 {
     public class RoleService
     {
-        private readonly IUserService _userService;
         private readonly DataContext _context;
 
-        public RoleService(IUserService userService, DataContext context)
+        public RoleService(DataContext context)
         {
-            _userService = userService;
             _context = context;
         }
 
@@ -36,51 +33,68 @@ namespace RustyTech.Server.Services
             return roleDto;
         }
 
-        public async Task<List<RoleDto>?> GetUserRoles(Guid id)
+        public async Task<List<UserRole>?> GetUserRoles(Guid id)
         {
             if (id == Guid.Empty)
             {
                 return null;
             }
-            var roles = await _context.Roles
-                .Select(role => new RoleDto { Id = role.Id, RoleName = role.Name })
-                .Where(role => role.Id == id.ToString()).ToListAsync();
-            if (roles == null)
+
+            var userRoles = await _context.UserRoles
+                .Where(role => role.UserId == id).ToListAsync();
+
+            if (userRoles == null)
             {
                 return null;
             }
-            return roles;
+
+            return userRoles;
         }
 
-        public async Task<string> AddRoleToUserAsync(AddRoleRequest request)
+        public async Task<string> AddRoleToUserAsync(RoleRequest request)
         {
-            if (string.IsNullOrWhiteSpace(request.Id) || 
-                string.IsNullOrWhiteSpace(request.RoleName) || 
-                request.UserId == Guid.Empty)
+            if (string.IsNullOrWhiteSpace(request.RoleId) || request.UserId == Guid.Empty)
             {
                 return "Bad request";
             }
+
             var user = await _context.Users.FirstOrDefaultAsync(user => user.Id == request.UserId);
             if (user == null)
             {
                 return "User not found";
             }
-            var role = await _context.Roles.FirstOrDefaultAsync(role => role.Id == request.Id);
+
+            var role = await _context.Roles.FirstOrDefaultAsync(role => role.Id == request.RoleId);
+
             if (role == null)
             {
-                //create the role if it doesn't exist, send error message
-                var newRole = new IdentityRole { Name = request.RoleName };
-                _context.Roles.Add(newRole);
-                await _context.SaveChangesAsync();
                 return "Role does not exist";
             }
-            var result = await _userManager.AddToRoleAsync(user, request.RoleName);
+
+            var userRole = new UserRole { RoleId = role.Id, UserId = user.Id, CreatedAt = DateTime.UtcNow };
+            _context.UserRoles.Add(userRole);
+            await _context.SaveChangesAsync();
+
             return "Role added to user";
         }
 
-        private IdentityResult CreateFailureResult()
+        public async Task<string> RemoveRoleFromUserAsync(RoleRequest request)
         {
-            return IdentityResult.Failed(new IdentityError { Description = Constants.Message.InvalidRequest });
+            if (string.IsNullOrWhiteSpace(request.RoleId) || request.UserId == Guid.Empty)
+            {
+                return "Bad request";
+            }
+
+            var userRole = _context.UserRoles.FirstOrDefault(ur => ur.UserId == request.UserId && ur.RoleId == request.RoleId);
+            if (userRole == null)
+            {
+                return "User role not found";
+            }
+
+            _context.UserRoles.Remove(userRole);
+            await _context.SaveChangesAsync();
+
+            return "Role added to user";
         }
     }
 }

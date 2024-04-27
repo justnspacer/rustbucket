@@ -10,14 +10,12 @@ namespace RustyTech.Server.Controllers
     public class RoleController : ControllerBase
     {
         private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly UserManager<User> _userManager;
-        private readonly DataContext _context;
+        private readonly RoleService _roleService;
 
-        public RoleController(RoleManager<IdentityRole> roleManager, UserManager<User> userManager, DataContext context)
+        public RoleController(RoleManager<IdentityRole> roleManager, RoleService roleService)
         {
             _roleManager = roleManager;
-            _userManager = userManager;
-            _context = context;
+            _roleService = roleService;
         }
 
         [HttpPost("create")]
@@ -34,27 +32,11 @@ namespace RustyTech.Server.Controllers
             return Ok(result);
         }
 
-        [HttpPost("get/{roleId}/{userid}")]
-        public async Task<IActionResult> AddRoleToUserAsync(string roleId, string roleName, Guid userId)
+        [HttpPost("add/{request}")]
+        public async Task<IActionResult> AddRoleToUserAsync(RoleRequest request)
         {
-            if (string.IsNullOrWhiteSpace(roleId) || string.IsNullOrWhiteSpace(roleName))
-            {
-                return BadRequest("Id/Name required");
-            }
-            var user = await _context.Users.FirstOrDefaultAsync(user => user.Id == userId);
-            if (user == null)
-            {
-                return BadRequest("User not found");
-            }
-            var roleExists = await _roleManager.RoleExistsAsync(roleName);
-            if (!roleExists)
-            {
-                //create the role if it doesn't exist, send error message
-                await _roleManager.CreateAsync(new IdentityRole(roleName));
-                return Ok("Role not created");
-            }
-            var result = await _userManager.AddToRoleAsync(user, model.RoleName);
-            return result.Succeeded ? IdentityResult.Success : CreateFailureResult();
+            var result = await _roleService.AddRoleToUserAsync(new RoleRequest { RoleId = request.RoleId, UserId = request.UserId });
+            return Ok(result);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using RustyTech.Server.Models.Auth;
+using RustyTech.Server.Models.Role;
 
 namespace RustyTech.Server.Data
 {
@@ -16,6 +17,6 @@ namespace RustyTech.Server.Data
         public DbSet<User> Users => Set<User>();
         public DbSet<LoginInfo> Logins => Set<LoginInfo>();
         public DbSet<IdentityRole> Roles => Set<IdentityRole>();
-        //public DbSet<IdentityUserRole> UserRoles => Set<IdentityUserRole>();
+        public DbSet<UserRole> UserRoles => Set<UserRole>();
     }
 }

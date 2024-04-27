@@ -12,8 +12,8 @@ using RustyTech.Server.Data;
 namespace RustyTech.Server.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240423050359_initial")]
-    partial class initial
+    [Migration("20240423050359_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

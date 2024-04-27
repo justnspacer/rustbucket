@@ -1,14 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Security.Claims;
 using System.Text;
 using RustyTech.Server.Models.Auth;
-using RustyTech.Server.Models.User;
-using RustyTech.Server.Data;
 using System.Security.Cryptography;
 
 namespace RustyTech.Server.Services
@@ -17,23 +14,19 @@ namespace RustyTech.Server.Services
     {
         private readonly UserManager<User> _userManager;
         private readonly IEmailService _emailService;
-        private readonly SignInManager<User> _signInManager;
         private readonly IConfiguration _configuration;
         private readonly ILogger<UserService> _logger;
         private readonly DataContext _context;
 
-        public AuthService(UserManager<User> user, IEmailService emailService,
-            SignInManager<User> signInManager, IConfiguration configuration,
+        public AuthService(UserManager<User> user, IEmailService emailService, IConfiguration configuration,
             ILogger<UserService> logger, DataContext context)
         {
             _userManager = user;
             _emailService = emailService;
-            _signInManager = signInManager;
             _configuration = configuration;
             _logger = logger;
             _context = context;
         }
-        //updated
 
         public async Task<(bool IsSuccess, string Message, User? User)> RegisterAsync(UserRegister request)
         {
@@ -50,7 +43,8 @@ namespace RustyTech.Server.Services
                 Email = request.Email,
                 PasswordHash = passwordHash,
                 PasswordSalt = passwordSalt,
-                VerificationToken = CreateRandomToken()
+                VerificationToken = CreateRandomToken(),
+                BirthYear = request.BirthYear,
             };
 
             _context.Users.Add(user);
@@ -63,7 +57,6 @@ namespace RustyTech.Server.Services
 
             return (true, "User registered successfully.", user);
         }
-        //updated
 
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
@@ -73,7 +66,6 @@ namespace RustyTech.Server.Services
                 passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
             }
         }
-        //updated
 
         private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
         {
@@ -83,13 +75,11 @@ namespace RustyTech.Server.Services
                 return computedHash.SequenceEqual(passwordHash);
             }
         }
-        //updated
 
         private string CreateRandomToken()
         {
             return Convert.ToHexString(RandomNumberGenerator.GetBytes(64));
         }
-        //updated
 
         public async Task<(bool IsAuthenticated, User? User, string? token, string Message)> LoginAsync(UserLogin request)
         {
@@ -112,7 +102,6 @@ namespace RustyTech.Server.Services
             var token = GenerateJwtToken(request.Email);
             return (true, user, token, "Login successful");
         }
-        //updated
 
         public async Task AddLoginRecordAsync(Guid userId, string? applicationName, string loginProvider, string providerKey)
         {
@@ -128,7 +117,6 @@ namespace RustyTech.Server.Services
             _context.Logins.Add(loginInfo);
             await _context.SaveChangesAsync();
         }
-        //updated
 
         public async Task<string> VerifyEmail(ConfirmEmailRequest request)
         {
@@ -149,7 +137,6 @@ namespace RustyTech.Server.Services
 
             return $"User verified at: {user.VerifiedAt}";
         }
-        //updated
 
         public async Task<string> ResendEmailAsync(string email)
         {
@@ -172,7 +159,6 @@ namespace RustyTech.Server.Services
             }
             return "Resent confirmation email with new token";
         }
-        //updated
 
         public async Task<string> ForgotPasswordAsync(string email)
         {
@@ -197,7 +183,6 @@ namespace RustyTech.Server.Services
             _logger.LogInformation($"forgot password email sent");
             return "You may reset your password";
         }
-        //updated
 
         public async Task<string> UpdateUserAsync(string id, UserUpdate userUpdateDto)
         {
@@ -230,7 +215,7 @@ namespace RustyTech.Server.Services
             _context.SaveChanges();            
             return $"User {user.Email} updated";
         }
-        //updated
+
         public async Task<string> ResetPasswordAsync(ResetPasswordRequest request)
         {
             // Check if email, new password, and reset code are provided
@@ -266,7 +251,6 @@ namespace RustyTech.Server.Services
             return true;
         }
 
-        //updated
         public async Task<bool> GetInfoAsync(Guid id)
         {
 
@@ -282,7 +266,7 @@ namespace RustyTech.Server.Services
             }
             return user.TwoFactorEnabled;
         }
-        //updated
+
         public async Task<string> ChangePasswordAsync(ChangePasswordRequest request)
         {
             var user = await _context.Users.FirstOrDefaultAsync(user => user.PasswordResetToken == request.Token);
@@ -302,8 +286,7 @@ namespace RustyTech.Server.Services
             return "Password changed";
         }
 
-        //updated
-        public async Task<(bool IsAuthenticated, User? User, string? token, string Message)> LogoutAsync()
+        public (bool IsAuthenticated, User? User, string? token, string Message) LogoutAsync()
         {
             return (false, null, null, "User should be logged out");
         }

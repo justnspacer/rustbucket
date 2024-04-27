@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using RustyTech.Server.Models.Role;
 using RustyTech.Server.Services;
 
 namespace RustyTech.Server.Controllers
@@ -24,7 +23,7 @@ namespace RustyTech.Server.Controllers
         }
 
         [HttpGet("get/{id}")]
-        public async Task<IActionResult> GetByIdAsync(string id)
+        public async Task<IActionResult> GetByIdAsync(Guid id)
         {
             var user = await _userService.GetByIdAsync(id);
             if (user == null)
@@ -36,18 +35,20 @@ namespace RustyTech.Server.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpDelete("delete/{id}")]
-        public async Task<IActionResult> DeleteAsync(string id)
+        public async Task<IActionResult> DeleteAsync(Guid id)
         {
             var result = await _userService.DeleteAsync(id);
             return Ok(result);
         }
 
+        /*
         [Authorize(Roles = "Admin")]
         [HttpPost("role")]
-        public async Task<IActionResult> AddRoleToUserAsync(AddRoleRequest model)
+        public async Task<IActionResult> AddRoleToUserAsync(RoleRequest model)
         {
             var result = await _userService.AddRoleToUserAsync(model);
             return Ok(result);
         }
+        */
     }
 }

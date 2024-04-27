@@ -10,5 +10,6 @@ namespace RustyTech.Server.Models.User
         public required string Password { get; set; }
         [Required, Compare("Password")]
         public required string ConfirmPassword { get; set; }
+        public int BirthYear { get; set; }
     }
 }
