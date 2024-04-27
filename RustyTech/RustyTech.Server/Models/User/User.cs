@@ -4,7 +4,7 @@ namespace RustyTech.Server.Models.User
 {
     public class User : IdentityUser
     {
-        public Guid Id { get; set; }
+        public new Guid Id { get; set; }
         public override string? Email { get; set; }
         public override string? UserName { get; set; }
         public new byte[] PasswordHash { get; set; } = new byte[32];

@@ -94,9 +94,9 @@ namespace RustyTech.Server.Controllers
 
         [Authorize]
         [HttpPost("logout")]
-        public async Task<IActionResult> LogoutAsync()
+        public IActionResult LogoutAsync()
         {
-            var result = await _authService.LogoutAsync();
+            var result = _authService.LogoutAsync();
             return Ok(result);
         }
     }
