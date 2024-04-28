@@ -6,14 +6,12 @@ using AspNetCoreRateLimit;
 using Microsoft.AspNetCore.Identity;
 using NLog.Extensions.Logging;
 using RustyTech.Server.Services;
+using System.Globalization;
+using Microsoft.AspNetCore.Localization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
-builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-builder.Services.AddIdentityCore<User>().AddRoles<IdentityRole>().AddEntityFrameworkStores<DataContext>();
-
 
 builder.Services.AddMemoryCache();
 builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimiting"));
@@ -37,12 +35,30 @@ builder.Services.AddAuthorization();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddRouting(options => options.LowercaseUrls = true);
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddDbContext<DataContext>(options =>
+       options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddIdentityCore<User>().AddRoles<IdentityRole>().AddEntityFrameworkStores<DataContext>();
 
 builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
 builder.Services.AddScoped<AuthService, AuthService>();
+builder.Services.AddScoped<RoleService, RoleService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    var supportedCultures = new[]
+    {
+        new CultureInfo("en-US"),
+        new CultureInfo("es-ES"),
+    };
+    options.DefaultRequestCulture = new RequestCulture("en-US");
+    options.SupportedCultures = supportedCultures;
+    options.SupportedUICultures = supportedCultures;
+});
 
 builder.Logging.AddNLog();
 
@@ -77,31 +93,27 @@ app.MapFallbackToFile("/index.html");
 //role management
 using (var scope = app.Services.CreateScope())
 {
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var roleService = scope.ServiceProvider.GetRequiredService<RoleService>();
     var roles = new[] { "Admin", "Manager", "User", "Guest" };
     foreach (var role in roles)
     {
-        if (!await roleManager.RoleExistsAsync(role))
-        {
-            await roleManager.CreateAsync(new IdentityRole(role));
-        }
+        await roleService.CreateRoleAsync(role);
     }
 }
 
 //create a admin if doesn't exist
 using (var scope = app.Services.CreateScope())
 {
-    var userManger = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+
+    var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
+    var authService = scope.ServiceProvider.GetRequiredService<AuthService>();
+    var roleService = scope.ServiceProvider.GetRequiredService<RoleService>();
     string email = "admin@rustbucket.io";
     string password = "Adm1nTheMadm@n";
-    if (await userManger.FindByEmailAsync(email) == null)
+    if (await userService.FindByEmailAsync(email) == null)
     {
-        var user = new User();
-        user.UserName = email;
-        user.Email = email;
-        user.VerifiedAt = DateTime.UtcNow;
-        await userManger.CreateAsync(user, password);
-        await userManger.AddToRoleAsync(user, "Admin");
+        var request = new UserRegister() { Email = email, Password = password, ConfirmPassword = password, BirthYear = 1989  };
+        await authService.RegisterAsync(request);
     }
 }
 

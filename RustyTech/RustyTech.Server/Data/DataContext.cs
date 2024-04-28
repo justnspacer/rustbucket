@@ -8,15 +8,14 @@ namespace RustyTech.Server.Data
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();
-            modelBuilder.Entity<IdentityRole>().HasIndex(r => r.Name).IsUnique();
+            base.OnConfiguring(optionsBuilder);
+            optionsBuilder.UseSqlServer("Server=.\\Rustbucket;Database=RustyTech;Trusted_Connection=True;TrustServerCertificate=True");
         }
 
-        public DbSet<User> Users => Set<User>();
-        public DbSet<LoginInfo> Logins => Set<LoginInfo>();
-        public DbSet<IdentityRole> Roles => Set<IdentityRole>();
-        public DbSet<UserRole> UserRoles => Set<UserRole>();
+        public DbSet<User> Users { get; set; }
+        public DbSet<LoginInfo> Logins { get; set; }
+        public DbSet<IdentityRole> Roles { get; set; }
     }
 }

@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using RustyTech.Server.Models.Auth;
-using RustyTech.Server.Models.User;
 using RustyTech.Server.Services;
 
 namespace RustyTech.Server.Controllers
@@ -26,9 +25,9 @@ namespace RustyTech.Server.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> LoginAsync([FromBody] UserLogin model)
+        public async Task<IActionResult> LoginAsync(UserLogin request)
         {
-            var result = await _authService.LoginAsync(model);
+            var result = await _authService.LoginAsync(request);
             return Ok(result);
         }
 
@@ -55,14 +54,14 @@ namespace RustyTech.Server.Controllers
 
         //[Authorize]
         [HttpPut("update/{id}")]
-        public async Task<IActionResult> UpdateUserAsync(string id, UserUpdate user)
+        public async Task<IActionResult> UpdateUserAsync(UserUpdateDto user)
         {
-            var result = await _authService.UpdateUserAsync(id, user);
+            var result = await _authService.UpdateUserAsync(user);
             return Ok(result);
         }
 
         [HttpPost("resetPassword")]
-        public async Task<IActionResult> ResetPasswordAsync([FromBody] ResetPasswordRequest model)
+        public async Task<IActionResult> ResetPasswordAsync(ResetPasswordRequest model)
         {
             var result = await _authService.ResetPasswordAsync(model);
             return Ok(result);
@@ -81,14 +80,6 @@ namespace RustyTech.Server.Controllers
         public async Task<IActionResult> GetInfoAsync(Guid userId)
         {
             var result = await _authService.GetInfoAsync(userId);
-            return Ok(result);
-        }
-
-        [Authorize]
-        [HttpPost("manage/changePassword")]
-        public async Task<IActionResult> ChangePasswordAsync([FromBody] ChangePasswordRequest model)
-        {
-            var result = await _authService.ChangePasswordAsync(model);
             return Ok(result);
         }
 

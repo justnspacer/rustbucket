@@ -1,4 +1,6 @@
-﻿namespace RustyTech.Server.Services
+﻿using System.Net;
+
+namespace RustyTech.Server.Services
 {
     public class UserService : IUserService
     {
@@ -25,6 +27,21 @@
                 return null;
             }
             var user = await _context.Users.FirstOrDefaultAsync(user => user.Id == id);
+            if (user == null)
+            {
+                return null;
+            }
+            var userDto = new UserDto { Id = user.Id, Email = user.Email };
+            return userDto;
+        }
+
+        public async Task<UserDto?> FindByEmailAsync(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+            {
+                return null;
+            }
+            var user = await _context.Users.FirstOrDefaultAsync(user => user.Email == email);
             if (user == null)
             {
                 return null;

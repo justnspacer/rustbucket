@@ -1,6 +1,6 @@
 @RustyTech.Server_HostAddress = http://localhost:5008
 
-GET {{RustyTech.Server_HostAddress}}/weatherforecast/
+GET {{RustyTech.Server_HostAddress}}/rustyTech/
 Accept: application/json
 
 ###

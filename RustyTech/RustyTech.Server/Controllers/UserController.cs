@@ -26,10 +26,13 @@ namespace RustyTech.Server.Controllers
         public async Task<IActionResult> GetByIdAsync(Guid id)
         {
             var user = await _userService.GetByIdAsync(id);
-            if (user == null)
-            {
-                return BadRequest(Constants.Message.InvalidRequest);
-            }
+            return Ok(user);
+        }
+
+        [HttpGet("find/{email}")]
+        public async Task<IActionResult> FindByEmailAsync(string email)
+        {
+            var user = await _userService.FindByEmailAsync(email);
             return Ok(user);
         }
 
@@ -40,15 +43,5 @@ namespace RustyTech.Server.Controllers
             var result = await _userService.DeleteAsync(id);
             return Ok(result);
         }
-
-        /*
-        [Authorize(Roles = "Admin")]
-        [HttpPost("role")]
-        public async Task<IActionResult> AddRoleToUserAsync(RoleRequest model)
-        {
-            var result = await _userService.AddRoleToUserAsync(model);
-            return Ok(result);
-        }
-        */
     }
 }
