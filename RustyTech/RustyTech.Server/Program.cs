@@ -8,6 +8,7 @@ using NLog.Extensions.Logging;
 using RustyTech.Server.Services;
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
+using RustyTech.Server.Models.Role;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +31,20 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddControllers();
+
+
+
+// Add authentication
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = "Bearer";
+    options.DefaultChallengeScheme = "Bearer";
+})
+.AddJwtBearer("Bearer", options =>
+{
+    options.Authority = "https://some-authentication-authority.com";
+    options.Audience = "some-audience";
+});
 
 builder.Services.AddAuthorization();
 
@@ -104,16 +119,22 @@ using (var scope = app.Services.CreateScope())
 //create a admin if doesn't exist
 using (var scope = app.Services.CreateScope())
 {
-
     var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
     var authService = scope.ServiceProvider.GetRequiredService<AuthService>();
     var roleService = scope.ServiceProvider.GetRequiredService<RoleService>();
+
     string email = "admin@rustbucket.io";
     string password = "Adm1nTheMadm@n";
     if (await userService.FindByEmailAsync(email) == null)
     {
         var request = new UserRegister() { Email = email, Password = password, ConfirmPassword = password, BirthYear = 1989  };
         await authService.RegisterAsync(request);
+
+        var role = await roleService.GetRoleByNameAsync("Admin");
+        var user = await userService.FindByEmailAsync(email);
+        var roleRequest = new RoleRequest() { RoleId = role?.Id, UserId = user?.Id };
+
+        await roleService.AddRoleToUserAsync(roleRequest);
     }
 }
 

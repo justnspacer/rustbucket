@@ -17,5 +17,6 @@ namespace RustyTech.Server.Data
         public DbSet<User> Users { get; set; }
         public DbSet<LoginInfo> Logins { get; set; }
         public DbSet<IdentityRole> Roles { get; set; }
+        public DbSet<UserRole> UserRoles { get; set; }
     }
 }

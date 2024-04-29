@@ -39,9 +39,9 @@ namespace RustyTech.Server.Controllers
         }
 
         [HttpPost("resendConfirmationEmail")]
-        public async Task<IActionResult> ResendEmailAsync(string email)
+        public IActionResult ResendEmailAsync(string email)
         {
-            var result = await _authService.ResendEmailAsync(email);
+            var result = _authService.ResendEmailAsync(email);
             return Ok(result);
         }
 
@@ -77,9 +77,9 @@ namespace RustyTech.Server.Controllers
 
         //[Authorize]
         [HttpGet("manage/info")]
-        public async Task<IActionResult> GetInfoAsync(Guid userId)
+        public IActionResult GetInfoAsync(Guid userId)
         {
-            var result = await _authService.GetInfoAsync(userId);
+            var result = _authService.GetInfoAsync(userId);
             return Ok(result);
         }
 
