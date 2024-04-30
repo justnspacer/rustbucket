@@ -25,7 +25,7 @@ namespace RustyTech.Server.Middleware
                 context.Response.Body.Seek(0, SeekOrigin.Begin);
                 var readBuffer = new StreamReader(context.Response.Body).ReadToEnd();
 
-                var apiResponse = Response<object>.Success(JsonConvert.DeserializeObject(readBuffer));
+                var apiResponse = ApiResponse<object>.Success(JsonConvert.DeserializeObject(readBuffer));
 
                 var responseToReturn = JsonConvert.SerializeObject(apiResponse);
                 var responseBytes = Encoding.UTF8.GetBytes(responseToReturn);

@@ -18,9 +18,9 @@ namespace RustyTech.Server.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> RegisterAsync(UserRegister model)
+        public async Task<IActionResult> RegisterAsync([FromBody] UserRegister request)
         {
-            var result = await _authService.RegisterAsync(model);
+            var result = await _authService.RegisterAsync(request);
             if (!result.IsSuccess)
             {
                 return BadRequest("Error with user registration");
@@ -29,16 +29,24 @@ namespace RustyTech.Server.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> LoginAsync(UserLogin request)
+        public async Task<IActionResult> LoginAsync([FromBody] UserLogin request)
         {
             var result = await _authService.LoginAsync(request);
+            if (!result.IsAuthenticated)
+            {
+                return BadRequest("Error with user login");
+            }
             return Ok(result);
         }
 
         [HttpPost("verifyEmail")]
-        public async Task<IActionResult> VerifyEmail(ConfirmEmailRequest model)
+        public async Task<IActionResult> VerifyEmail([FromBody] ConfirmEmailRequest request)
         {
-            var result = await _authService.VerifyEmail(model);
+            var result = await _authService.VerifyEmail(request);
+            if (!result.IsSuccess)
+            {
+                return BadRequest("Error with email verification");
+            }
             return Ok(result);
         }
 
@@ -46,6 +54,10 @@ namespace RustyTech.Server.Controllers
         public IActionResult ResendEmailAsync(string email)
         {
             var result = _authService.ResendEmailAsync(email);
+            if (!result.IsSuccess)
+            {
+                return BadRequest("Error with email resending");
+            }
             return Ok(result);
         }
 
@@ -53,21 +65,33 @@ namespace RustyTech.Server.Controllers
         public async Task<IActionResult> ForgotPasswordAsync(string email)
         {
             var result = await _authService.ForgotPasswordAsync(email);
+            if (!result.IsSuccess)
+            {
+                return BadRequest("Error with forgot password");
+            }
             return Ok(result);
         }
 
         //[Authorize]
-        [HttpPut("update/{id}")]
-        public async Task<IActionResult> UpdateUserAsync(UserUpdateDto user)
+        [HttpPut("update")]
+        public async Task<IActionResult> UpdateUserAsync([FromBody] UserUpdateDto user)
         {
             var result = await _authService.UpdateUserAsync(user);
+            if (!result.IsSuccess)
+            {
+                return BadRequest("Error with user update");
+            }
             return Ok(result);
         }
 
         [HttpPost("resetPassword")]
-        public async Task<IActionResult> ResetPasswordAsync(ResetPasswordRequest model)
+        public async Task<IActionResult> ResetPasswordAsync([FromBody] ResetPasswordRequest model)
         {
             var result = await _authService.ResetPasswordAsync(model);
+            if (!result.IsSuccess)
+            {
+                return BadRequest("Error with password reset");
+            }
             return Ok(result);
         }
 
@@ -76,6 +100,10 @@ namespace RustyTech.Server.Controllers
         public async Task<IActionResult> Enable2faAsync(Guid userId)
         {
             var result = await _authService.EnableTwoFactorAuthenticationAsync(userId);
+            if (!result.IsSuccess)
+            {
+                return BadRequest("Error with enabling 2fa");
+            }
             return Ok(result);
         }
 
@@ -84,6 +112,10 @@ namespace RustyTech.Server.Controllers
         public IActionResult GetInfoAsync(Guid userId)
         {
             var result = _authService.GetInfoAsync(userId);
+            if (!result.IsSuccess)
+            {
+                return BadRequest("Error with getting user info");
+            }
             return Ok(result);
         }
 
@@ -92,6 +124,10 @@ namespace RustyTech.Server.Controllers
         public IActionResult LogoutAsync()
         {
             var result = _authService.LogoutAsync();
+            if (!result.IsAuthenticated)
+            {
+                return BadRequest("Error with user logout");
+            }
             return Ok(result);
         }
     }
