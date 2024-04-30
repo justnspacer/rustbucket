@@ -25,7 +25,7 @@ namespace RustyTech.Server.Controllers
         [HttpGet("get/all")]
         public async Task<IActionResult> GetAllAsync()
         {
-            var result = await _roleService.GetAllAsync();
+            var result = await _roleService.GetAllRolesAsync();
             return Ok(result);
         }
 
@@ -50,15 +50,15 @@ namespace RustyTech.Server.Controllers
             return Ok(result);
         }
 
-        [HttpPost("add/user/{request}")]
-        public async Task<IActionResult> AddRoleToUserAsync(RoleRequest request)
+        [HttpPost("add/user")]
+        public async Task<IActionResult> AddRoleToUserAsync([FromBody] RoleRequest request)
         {
             var result = await _roleService.AddRoleToUserAsync(request);
             return Ok(result);
         }
 
-        [HttpPost("remove/user/{request}")]
-        public async Task<IActionResult> RemoveRoleFromUserAsync(RoleRequest request)
+        [HttpPost("remove/user")]
+        public async Task<IActionResult> RemoveRoleFromUserAsync([FromBody] RoleRequest request)
         {
             var result = await _roleService.RemoveRoleFromUserAsync(request);
             return Ok(result);

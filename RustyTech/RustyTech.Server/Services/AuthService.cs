@@ -6,7 +6,6 @@ using System.Security.Claims;
 using System.Text;
 using RustyTech.Server.Models.Auth;
 using System.Security.Cryptography;
-using RustyTech.Server.Models.Role;
 using LoginRequest = RustyTech.Server.Models.Auth.LoginRequest;
 using RegisterRequest = RustyTech.Server.Models.Auth.RegisterRequest;
 
@@ -18,16 +17,14 @@ namespace RustyTech.Server.Services
         private readonly IConfiguration _configuration;
         private readonly ILogger<UserService> _logger;
         private readonly DataContext _context;
-        private readonly RoleService _roleService;
 
         public AuthService(IEmailService emailService, IConfiguration configuration,
-            ILogger<UserService> logger, DataContext context , RoleService roleService)
+            ILogger<UserService> logger, DataContext context)
         {
             _emailService = emailService;
             _configuration = configuration;
             _logger = logger;
             _context = context;
-            _roleService = roleService;
         }
 
         public async Task<RegisterRequest> RegisterAsync(UserRegister request)
@@ -57,11 +54,10 @@ namespace RustyTech.Server.Services
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
+            //address
             if (user.Email == "admin@rustbucket.io")
             {
                 user.VerifiedAt = DateTime.UtcNow;
-                var roleRequest = new RoleRequest() { RoleName = "Admin", UserId = user.Id };
-                await _roleService.AddRoleToUserAsync(roleRequest);
             }
 
             SendConfirmationEmail(user.Email, user.Id, EncodeToken(user.VerificationToken));
@@ -311,7 +307,7 @@ namespace RustyTech.Server.Services
             return new LoginRequest() { IsAuthenticated = false, User = null, Message = "User logged out"};
         }
         
-
+        //helper methods
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
             using (var hmac = new HMACSHA512())
@@ -329,7 +325,6 @@ namespace RustyTech.Server.Services
                 return computedHash.SequenceEqual(passwordHash);
             }
         }
-
 
         private string CreateRandomToken()
         {

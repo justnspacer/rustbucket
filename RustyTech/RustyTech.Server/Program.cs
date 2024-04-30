@@ -9,6 +9,7 @@ using RustyTech.Server.Services;
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
 using RustyTech.Server.Models.Role;
+using RustyTech.Server.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -79,6 +80,7 @@ builder.Logging.AddNLog();
 
 var app = builder.Build();
 
+//middleware
 app.UseCors("MyCorsPolicy");
 
 app.UseDefaultFiles();
@@ -90,6 +92,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseMiddleware<ResponseMiddleware>();
 
 app.UseIpRateLimiting();
 
@@ -131,9 +135,8 @@ using (var scope = app.Services.CreateScope())
         await authService.RegisterAsync(request);
 
         var role = await roleService.GetRoleByNameAsync("Admin");
-        var user = await userService.FindByEmailAsync(email);
-        var roleRequest = new RoleRequest() { RoleId = role?.Id, UserId = user?.Id };
-
+        var user = await userService.FindByEmailAsync(email); 
+        var roleRequest = new RoleRequest() { RoleName = role?.RoleName, UserId = user?.Id };
         await roleService.AddRoleToUserAsync(roleRequest);
     }
 }

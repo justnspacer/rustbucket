@@ -29,7 +29,7 @@ namespace RustyTech.Server.Services
             return "Role created!";
         }
 
-        public async Task<List<RoleDto>> GetAllAsync()
+        public async Task<List<RoleDto>> GetAllRolesAsync()
         {
             var roles = await _context.Roles.Select(role => new RoleDto { Id = role.Id, RoleName = role.Name }).ToListAsync();
             return roles;
@@ -63,20 +63,6 @@ namespace RustyTech.Server.Services
             }
             var roleDto = new RoleDto { Id = role.Id, RoleName = role.Name };
             return roleDto;
-        }
-
-        public async Task<bool> RoleExistsAsync(string roleName)
-        {
-            if (string.IsNullOrEmpty(roleName))
-            {
-                return false;
-            }
-            var role = await _context.Roles.FirstOrDefaultAsync(role => role.Name == roleName);
-            if (role == null)
-            {
-                return false;
-            }
-            return true;
         }
 
         public async Task<List<UserRole>?> GetUserRolesAsync(Guid id)
@@ -140,7 +126,7 @@ namespace RustyTech.Server.Services
             _context.UserRoles.Remove(userRole);
             await _context.SaveChangesAsync();
 
-            return "Role added to user";
+            return "Role removed from user";
         }
     }
 }

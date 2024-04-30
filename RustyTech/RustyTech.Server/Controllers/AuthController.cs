@@ -21,6 +21,10 @@ namespace RustyTech.Server.Controllers
         public async Task<IActionResult> RegisterAsync(UserRegister model)
         {
             var result = await _authService.RegisterAsync(model);
+            if (!result.IsSuccess)
+            {
+                return BadRequest("Error with user registration");
+            }
             return Ok(result);
         }
 
