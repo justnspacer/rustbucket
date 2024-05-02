@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity.Data;
+﻿using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using RustyTech.Server.Models.Auth;
 using RustyTech.Server.Services;
@@ -119,7 +118,7 @@ namespace RustyTech.Server.Controllers
             return Ok(result);
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpPost("logout")]
         public IActionResult LogoutAsync()
         {
