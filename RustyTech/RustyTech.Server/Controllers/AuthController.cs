@@ -41,7 +41,7 @@ namespace RustyTech.Server.Controllers
         [HttpPost("verifyEmail")]
         public async Task<IActionResult> VerifyEmail([FromBody] ConfirmEmailRequest request)
         {
-            var result = await _authService.VerifyEmail(request);
+            var result = await _authService.VerifyEmailAsync(request);
             if (!result.IsSuccess)
             {
                 return BadRequest("Error with email verification");

@@ -50,7 +50,7 @@ namespace RustyTech.Server.Services
             await _context.SaveChangesAsync();
 
             //address
-            if (user.Email == "admin@rustbucket.io")
+            if (user.Email == "someemail")
             {
                 user.VerifiedAt = DateTime.UtcNow;
             }
@@ -88,7 +88,7 @@ namespace RustyTech.Server.Services
             return new LoginResponse() { IsAuthenticated = true, IsSuccess = true, User = userDto, Token = token, Message = "User logged in" };
         }
 
-        public async Task<ResponseBase> VerifyEmail(ConfirmEmailRequest request)
+        public async Task<ResponseBase> VerifyEmailAsync(ConfirmEmailRequest request)
         {
             var decodedToken = DecodeToken(request.Token);
             if (decodedToken == null)
