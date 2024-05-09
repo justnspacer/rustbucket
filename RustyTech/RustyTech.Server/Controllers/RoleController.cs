@@ -57,7 +57,7 @@ namespace RustyTech.Server.Controllers
             return Ok(result);
         }
 
-        [HttpPost("remove/user")]
+        [HttpDelete("remove/user")]
         public async Task<IActionResult> RemoveRoleFromUserAsync([FromBody] RoleRequest request)
         {
             var result = await _roleService.RemoveRoleFromUserAsync(request);

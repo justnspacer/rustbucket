@@ -22,11 +22,21 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
     const apiUrl = 'https://localhost:7262/api/auth';
 
+    const register = async (data: RegisterRequest) => {
+        try {
+            const response = await axios.post<ApiResponse>(`${apiUrl}/register`, data);
+            setState(s => ({ ...s, message: response.data.message }));
+        } catch (error: any) {
+            setState(s => ({ ...s, message: error.message || 'Registration failed' }));
+        }
+    };
+
     const login = async (data: LoginRequest) => {
         try {
             const response = await axios.post<ApiResponse & { user: User }>(`${apiUrl}/login`, data);
             if (response.data.isSuccess) {
                 setState({
+                    ...state,
                     user: response.data.user,
                     isAuthenticated: true,
                     isLoading: false,
@@ -40,17 +50,9 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         }
     };
 
-    const register = async (data: RegisterRequest) => {
-        try {
-            const response = await axios.post<ApiResponse>(`${apiUrl}/register`, data);
-            setState(s => ({ ...s, message: response.data.message }));
-        } catch (error: any) {
-            setState(s => ({ ...s, message: error.message || 'Registration failed' }));
-        }
-    };
-
     const logout = () => {
         setState({
+            ...state,
             user: null,
             isAuthenticated: false,
             isLoading: false,

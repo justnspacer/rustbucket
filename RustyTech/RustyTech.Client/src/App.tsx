@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css';
 import LoginForm from './components/loginForm';
+import Home from './components/home';
 import AuthProvider from './contexts/authContext';
 
 function App() {
@@ -9,13 +11,14 @@ function App() {
     }, []);
 
     return (
-        <div>
-            <h1 id="tabelLabel">Its morphin' time</h1>
-            
-            <AuthProvider>
-                <LoginForm />
-            </AuthProvider>
-        </div>
+        <AuthProvider>
+            <BrowserRouter>
+                <Routes>
+                    <Route path="/login" Component={LoginForm} />
+                    <Route path="/" Component={Home} />
+                </Routes>
+            </BrowserRouter>
+        </AuthProvider>
     );
 }
 
