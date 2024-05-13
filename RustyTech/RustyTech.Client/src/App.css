@@ -1,8 +1,7 @@
 ﻿#root {
-    max-width: 1280px;
+    width: 100%;
     margin: 0 auto;
     padding: 2rem;
-    text-align: center;
 }
 
 tr:nth-child(even) {
@@ -18,31 +17,61 @@ th, td {
     padding-right: 1rem;
 }
 
-#loginForm {
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background-color: #333;
+    color: white;
+    margin-bottom: 2rem;
+}
+
+nav .links {
+    display: flex;
+    gap: 2rem;
+}
+
+.header-one {
+    color: #000;
+    margin: 0 0 1rem 0;
+}
+
+#loginForm, #registerForm {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    border: 2px solid #000;
-    border-radius: 2px;
-    padding: 20px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    background-color: #ffff;
+    padding: 2rem;
+    width: 300px;
+    margin: 0 auto;
 }
 
-#loginForm input {
+label {
+    color: #333;
+    font-weight: bold;
+}
+
+#loginForm input, #registerForm input {
     padding: 0.5rem;
     font-size: 1rem;
     border: none;
-    border-radius: 2px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    margin-bottom: 1rem;
 }
 
-#loginForm button {
+#loginForm button, #registerForm button {
     padding: 0.5rem;
     font-size: 1rem;
     border: none;
-    border-radius: 2px;
-    background-color: red;
-    color: white;
+    border-radius: 8px;
+    background-color: #4cff00;
+    color: #333;
     cursor: pointer;
     width: 50%;
-    margin-top: 20px;
+    margin-top: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 

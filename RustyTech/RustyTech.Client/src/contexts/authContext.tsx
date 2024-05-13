@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { AuthState, LoginRequest, RegisterRequest, ApiResponse, User } from '../types/index';
+import { AuthState, LoginRequest, RegisterRequest, ApiResponse } from '../types/index';
 import axios from 'axios';
 
 interface AuthContextType extends AuthState {
@@ -13,40 +13,66 @@ interface AuthContextType extends AuthState {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const [state, setState] = useState<AuthState>({
-        user: null,
-        isAuthenticated: false,
-        isLoading: false,
-        message: '',
-    });
 
     const apiUrl = 'https://localhost:7262/api/auth';
+
+    const [state, setState] = useState<AuthState>({
+        statusCode: 0,
+        isSuccess: false,
+        message: '',
+        user: null,
+        isAuthenticated: false,
+        isTokenValid: false,
+        token: '',
+        isLoading: false,
+    });
+
+    const handleRegisterResponse = async (response: ApiResponse) => {
+        setState({
+            isSuccess: response.Data.isSuccess,
+            statusCode: response.Data.statusCode,
+            message: response.Data.message,
+            user: null,
+            isAuthenticated: false,
+            isTokenValid: false,
+            token: '',
+            isLoading: false,
+        });
+    };
+
+    const handleLoginResponse = async (response: ApiResponse) => {
+        setState({
+            statusCode: response.Data.statusCode,
+            isSuccess: response.Data.isSuccess,
+            message: response.Data.message,
+            user: response.Data.user,
+            isAuthenticated: response.Data.isAuthenticated,
+            isTokenValid: true,
+            token: response.Data.token,
+            isLoading: false,
+        });
+
+        const expirationDate = new Date();
+        expirationDate.setDate(expirationDate.getDate() + 1);
+        document.cookie = "rusty-expiry=" + expirationDate.toISOString() + "; path=/";
+        document.cookie = "rusty-token=" + response.Data.token + "; path=/";
+    };
 
     const register = async (data: RegisterRequest) => {
         try {
             const response = await axios.post<ApiResponse>(`${apiUrl}/register`, data);
-            setState(s => ({ ...s, message: response.data.message }));
+            await handleRegisterResponse(response.data);
         } catch (error: any) {
-            setState(s => ({ ...s, message: error.message || 'Registration failed' }));
+            setState({ ...state, message: error.message || 'Registration failed' });
         }
     };
 
     const login = async (data: LoginRequest) => {
         try {
-            const response = await axios.post<ApiResponse & { user: User }>(`${apiUrl}/login`, data);
-            if (response.data.isSuccess) {
-                setState({
-                    ...state,
-                    user: response.data.user,
-                    isAuthenticated: true,
-                    isLoading: false,
-                    message: response.data.message,
-                });
-            } else {
-                setState(s => ({ ...s, message: response.data.message }));
-            }
+            const response = await axios.post<ApiResponse>(`${apiUrl}/login`, data);
+            await handleLoginResponse(response.data);
         } catch (error: any) {
-            setState(s => ({ ...s, message: error.message || 'Login failed' }));
+            setState({ ...state, message: error.message || 'Login failed' });
         }
     };
 
@@ -58,6 +84,9 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
             isLoading: false,
             message: 'User logged out',
         });
+
+        document.cookie = "rusty-expiry=" + null + "; path=/";
+        document.cookie = "rusty-token=" + null + "; path=/";
     };
 
     return <AuthContext.Provider value={{ ...state, login, register, logout }}>
