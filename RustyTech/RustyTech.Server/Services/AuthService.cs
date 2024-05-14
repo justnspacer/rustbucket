@@ -108,6 +108,34 @@ namespace RustyTech.Server.Services
             return new ResponseBase() { IsSuccess = true };
         }
 
+        public ResponseBase VerifyJwtToken(string token)
+        {
+            var key = _configuration["Jwt:Key"];
+
+            try
+            {
+                var jwtHandler = new JwtSecurityTokenHandler();
+                var jwtToken = jwtHandler.ReadJwtToken(token);
+
+                var expirationDate = jwtToken.ValidTo;
+                var tokenKey = jwtToken.SecurityKey;
+
+                var currentDate = DateTime.UtcNow;
+
+                SymmetricSecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
+
+                if (currentDate > expirationDate && securityKey != tokenKey)
+                {
+                    return new ResponseBase() { IsSuccess = false, Message = "Invalid token" };
+                }
+                return new ResponseBase() { IsSuccess = true, Message = "Valid token" };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseBase() { IsSuccess = false, Message = ex.Message };
+            }
+        }
+        
         public ResponseBase ResendEmailAsync(string email)
         {
             if (string.IsNullOrEmpty(email))
@@ -273,7 +301,7 @@ namespace RustyTech.Server.Services
         {
             return new LoginResponse() { IsAuthenticated = false, IsSuccess = true, User = null, Message = "User logged out"};
         }
-        
+
         //helper methods
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
@@ -334,7 +362,7 @@ namespace RustyTech.Server.Services
                 issuer: issuer,
                 audience: audience,
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(int.Parse(expires)),
+                expires: DateTime.UtcNow.AddMinutes(int.Parse(expires)),
                 signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
