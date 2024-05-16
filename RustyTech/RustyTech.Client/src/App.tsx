@@ -14,7 +14,7 @@ function App() {
     return (
         <AuthProvider>
             <BrowserRouter>
-                <Navbar isAuthenticated={false} isTokenValid={false} />
+                <Navbar />
                 <Routes>
                     <Route path="/login" Component={LoginForm} />
                     <Route path="/register" Component={RegisterForm} />

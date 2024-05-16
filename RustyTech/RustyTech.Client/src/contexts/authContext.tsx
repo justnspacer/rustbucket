@@ -1,8 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import axios from 'axios';
-import { verifyToken } from '../services/rustyTechService';
+import { registerEP, loginEP, verifyTokenEP } from '../services/rustyTechService';
 
 interface AuthState {
     isAuthenticated: boolean;
@@ -13,18 +12,6 @@ interface AuthState {
     isSuccess: boolean;
     message: string;
     user: User | null;
-}
-
-interface ApiResponse {
-    statusCode: number;
-    Data: {
-        statusCode: number;
-        isSuccess: boolean;
-        user: User;
-        isAuthenticated: boolean;
-        token: string;
-        message: string;
-    };
 }
 
 interface LoginRequest {
@@ -67,37 +54,43 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     useEffect(() => {
         const token = localStorage.getItem('jwtToken');
         if (token) {
-            verifyToken(token).then((response) => {
+            verifyTokenEP(token).then((response) => {
                 setAuthState((prevState) => ({
                     ...prevState,
                     isAuthenticated: response,
                     isTokenValid: response,
                     token,
                     isLoading: false,
-                    statusCode: 200,
+                    statusCode: 201,
                     isSuccess: response,
-                    user: null,
+                    user: prevState.user,
                 }));
             });
+
         }
     }, []);
 
-    const apiUrl = 'https://localhost:7262/api/auth';
 
     const register = async (data: RegisterRequest) => {
         try {
-            const response = await axios.post<ApiResponse>(`${apiUrl}/register`, data);
-            setAuthState((prevState) => ({
-                ...prevState,
-                isSuccess: response.data.Data.isSuccess,
-                statusCode: response.data.Data.statusCode,
-                message: response.data.Data.message,
-                user: null,
-                isAuthenticated: false,
-                isTokenValid: false,
-                token: '',
-                isLoading: false,
-            }));
+            const response = await registerEP(data);
+            if (response != null) {
+                setAuthState((prevState) => ({
+                    ...prevState,
+                    isSuccess: response.data.Data.isSuccess,
+                    statusCode: response.data.Data.statusCode,
+                    message: response.data.Data.message,
+                    user: null,
+                    isAuthenticated: false,
+                    isTokenValid: false,
+                    token: '',
+                    isLoading: false,
+                }));
+            }
+            else {
+                console.error('error with registration');
+            }
+
         } catch (error: any) {
             setAuthState((prevState) => ({
                 ...prevState,
@@ -110,11 +103,11 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const login = async (data: LoginRequest) => {
         setAuthState((prevState) => ({ ...prevState, isLoading: true }));
         try {
-            const response = await axios.post<ApiResponse>(`${apiUrl}/login`, data);
-            if (response.data.Data.isSuccess) {
-                const token = response.data.Data.token;
+            const response = await loginEP(data);
+            const token = response?.data.Data.token;
+            if (token) {
                 localStorage.setItem('jwtToken', token);
-                verifyToken(token).then((res) => {
+                verifyTokenEP(token).then((res) => {
                     setAuthState({
                         isAuthenticated: res,
                         isTokenValid: res,
@@ -127,6 +120,10 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
                     });
                 });
             }
+            else {
+                console.error('missing token for login');
+            }
+
         } catch (error: any) {
             setAuthState((prevState) => ({
                 ...prevState,

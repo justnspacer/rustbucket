@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/authContext';
 
 const NavBar: React.FC = () => {
-    const { isAuthenticated, isTokenValid, logout } = useAuth();
+    const { isAuthenticated, isTokenValid, logout, user } = useAuth();
 
     return (
         <nav>
@@ -13,6 +13,7 @@ const NavBar: React.FC = () => {
             <div className="links">
                 {isAuthenticated && isTokenValid ? (
                     <>
+                        <span className="username">Hi <Link to="/profile">{user?.email}</Link></span>
                         <button onClick={logout}>Logout</button>
                     </>
                 ) : (

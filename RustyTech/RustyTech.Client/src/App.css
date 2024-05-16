@@ -27,9 +27,25 @@ nav {
     margin-bottom: 2rem;
 }
 
+.logo a:link, .logo a:visited {
+    color: #fff;
+    text-decoration: none;
+}
+
+.username {
+    color: #fff;
+    font-weight: bold;
+}
+
+.username a:link, .username a:visited {
+    color: #fff;
+    text-decoration: none;
+}
+
 nav .links {
     display: flex;
     gap: 2rem;
+    align-items: center;
 }
 
 .header-one {
