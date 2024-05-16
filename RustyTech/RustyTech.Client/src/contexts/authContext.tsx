@@ -50,11 +50,9 @@ interface AuthContextType extends AuthState {
     logout: () => void;
 }
 
-
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-
     const [authState, setAuthState] = useState<AuthState>({
         isAuthenticated: false,
         isTokenValid: false,
@@ -70,37 +68,27 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         const token = localStorage.getItem('jwtToken');
         if (token) {
             verifyToken(token).then((response) => {
-                setAuthState({
+                setAuthState((prevState) => ({
+                    ...prevState,
                     isAuthenticated: response,
                     isTokenValid: response,
                     token,
                     isLoading: false,
                     statusCode: 200,
                     isSuccess: response,
-                    message: '',
                     user: null,
-                });
+                }));
             });
         }
     }, []);
 
     const apiUrl = 'https://localhost:7262/api/auth';
 
-    const [state, setState] = useState<AuthState>({
-        statusCode: 0,
-        isSuccess: false,
-        message: '',
-        user: null,
-        isAuthenticated: false,
-        isTokenValid: false,
-        token: '',
-        isLoading: false,
-    });
-
     const register = async (data: RegisterRequest) => {
         try {
             const response = await axios.post<ApiResponse>(`${apiUrl}/register`, data);
-            setState({
+            setAuthState((prevState) => ({
+                ...prevState,
                 isSuccess: response.data.Data.isSuccess,
                 statusCode: response.data.Data.statusCode,
                 message: response.data.Data.message,
@@ -109,17 +97,21 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
                 isTokenValid: false,
                 token: '',
                 isLoading: false,
-            });
+            }));
         } catch (error: any) {
-            setState({ ...state, message: error.message || 'Registration failed' });
+            setAuthState((prevState) => ({
+                ...prevState,
+                message: error.message || 'Registration failed',
+                isLoading: false,
+            }));
         }
     };
 
     const login = async (data: LoginRequest) => {
+        setAuthState((prevState) => ({ ...prevState, isLoading: true }));
         try {
             const response = await axios.post<ApiResponse>(`${apiUrl}/login`, data);
-            if (response.data.Data.isSuccess)
-            {
+            if (response.data.Data.isSuccess) {
                 const token = response.data.Data.token;
                 localStorage.setItem('jwtToken', token);
                 verifyToken(token).then((res) => {
@@ -128,7 +120,7 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
                         isTokenValid: res,
                         token,
                         isLoading: false,
-                        statusCode: response.data.statusCode,
+                        statusCode: response.data.Data.statusCode,
                         isSuccess: response.data.Data.isSuccess,
                         message: response.data.Data.message,
                         user: response.data.Data.user,
@@ -136,7 +128,11 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
                 });
             }
         } catch (error: any) {
-            setState({ ...state, message: error.message || 'Login failed' });
+            setAuthState((prevState) => ({
+                ...prevState,
+                message: error.message || 'Login failed',
+                isLoading: false,
+            }));
         }
     };
 
@@ -149,14 +145,16 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
             isLoading: false,
             statusCode: 200,
             isSuccess: true,
-            message: 'user logged out',
+            message: 'User logged out',
             user: null,
         });
     };
 
-    return <AuthContext.Provider value={{ ...authState, login, register, logout }}>
-        {children}
-    </AuthContext.Provider>;
+    return (
+        <AuthContext.Provider value={{ ...authState, login, register, logout }}>
+            {children}
+        </AuthContext.Provider>
+    );
 };
 
 export const useAuth = (): AuthContextType => {

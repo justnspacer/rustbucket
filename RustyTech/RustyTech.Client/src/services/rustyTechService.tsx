@@ -1,6 +1,6 @@
 import axios, { AxiosError } from 'axios';
 
-const API_URL = 'https://localhost:5001/api';
+const API_URL = 'https://localhost:7262/api';
 
 interface ApiResponse {
     statusCode: number;
@@ -15,7 +15,7 @@ export const login = async (data: unknown) => axios.post(`${API_URL}/auth/login`
 
 export const verifyToken = async (token: string) => {
     try {
-        const response = await axios.post<ApiResponse>(`${API_URL}/auth/verify/token`, token);
+        const response = await axios.get<ApiResponse>(`${API_URL}/auth/verify/token?token=${token}`);
         if (!response.data.Data.isSuccess) {
             throw new Error('Token is invalid');
         }

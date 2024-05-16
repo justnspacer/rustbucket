@@ -9,8 +9,7 @@ const LoginForm: React.FC = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (isAuthenticated) {
-            isTokenValid == true;
+        if (isAuthenticated && isTokenValid) {
             navigate('/', { state: { message } });
         }
     }, [isAuthenticated, isTokenValid, navigate, message]);
