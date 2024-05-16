@@ -120,25 +120,4 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-//create a admin if doesn't exist
-using (var scope = app.Services.CreateScope())
-{
-    var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
-    var authService = scope.ServiceProvider.GetRequiredService<AuthService>();
-    var roleService = scope.ServiceProvider.GetRequiredService<RoleService>();
-
-    string email = "admin@rustbucket.io";
-    string password = "Adm1nTheMadm@n";
-    if (await userService.FindByEmailAsync(email) == null)
-    {
-        var request = new UserRegister() { Email = email, Password = password, ConfirmPassword = password, BirthYear = 1989  };
-        await authService.RegisterAsync(request);
-
-        var role = await roleService.GetRoleByNameAsync("Admin");
-        var user = await userService.FindByEmailAsync(email); 
-        var roleRequest = new RoleRequest() { RoleName = role?.RoleName, UserId = user?.Id };
-        await roleService.AddRoleToUserAsync(roleRequest);
-    }
-}
-
 app.Run();
