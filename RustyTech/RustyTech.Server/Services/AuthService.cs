@@ -13,16 +13,18 @@ namespace RustyTech.Server.Services
     {
         private readonly IEmailService _emailService;
         private readonly IConfiguration _configuration;
-        private readonly ILogger<UserService> _logger;
+        private readonly ILogger<AuthService> _logger;
         private readonly DataContext _context;
+        private readonly RoleService _roleService;
 
         public AuthService(IEmailService emailService, IConfiguration configuration,
-            ILogger<UserService> logger, DataContext context)
+            ILogger<AuthService> logger, DataContext context, RoleService roleService)
         {
             _emailService = emailService;
             _configuration = configuration;
             _logger = logger;
             _context = context;
+            _roleService = roleService;
         }
 
         public async Task<ResponseBase> RegisterAsync(UserRegister request)
@@ -63,7 +65,7 @@ namespace RustyTech.Server.Services
 
         public async Task<LoginResponse> LoginAsync(UserLogin request)
         {
-            var user = _context.Users.FirstOrDefault(user => user.Email == request.Email);
+            var user = await _context.Users.FirstOrDefaultAsync(user => user.Email == request.Email);
             if (user == null)
             {
                 return new LoginResponse() { IsAuthenticated = false, Message = "User not found" };
@@ -79,7 +81,21 @@ namespace RustyTech.Server.Services
                 return new LoginResponse() { IsAuthenticated = false, Message = "Invalid creds" };
             }
             await AddLoginRecordAsync(user.Id, "RustyTech", "Email", string.Empty);
-            var token = GenerateJwtToken(request.Email);
+
+            var getRoles = await _context.UserRoles.Where(userRole => userRole.UserId == user.Id).ToListAsync();
+            List<string> userRoles = new List<string>();
+            foreach (var role in getRoles)
+            {
+                if (role.RoleId != null)
+                {
+                    var addRole = await _roleService.GetRoleByIdAsync(role.RoleId);
+                    if (addRole != null && addRole.RoleName != null)
+                    {
+                        userRoles.Add(addRole.RoleName);
+                    }
+                }
+            }
+            var token = GenerateJwtToken(user.Id, userRoles);
             var userDto = new UserDto
             {
                 Id = user.Id,
@@ -342,30 +358,36 @@ namespace RustyTech.Server.Services
             return decodedToken;
         }
 
-        private string GenerateJwtToken(string email)
+        private string GenerateJwtToken(Guid id, List<string> userRoles)
         {
             var key = _configuration["Jwt:Key"];
             var issuer = _configuration["Jwt:Issuer"];
             var audience = _configuration["Jwt:Audience"];
             var expires = _configuration["Jwt:ExpiresInMinutes"];
 
-            SymmetricSecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
-            SigningCredentials credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+            //need a key and expiration time to generate token
+            if (key != null && expires != null)
+            {
+                SymmetricSecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
+                SigningCredentials credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-            List<Claim> claims = new List<Claim>
+                List<Claim> claims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.Email, email),
-                    new Claim(ClaimTypes.Role, "User"),
+                new Claim(ClaimTypes.NameIdentifier, id.ToString()),
+                new Claim(ClaimTypes.Role, string.Join(",", userRoles)),
                 };
 
-            JwtSecurityToken token = new JwtSecurityToken(
-                issuer: issuer,
-                audience: audience,
-                claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(int.Parse(expires)),
-                signingCredentials: credentials);
+                JwtSecurityToken token = new JwtSecurityToken(
+                    issuer: issuer,
+                    audience: audience,
+                    claims: claims,
+                    expires: DateTime.UtcNow.AddMinutes(int.Parse(expires)),
+                    signingCredentials: credentials);
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+                return new JwtSecurityTokenHandler().WriteToken(token);
+
+            }
+            return "Error generating Key";
         }
 
         private string CreateConfirmEmailBody(Guid id, string token)

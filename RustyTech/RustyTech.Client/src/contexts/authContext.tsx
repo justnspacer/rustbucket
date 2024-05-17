@@ -2,6 +2,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { registerEP, loginEP, verifyTokenEP } from '../services/rustyTechService';
+import axios from 'axios';
+import { jwtDecode } from "jwt-decode";
 
 interface AuthState {
     isAuthenticated: boolean;
@@ -54,19 +56,53 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     useEffect(() => {
         const token = localStorage.getItem('jwtToken');
         if (token) {
-            verifyTokenEP(token).then((response) => {
-                setAuthState((prevState) => ({
-                    ...prevState,
-                    isAuthenticated: response,
-                    isTokenValid: response,
-                    token,
-                    isLoading: false,
-                    statusCode: 201,
-                    isSuccess: response,
-                    user: prevState.user,
-                }));
-            });
-
+            verifyTokenEP(token)
+                .then((response) => {
+                    if (response) {
+                        const decodedToken = jwtDecode(token);
+                        //const userId = decodedToken.sub;
+                        console.log(decodedToken.sub);
+                        // Fetch user data if needed and update state
+                        axios.get<User>(`https://localhost:7262/api/user/get/E871281F-B180-4878-5E53-08DC68C32210`)
+                            .then(user => {
+                                setAuthState({
+                                    isAuthenticated: true,
+                                    isTokenValid: true,
+                                    token,
+                                    isLoading: false,
+                                    statusCode: 200,
+                                    isSuccess: true,
+                                    message: '',
+                                    user: user.data,
+                                });
+                            });
+                    } else {
+                        setAuthState((prevState) => ({
+                            ...prevState,
+                            isAuthenticated: false,
+                            isTokenValid: false,
+                            token: null,
+                            isLoading: false,
+                            statusCode: 401,
+                            isSuccess: false,
+                            message: 'Token is invalid',
+                            user: null,
+                        }));
+                    }
+                })
+                .catch(() => {
+                    setAuthState((prevState) => ({
+                        ...prevState,
+                        isAuthenticated: false,
+                        isTokenValid: false,
+                        token: null,
+                        isLoading: false,
+                        statusCode: 500,
+                        isSuccess: false,
+                        message: 'Token verification failed',
+                        user: null,
+                    }));
+                });
         }
     }, []);
 
