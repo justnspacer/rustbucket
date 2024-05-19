@@ -95,7 +95,12 @@ namespace RustyTech.Server.Services
                     }
                 }
             }
-            var token = GenerateJwtToken(user.Id, userRoles);
+            var token = string.Empty;
+            if (user.Email != null)
+            {
+                token = GenerateJwtToken(user.Id, user.Email, userRoles);
+            }
+
             var userDto = new UserDto
             {
                 Id = user.Id,
@@ -358,7 +363,7 @@ namespace RustyTech.Server.Services
             return decodedToken;
         }
 
-        private string GenerateJwtToken(Guid id, List<string> userRoles)
+        private string GenerateJwtToken(Guid id, string email, List<string> userRoles)
         {
             var key = _configuration["Jwt:Key"];
             var issuer = _configuration["Jwt:Issuer"];
@@ -374,6 +379,7 @@ namespace RustyTech.Server.Services
                 List<Claim> claims = new List<Claim>
                 {
                 new Claim(ClaimTypes.NameIdentifier, id.ToString()),
+                new Claim(ClaimTypes.Email, email),
                 new Claim(ClaimTypes.Role, string.Join(",", userRoles)),
                 };
 

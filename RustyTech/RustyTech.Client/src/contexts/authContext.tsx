@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { registerEP, loginEP, verifyTokenEP } from '../services/rustyTechService';
 import axios from 'axios';
-import { jwtDecode } from "jwt-decode";
+import { getJwtClaims } from '../utils/getJwtClaims';
 
 interface AuthState {
     isAuthenticated: boolean;
@@ -56,40 +56,37 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     useEffect(() => {
         const token = localStorage.getItem('jwtToken');
         if (token) {
-            verifyTokenEP(token)
-                .then((response) => {
-                    if (response) {
-                        const decodedToken = jwtDecode(token);
-                        //const userId = decodedToken.sub;
-                        console.log(decodedToken.sub);
-                        // Fetch user data if needed and update state
-                        axios.get<User>(`https://localhost:7262/api/user/get/E871281F-B180-4878-5E53-08DC68C32210`)
-                            .then(user => {
-                                setAuthState({
-                                    isAuthenticated: true,
-                                    isTokenValid: true,
-                                    token,
-                                    isLoading: false,
-                                    statusCode: 200,
-                                    isSuccess: true,
-                                    message: '',
-                                    user: user.data,
-                                });
-                            });
-                    } else {
-                        setAuthState((prevState) => ({
-                            ...prevState,
-                            isAuthenticated: false,
-                            isTokenValid: false,
-                            token: null,
+            verifyTokenEP(token).then((response) => {
+                if (response) {
+                    const claims = getJwtClaims(token);
+                    if (claims) {
+                        const userClaimed = { id: claims.nameIdentifier, email: claims.email };
+                        setAuthState({
+                            isAuthenticated: true,
+                            isTokenValid: true,
+                            token,
                             isLoading: false,
-                            statusCode: 401,
-                            isSuccess: false,
-                            message: 'Token is invalid',
-                            user: null,
-                        }));
+                            statusCode: 200,
+                            isSuccess: true,
+                            message: 'Welcome back',
+                            user: userClaimed,
+                        });
                     }
-                })
+                } else {
+                    setAuthState((prevState) => ({
+                        ...prevState,
+                        isAuthenticated: false,
+                        isTokenValid: false,
+                        token: null,
+                        isLoading: false,
+                        statusCode: 401,
+                        isSuccess: false,
+                        message: 'Token is invalid',
+                        user: null,
+                    }));
+                    localStorage.removeItem('jwtToken');
+                }
+            })
                 .catch(() => {
                     setAuthState((prevState) => ({
                         ...prevState,
