@@ -15,24 +15,37 @@ namespace RustyTech.Server.Middleware
 
         public async Task InvokeAsync(HttpContext context)
         {
-            var originalBodyStream = context.Response.Body;
-            using (var newBodyStream = new MemoryStream())
+            try
             {
-                context.Response.Body = newBodyStream;
+                Stream originalBodyStream = context.Response.Body;
+                using (var newBodyStream = new MemoryStream())
+                {
+                    context.Response.Body = newBodyStream;
 
-                await _next(context);
+                    await _next(context);
 
-                context.Response.Body.Seek(0, SeekOrigin.Begin);
-                var readBuffer = new StreamReader(context.Response.Body).ReadToEnd();
+                    context.Response.Body.Seek(0, SeekOrigin.Begin);
+                    string readBuffer = await new StreamReader(context.Response.Body).ReadToEndAsync();
 
-                var apiResponse = ApiResponse<object>.Success(JsonConvert.DeserializeObject(readBuffer));
+                    context.Response.Body = originalBodyStream;
 
-                var responseToReturn = JsonConvert.SerializeObject(apiResponse);
-                var responseBytes = Encoding.UTF8.GetBytes(responseToReturn);
-                context.Response.Body = originalBodyStream;  // Reset the original stream
-                context.Response.ContentType = "application/json";  // Set Content Type
-                await context.Response.Body.WriteAsync(responseBytes, 0, responseBytes.Length);
+                    ApiResponse<object> response = new ApiResponse<object>(context.Response.StatusCode, null, JsonConvert.DeserializeObject(readBuffer));
+                    await WriteResponse(response, context);
+                }
             }
+            catch (Exception ex)
+            {
+                ApiResponse<object> response = new ApiResponse<object>(context.Response.StatusCode, ex.Message, null);
+                await WriteResponse(response, context);
+            }
+        }
+
+        private async Task WriteResponse(ApiResponse<object> response, HttpContext context)
+        {
+            var responseJson = JsonConvert.SerializeObject(response);
+            var responseBytes = Encoding.UTF8.GetBytes(responseJson);
+            context.Response.ContentType = "application/json";
+            await context.Response.Body.WriteAsync(responseBytes, 0, responseBytes.Length);
         }
     }
 }

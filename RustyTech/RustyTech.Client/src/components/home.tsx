@@ -5,8 +5,12 @@ const Home: React.FC = () => {
     const { message } = useAuth();
 
     return (
-        <>{message && <p>{message}</p>}
-        <h1>Home Component</h1></>
+        <><main>
+            {message && <p>{message}</p>}
+            <h1>Home Component</h1>
+
+        </main>
+        </>
     );
 };
 

@@ -3,15 +3,17 @@ import axios from 'axios';
 const API_URL = 'https://localhost:7262/api';
 
 interface VerifyResponse {
-    statusCode: number;
-    Data: {
+    status_code: number;
+    message: string;
+    data: {
         isSuccess: boolean;
     };
 }
 
 interface ApiResponse {
-    statusCode: number;
-    Data: {
+    status_code: number;
+    message: string;
+    data: {
         statusCode: number;
         isSuccess: boolean;
         user: User;
@@ -59,8 +61,12 @@ export const loginEP = async (data: LoginRequest) => {
 
 export const verifyTokenEP = async (token: string) => {
     try {
-        const response = await axios.get<VerifyResponse>(`${API_URL}/auth/verify/token?token=${token}`);        
-        return response.data.Data.isSuccess;
+        const response = await axios.get<VerifyResponse>(`${API_URL}/auth/verify/token`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            }
+        });        
+        return response.data.data.isSuccess;
     } catch (e) {
         console.error('error verifying token: ', e);
         return false;

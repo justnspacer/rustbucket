@@ -29,6 +29,7 @@ namespace RustyTech.Server.Controllers
             return Ok(user);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("find/{email}")]
         public async Task<IActionResult> FindByEmailAsync(string email)
         {

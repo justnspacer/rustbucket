@@ -1,6 +1,9 @@
 ﻿#root {
     width: 100%;
     margin: 0 auto;
+}
+
+main {
     padding: 2rem;
 }
 
@@ -24,7 +27,15 @@ nav {
     padding: 1rem;
     background-color: #333;
     color: white;
-    margin-bottom: 2rem;
+}
+
+footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+    background-color: #333;
+    color: white;
 }
 
 .logo a:link, .logo a:visited {
@@ -37,10 +48,10 @@ nav {
     font-weight: bold;
 }
 
-.username a:link, .username a:visited {
-    color: #fff;
-    text-decoration: none;
-}
+    .username a:link, .username a:visited {
+        color: #fff;
+        text-decoration: none;
+    }
 
 nav .links {
     display: flex;
@@ -91,4 +102,3 @@ label {
     margin-top: 1rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
-

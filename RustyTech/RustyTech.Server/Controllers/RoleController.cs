@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RustyTech.Server.Models.Role;
 using RustyTech.Server.Services;
 
@@ -15,6 +16,7 @@ namespace RustyTech.Server.Controllers
             _roleService = roleService;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost("create")]
         public async Task<IActionResult> CreateRoleAsync(string roleName)
         {
@@ -22,6 +24,7 @@ namespace RustyTech.Server.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("get/all")]
         public async Task<IActionResult> GetAllAsync()
         {
@@ -29,6 +32,7 @@ namespace RustyTech.Server.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("get/{roleId}")]
         public async Task<IActionResult> GetRoleByIdAsync(string roleId)
         {
@@ -36,6 +40,7 @@ namespace RustyTech.Server.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("get/name/{roleName}")]
         public async Task<IActionResult> GetRoleByNameAsync(string roleName)
         {
@@ -43,6 +48,7 @@ namespace RustyTech.Server.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("get/user/{userId}")]
         public async Task<IActionResult> GetUserRolesAsync(Guid userId)
         {
@@ -50,6 +56,7 @@ namespace RustyTech.Server.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost("add/user")]
         public async Task<IActionResult> AddRoleToUserAsync([FromBody] RoleRequest request)
         {
@@ -57,6 +64,7 @@ namespace RustyTech.Server.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("remove/user")]
         public async Task<IActionResult> RemoveRoleFromUserAsync([FromBody] RoleRequest request)
         {

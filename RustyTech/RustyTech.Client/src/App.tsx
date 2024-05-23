@@ -5,7 +5,8 @@ import LoginForm from './components/loginForm';
 import RegisterForm from './components/registerForm';
 import Home from './components/home';
 import AuthProvider from './contexts/authContext';
-import Navbar from './components/navBar'; // Import the Navbar component
+import Navbar from './components/navBar';
+import Footer from './components/footer';
 
 function App() {
     useEffect(() => {
@@ -20,6 +21,7 @@ function App() {
                     <Route path="/register" Component={RegisterForm} />
                     <Route path="/" Component={Home} />
                 </Routes>
+                <Footer />
             </BrowserRouter>
         </AuthProvider>
     );

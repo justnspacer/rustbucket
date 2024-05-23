@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { registerEP, loginEP, verifyTokenEP } from '../services/rustyTechService';
-import axios from 'axios';
 import { getJwtClaims } from '../utils/getJwtClaims';
 
 interface AuthState {
@@ -110,9 +109,9 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
             if (response != null) {
                 setAuthState((prevState) => ({
                     ...prevState,
-                    isSuccess: response.data.Data.isSuccess,
-                    statusCode: response.data.Data.statusCode,
-                    message: response.data.Data.message,
+                    isSuccess: response.data.data.isSuccess,
+                    statusCode: response.data.data.statusCode,
+                    message: response.data.data.message,
                     user: null,
                     isAuthenticated: false,
                     isTokenValid: false,
@@ -137,7 +136,7 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         setAuthState((prevState) => ({ ...prevState, isLoading: true }));
         try {
             const response = await loginEP(data);
-            const token = response?.data.Data.token;
+            const token = response?.data.data.token;
             if (token) {
                 localStorage.setItem('jwtToken', token);
                 verifyTokenEP(token).then((res) => {
@@ -146,10 +145,10 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
                         isTokenValid: res,
                         token,
                         isLoading: false,
-                        statusCode: response.data.Data.statusCode,
-                        isSuccess: response.data.Data.isSuccess,
-                        message: response.data.Data.message,
-                        user: response.data.Data.user,
+                        statusCode: response.data.data.statusCode,
+                        isSuccess: response.data.data.isSuccess,
+                        message: response.data.data.message,
+                        user: response.data.data.user,
                     });
                 });
             }

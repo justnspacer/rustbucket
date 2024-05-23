@@ -65,6 +65,7 @@ namespace RustyTech.Server.Services
 
         public async Task<LoginResponse> LoginAsync(UserLogin request)
         {
+            var expires = _configuration["Jwt:ExpiresInMinutes"];
             var user = await _context.Users.FirstOrDefaultAsync(user => user.Email == request.Email);
             if (user == null)
             {
@@ -100,13 +101,19 @@ namespace RustyTech.Server.Services
             {
                 token = GenerateJwtToken(user.Id, user.Email, userRoles);
             }
-
             var userDto = new UserDto
             {
                 Id = user.Id,
                 Email = user.Email,
             };
-            return new LoginResponse() { IsAuthenticated = true, IsSuccess = true, User = userDto, Token = token, Message = "User logged in" };
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddMinutes(int.Parse(expires))
+            };
+            return new LoginResponse() { IsAuthenticated = true, IsSuccess = true, User = userDto, Token = token, Message = "User logged in", CookieOptions = cookieOptions };
         }
 
         public async Task<ResponseBase> VerifyEmailAsync(ConfirmEmailRequest request)
