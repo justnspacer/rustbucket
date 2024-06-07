@@ -9,10 +9,12 @@ namespace RustyTech.Server.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly ILogger<UserController> _logger;
 
-        public UserController(IUserService userService)
+        public UserController(IUserService userService, ILogger<UserController> logger)
         {
             _userService = userService;
+            _logger = logger;
         }
 
         [HttpGet("get/all")]
@@ -34,6 +36,7 @@ namespace RustyTech.Server.Controllers
         public async Task<IActionResult> FindByEmailAsync(string email)
         {
             var user = await _userService.FindByEmailAsync(email);
+            _logger.LogInformation($"User {email} found by email");
             return Ok(user);
         }
 
@@ -42,6 +45,7 @@ namespace RustyTech.Server.Controllers
         public async Task<IActionResult> DeleteAsync(Guid id)
         {
             var result = await _userService.DeleteAsync(id);
+            _logger.LogInformation($"User {id} deleted");
             return Ok(result);
         }
     }

@@ -13,17 +13,20 @@ namespace RustyTech.Server.Controllers
     {
         private readonly AuthService _authService;
         private readonly IAntiforgery _antiforgery;
+        private readonly ILogger<AuthController> _logger;
 
-        public AuthController(AuthService authService, IAntiforgery antiforgery)
+        public AuthController(AuthService authService, IAntiforgery antiforgery, ILogger<AuthController> logger)
         {
             _authService = authService;
             _antiforgery = antiforgery;
+            _logger = logger;
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> RegisterAsync([FromBody] UserRegister request)
         {
             var result = await _authService.RegisterAsync(request);
+            _logger.LogInformation($"User {request.Email} registered successfully");
             return Ok(result);
         }
 
@@ -34,18 +37,19 @@ namespace RustyTech.Server.Controllers
 
             if (result.Token == null || result.CookieOptions == null)
             {
-                return BadRequest("Invalid login attempt.");
+                _logger.LogError($"Invalid login attempt for user {request.Email}");
+                return BadRequest("Invalid login attempt");
             }
             Response.Cookies.Append("AuthToken", result.Token, result.CookieOptions);
 
             return Ok(result);
         }
 
-        [Authorize]
         [HttpPost("verify/email")]
         public async Task<IActionResult> VerifyEmail([FromBody] ConfirmEmailRequest request)
         {
             var result = await _authService.VerifyEmailAsync(request);
+            _logger.LogInformation($"Email verified");
             return Ok(result);
         }
 
@@ -56,7 +60,7 @@ namespace RustyTech.Server.Controllers
             var authHeader = HttpContext.Request.Headers["Authorization"].ToString();
             if (string.IsNullOrEmpty(authHeader) || !authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
             {
-                return BadRequest("Missing or invalid Authorization header.");
+                return BadRequest("Missing or invalid Authorization header");
             }
             var token = authHeader.Substring("Bearer ".Length).Trim();
             var result = _authService.VerifyJwtToken(token);
@@ -67,6 +71,7 @@ namespace RustyTech.Server.Controllers
         public IActionResult ResendEmailAsync(string email)
         {
             var result = _authService.ResendEmailAsync(email);
+            _logger.LogInformation($"Email resent to {email}");
             return Ok(result);
         }
 
@@ -74,6 +79,7 @@ namespace RustyTech.Server.Controllers
         public async Task<IActionResult> ForgotPasswordAsync(string email)
         {
             var result = await _authService.ForgotPasswordAsync(email);
+            _logger.LogInformation($"Forgot password: {email}");
             return Ok(result);
         }
 
@@ -82,6 +88,7 @@ namespace RustyTech.Server.Controllers
         public async Task<IActionResult> UpdateUserAsync([FromBody] UserUpdateDto user)
         {
             var result = await _authService.UpdateUserAsync(user);
+            _logger.LogInformation($"User updated");
             return Ok(result);
         }
 
@@ -106,6 +113,7 @@ namespace RustyTech.Server.Controllers
         public IActionResult GetInfoAsync(Guid userId)
         {
             var result = _authService.GetInfoAsync(userId);
+            _logger.LogInformation($"2fa status for: {userId}");
             return Ok(result);
         }
 
@@ -123,6 +131,7 @@ namespace RustyTech.Server.Controllers
         public IActionResult GetCsrfToken()
         {
             var token = _antiforgery.GetAndStoreTokens(HttpContext).RequestToken;
+            _logger.LogInformation($"Af token requested");
             return Ok(new { token });
         }
     }

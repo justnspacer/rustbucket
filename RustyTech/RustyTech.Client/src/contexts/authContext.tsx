@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { registerEP, loginEP, verifyTokenEP } from '../services/rustyTechService';
 import { getJwtClaims } from '../utils/getJwtClaims';
+import Spinner from '../components/spinner';
 
 interface AuthState {
     isAuthenticated: boolean;
@@ -45,7 +46,7 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         isAuthenticated: false,
         isTokenValid: false,
         token: null,
-        isLoading: false,
+        isLoading: true,
         statusCode: 0,
         isSuccess: false,
         message: '',
@@ -54,52 +55,65 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
     useEffect(() => {
         const token = localStorage.getItem('jwtToken');
-        if (token) {
-            verifyTokenEP(token).then((response) => {
-                if (response) {
-                    const claims = getJwtClaims(token);
-                    if (claims) {
-                        const userClaimed = { id: claims.nameIdentifier, email: claims.email };
-                        setAuthState({
-                            isAuthenticated: true,
-                            isTokenValid: true,
-                            token,
-                            isLoading: false,
-                            statusCode: 200,
-                            isSuccess: true,
-                            message: 'Welcome back',
-                            user: userClaimed,
-                        });
-                    }
-                } else {
-                    setAuthState((prevState) => ({
-                        ...prevState,
-                        isAuthenticated: false,
-                        isTokenValid: false,
-                        token: null,
-                        isLoading: false,
-                        statusCode: 401,
-                        isSuccess: false,
-                        message: 'Token is invalid',
-                        user: null,
-                    }));
-                    localStorage.removeItem('jwtToken');
-                }
-            })
-                .catch(() => {
-                    setAuthState((prevState) => ({
-                        ...prevState,
-                        isAuthenticated: false,
-                        isTokenValid: false,
-                        token: null,
-                        isLoading: false,
-                        statusCode: 500,
-                        isSuccess: false,
-                        message: 'Token verification failed',
-                        user: null,
-                    }));
-                });
+        if (!token) {
+            setAuthState((prevState) => ({
+                ...prevState,
+                isLoading: false, // Set isLoading to false if token is not present
+                message: 'no token found',
+            }));
+            return;
         }
+
+        setAuthState((prevState) => ({
+            ...prevState,
+            isLoading: true, // Set isLoading to true before token verification
+            message: 'loading...',
+        }));
+
+        verifyTokenEP(token).then((response) => {
+            if (response) {
+                const claims = getJwtClaims(token);
+                if (claims) {
+                    const userClaimed = { id: claims.nameIdentifier, email: claims.email };
+                    setAuthState({
+                        isAuthenticated: true,
+                        isTokenValid: true,
+                        token,
+                        isLoading: false,
+                        statusCode: 200,
+                        isSuccess: true,
+                        message: 'Welcome back',
+                        user: userClaimed,
+                    });
+                }
+            } else {
+                setAuthState((prevState) => ({
+                    ...prevState,
+                    isAuthenticated: false,
+                    isTokenValid: false,
+                    token: null,
+                    isLoading: false,
+                    statusCode: 401,
+                    isSuccess: false,
+                    message: 'no token found',
+                    user: null,
+                }));
+                localStorage.removeItem('jwtToken');
+            }
+        })
+            .catch(() => {
+                setAuthState((prevState) => ({
+                    ...prevState,
+                    isAuthenticated: false,
+                    isTokenValid: false,
+                    token: null,
+                    isLoading: false,
+                    statusCode: 500,
+                    isSuccess: false,
+                    message: 'Token verification failed',
+                    user: null,
+                }));
+            });
     }, []);
 
 
@@ -178,6 +192,10 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
             user: null,
         });
     };
+
+    if (authState.isLoading) {
+        return <Spinner />;
+    }
 
     return (
         <AuthContext.Provider value={{ ...authState, login, register, logout }}>

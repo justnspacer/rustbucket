@@ -136,7 +136,9 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+//middleware
 app.UseMiddleware<ResponseMiddleware>();
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseIpRateLimiting();
 
