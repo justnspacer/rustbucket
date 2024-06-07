@@ -37,7 +37,7 @@ namespace RustyTech.Server.Controllers
 
             if (result.Token == null || result.CookieOptions == null)
             {
-                _logger.LogError($"Invalid login attempt for user {request.Email}");
+                _logger.LogError($"Invalid login attempt for {request.Email}");
                 return BadRequest("Invalid login attempt");
             }
             Response.Cookies.Append("AuthToken", result.Token, result.CookieOptions);
