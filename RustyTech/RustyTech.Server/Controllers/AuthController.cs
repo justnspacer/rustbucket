@@ -35,12 +35,12 @@ namespace RustyTech.Server.Controllers
         {
             var result = await _authService.LoginAsync(request);
 
-            if (result.Token == null || result.CookieOptions == null)
+            if (result.Token == null)
             {
                 _logger.LogError($"Invalid login attempt for {request.Email}");
                 return BadRequest("Invalid login attempt");
             }
-            Response.Cookies.Append("AuthToken", result.Token, result.CookieOptions);
+            Response.Cookies.Append("AuthToken", result.Token);
 
             return Ok(result);
         }

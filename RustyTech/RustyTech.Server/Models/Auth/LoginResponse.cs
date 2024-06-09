@@ -7,6 +7,5 @@ namespace RustyTech.Server.Models.Auth
         public bool IsAuthenticated { get; set; }
         public UserDto? User { get; set; }
         public string? Token { get; set; }
-        public CookieOptions? CookieOptions { get; set; }
     }
 }

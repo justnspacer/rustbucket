@@ -107,14 +107,8 @@ namespace RustyTech.Server.Services
                 Id = user.Id,
                 Email = user.Email,
             };
-            var cookieOptions = new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTime.UtcNow.AddMinutes(int.Parse(expires))
-            };
-            return new LoginResponse() { IsAuthenticated = true, IsSuccess = true, User = userDto, Token = token, Message = Constants.Message.UserLoggedIn, CookieOptions = cookieOptions };
+
+            return new LoginResponse() { IsAuthenticated = true, IsSuccess = true, User = userDto, Token = token };
         }
 
         public async Task<ResponseBase> VerifyEmailAsync(ConfirmEmailRequest request)
