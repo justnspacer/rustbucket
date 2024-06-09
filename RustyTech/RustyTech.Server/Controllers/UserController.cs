@@ -18,9 +18,9 @@ namespace RustyTech.Server.Controllers
         }
 
         [HttpGet("get/all")]
-        public async Task<IActionResult> GetAllAsync()
+        public async Task<IActionResult> GetAllAsync(bool active = true)
         {
-            var users = await _userService.GetAllAsync();
+            var users = await _userService.GetAllAsync(active);
             return Ok(users);
         }
 

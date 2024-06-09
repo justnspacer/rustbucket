@@ -447,7 +447,7 @@ namespace RustyTech.Server.Services
 
         private bool IsPasswordValid(string password)
         {
-            string pattern = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{6,}$";
+            string pattern = Constants.PasswordRegex.Pattern;
             Regex regex = new Regex(pattern);
             return regex.IsMatch(password);
         }

@@ -9,7 +9,7 @@ namespace RustyTech.Server.Models.User
         public required string Email { get; set; }
         
         [Required, MinLength(6, ErrorMessage = "Please enter at least 6 characters")]
-        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{6,}$",
+        [RegularExpression(Constants.PasswordRegex.Pattern,
             ErrorMessage = "Please enter at least 6 characters and one lowercase letter, uppercase letter, digit, and special character")]
         [SwaggerSchema(Description = "string")]
         public required string Password { get; set; }

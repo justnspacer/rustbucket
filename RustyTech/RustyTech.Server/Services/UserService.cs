@@ -13,10 +13,17 @@ namespace RustyTech.Server.Services
             _logger = logger;
         }
 
-        public async Task<List<UserDto>> GetAllAsync()
+        public async Task<List<UserDto>> GetAllAsync(bool active = true)
         {
-            var users = await _context.Users
-                .Select(user => new UserDto { Id = user.Id, Email = user.Email }).ToListAsync();
+            var users = new List<UserDto>();
+            if (active)
+            {
+                users = await _context.Users.Where(confirmed => confirmed.EmailConfirmed).Select(user => new UserDto { Id = user.Id, Email = user.Email }).ToListAsync();
+            }
+            else
+            {
+                users = await _context.Users.Select(user => new UserDto { Id = user.Id, Email = user.Email }).ToListAsync();
+            }
             return users;
         }
 
