@@ -14,6 +14,9 @@
         public const string UserNotFound = "User not found";
         public const string UserNotVerified = "User not verified";
         public const string UserPassword = "User password reset, please check email";
+        public const string UserExists = "User already exists";
+        public const string UserRegistered = "User registered, please check email for confirmation";
+        public const string PasswordReset = "Password can be reset";
 
         //Error Messages
         public const string DataRecheck = "Please recheck input data";
@@ -21,6 +24,8 @@
         public const string InvalidCredentials = "Invalid credentials";
         public const string InvalidRequest = "Invalid request";
         public const string PasswordError = "Password must contain at least 6 characters, one lowercase letter, one uppercase letter, one digit, and one special character";
+        public const string PasswordMismatch = "Password and confirm password mismatch";
+
 
         //Token Messages
         public const string InvalidToken = "Invalid Token";

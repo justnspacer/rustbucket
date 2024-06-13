@@ -34,7 +34,12 @@ namespace RustyTech.Server.Services
         {
             if (_context.Users.Any(user => user.Email == request.Email))
             {
-                return new ResponseBase() { IsSuccess = false, Message = "User already exists" };
+                return new ResponseBase() { IsSuccess = false, Message = Constants.Message.UserExists };
+            }
+
+            if (request.Password != request.ConfirmPassword)
+            {
+                return new ResponseBase() { IsSuccess = false, Message = Constants.Message.PasswordMismatch };
             }
 
             CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
@@ -57,7 +62,7 @@ namespace RustyTech.Server.Services
             SendConfirmationEmail(user.Email, user.Id, EncodeToken(user.VerificationToken));
             _logger.LogInformation($"register email sent");
 
-            return new ResponseBase() { IsSuccess = true, Message = "User registered, email confirmation sent" };
+            return new ResponseBase() { IsSuccess = true, Message = Constants.Message.UserRegistered };
         }
 
         public async Task<LoginResponse> LoginAsync(UserLogin request)
@@ -78,7 +83,7 @@ namespace RustyTech.Server.Services
             {
                 return new LoginResponse() { IsAuthenticated = false, Message = Constants.Message.InvalidCredentials };
             }
-            await AddLoginRecordAsync(user.Id, "RustyTech", "Email", string.Empty);
+            await AddLoginRecordAsync(user.Id);
 
             var getRoles = await _context.UserRoles.Where(userRole => userRole.UserId == user.Id).ToListAsync();
             List<string> userRoles = new List<string>();
@@ -205,7 +210,7 @@ namespace RustyTech.Server.Services
 
             await _emailService.SendEmailAsync(emailRequest);
             _logger.LogInformation($"forgot password email sent");
-            return new ResponseBase() { IsSuccess = true, Message = "Password can be reset" };
+            return new ResponseBase() { IsSuccess = true, Message = Constants.Message.PasswordReset };
         }
 
         public async Task<ResponseBase> ResetPasswordAsync(ResetPasswordRequest request)
@@ -257,14 +262,20 @@ namespace RustyTech.Server.Services
 
         public async Task<ResponseBase> UpdateUserAsync(UserUpdateDto userDto)
         {
+            ResponseBase response = new ResponseBase();
+
             if (userDto.UserId == Guid.Empty)
             {
-                return new ResponseBase() { IsSuccess = false, Message = Constants.Message.IdRequried };
+                response.IsSuccess = false;
+                response.Message = Constants.Message.IdRequried;
+                return response;
             }
             var user = _context.Users.FirstOrDefault(user => user.Id == userDto.UserId);
             if (user == null)
             {
-                return new ResponseBase() { IsSuccess = false, Message = Constants.Message.UserNotFound };
+                response.IsSuccess = false;
+                response.Message = Constants.Message.UserNotFound;
+                return response;
             }
             if (userDto.Email != null)
             {
@@ -277,9 +288,9 @@ namespace RustyTech.Server.Services
                 {
                     user.VerificationToken = CreateRandomToken();
                     await _context.SaveChangesAsync();
-
                     SendConfirmationEmail(user.Email, user.Id, EncodeToken(user.VerificationToken));
                     _logger.LogInformation($"reconfirm new email sent");
+                    response.Message = $"Reverification email sent";
                 }
             }
             if (userDto.UserName != null)
@@ -292,9 +303,10 @@ namespace RustyTech.Server.Services
                 user.BirthYear = userDto.BirthYear;
             }
             _context.Users.Update(user);
-            await _context.SaveChangesAsync();            
-            return new ResponseBase() { IsSuccess = true, Message = $"User {user.Email} updated, if email updated, reverfication email sent" };
-
+            await _context.SaveChangesAsync();
+            response.IsSuccess = true;
+            response.Message += " user updated";
+            return response;
         }
 
         public async Task<ResponseBase> EnableTwoFactorAuthenticationAsync(Guid id)
@@ -425,14 +437,11 @@ namespace RustyTech.Server.Services
             _emailService.SendEmailAsync(emailRequest);
         }
 
-        private async Task AddLoginRecordAsync(Guid userId, string? applicationName, string loginProvider, string providerKey)
+        private async Task AddLoginRecordAsync(Guid userId)
         {
             var loginInfo = new LoginInfo
             {
                 UserId = userId,
-                LoginProvider = loginProvider,
-                ProviderKey = providerKey,
-                ApplicationName = applicationName,
                 LoginTime = DateTime.UtcNow,
             };
 

@@ -13,12 +13,15 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
 using RustyTech.Server.Services.Interfaces;
+using RustyTech.Server.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddMemoryCache();
+
+//rate limiting
 builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimiting"));
 builder.Services.Configure<IpRateLimitPolicies>(builder.Configuration.GetSection("IpRateLimitPolicies"));
 builder.Services.AddInMemoryRateLimiting();
@@ -95,13 +98,13 @@ builder.Services.AddSwaggerGen(config =>
             }
         });
 });
-builder.Services.AddDbContext<DataContext>(options =>
-       options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddIdentityCore<User>().AddRoles<IdentityRole>().AddEntityFrameworkStores<DataContext>();
 
 builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
-builder.Services.AddScoped<AuthService, AuthService>();
-builder.Services.AddScoped<RoleService, RoleService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 
@@ -161,7 +164,7 @@ app.MapFallbackToFile("/index.html");
 //role management
 using (var scope = app.Services.CreateScope())
 {
-    var roleService = scope.ServiceProvider.GetRequiredService<RoleService>();
+    var roleService = scope.ServiceProvider.GetRequiredService<IRoleService>();
     var roles = new[] { "Admin", "Manager", "User", "Guest" };
     foreach (var role in roles)
     {

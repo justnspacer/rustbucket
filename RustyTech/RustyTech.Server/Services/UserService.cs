@@ -69,6 +69,7 @@ namespace RustyTech.Server.Services
                 return "User not found";
             }
             _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
             _logger.LogInformation($"User {id} deleted");
             return $"User deleted";
         }

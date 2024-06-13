@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using RustyTech.Server.Models.Auth;
-using RustyTech.Server.Services;
 using RustyTech.Server.Services.Interfaces;
 
 namespace RustyTech.Server.Controllers
@@ -16,7 +15,7 @@ namespace RustyTech.Server.Controllers
         private readonly IAntiforgery _antiforgery;
         private readonly ILogger<AuthController> _logger;
 
-        public AuthController(AuthService authService, IAntiforgery antiforgery, ILogger<AuthController> logger)
+        public AuthController(IAuthService authService, IAntiforgery antiforgery, ILogger<AuthController> logger)
         {
             _authService = authService;
             _antiforgery = antiforgery;
