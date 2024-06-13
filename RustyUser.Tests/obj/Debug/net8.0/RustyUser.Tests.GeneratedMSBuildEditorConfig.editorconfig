@@ -8,6 +8,6 @@ build_property.PlatformNeutralAssembly =
 build_property.EnforceExtendedAnalyzerRules = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = RustyUser.Tests
-build_property.ProjectDir = C:\Users\justn\code\gullah\VerifyUser.Tests\
+build_property.ProjectDir = C:\Users\justn\code\rustbucket\RustyUser.Tests\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 

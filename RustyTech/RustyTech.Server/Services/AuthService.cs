@@ -7,19 +7,21 @@ using System.Text;
 using RustyTech.Server.Models.Auth;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
+using RustyTech.Server.Services.Interfaces;
+using RustyTech.Server.Interfaces;
 
 namespace RustyTech.Server.Services
 {
-    public class AuthService
+    public class AuthService : IAuthService
     {
         private readonly IEmailService _emailService;
+        private readonly IRoleService _roleService;
         private readonly IConfiguration _configuration;
-        private readonly ILogger<AuthService> _logger;
+        private readonly ILogger<IAuthService> _logger;
         private readonly DataContext _context;
-        private readonly RoleService _roleService;
 
-        public AuthService(IEmailService emailService, IConfiguration configuration,
-            ILogger<AuthService> logger, DataContext context, RoleService roleService)
+        public AuthService(IEmailService emailService, IRoleService roleService, IConfiguration configuration,
+            ILogger<IAuthService> logger, DataContext context)
         {
             _emailService = emailService;
             _configuration = configuration;
@@ -51,12 +53,6 @@ namespace RustyTech.Server.Services
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
-
-            //address
-            if (user.Email == "someemail")
-            {
-                user.VerifiedAt = DateTime.UtcNow;
-            }
 
             SendConfirmationEmail(user.Email, user.Id, EncodeToken(user.VerificationToken));
             _logger.LogInformation($"register email sent");
@@ -144,6 +140,11 @@ namespace RustyTech.Server.Services
                 var tokenKey = jwtToken.SecurityKey;
 
                 var currentDate = DateTime.UtcNow;
+
+                if (key == null)
+                {
+                    return new ResponseBase() { IsSuccess = false, Message = "No jwt key" };
+                }
 
                 SymmetricSecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
 

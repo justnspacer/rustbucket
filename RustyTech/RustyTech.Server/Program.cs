@@ -12,6 +12,7 @@ using RustyTech.Server.Middleware;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
+using RustyTech.Server.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 

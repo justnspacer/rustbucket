@@ -1,4 +1,4 @@
-﻿namespace RustyTech.Server.Services
+﻿namespace RustyTech.Server.Services.Interfaces
 {
     public interface IUserService
     {

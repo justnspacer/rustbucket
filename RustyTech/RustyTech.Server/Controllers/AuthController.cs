@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using RustyTech.Server.Models.Auth;
 using RustyTech.Server.Services;
+using RustyTech.Server.Services.Interfaces;
 
 namespace RustyTech.Server.Controllers
 {
@@ -11,7 +12,7 @@ namespace RustyTech.Server.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly AuthService _authService;
+        private readonly IAuthService _authService;
         private readonly IAntiforgery _antiforgery;
         private readonly ILogger<AuthController> _logger;
 

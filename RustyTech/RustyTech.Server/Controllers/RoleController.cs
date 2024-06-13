@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RustyTech.Server.Interfaces;
 using RustyTech.Server.Models.Role;
 using RustyTech.Server.Services;
 
@@ -9,7 +10,7 @@ namespace RustyTech.Server.Controllers
     [ApiController]
     public class RoleController : ControllerBase
     {
-        private readonly RoleService _roleService;
+        private readonly IRoleService _roleService;
         private readonly ILogger<RoleController> _logger;
 
 

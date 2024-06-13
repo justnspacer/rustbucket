@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using RustyTech.Server.Services;
+using RustyTech.Server.Services.Interfaces;
 
 namespace RustyTech.Server.Controllers
 {

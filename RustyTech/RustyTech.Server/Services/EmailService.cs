@@ -3,6 +3,7 @@ using MimeKit.Text;
 using MimeKit;
 using MailKit.Net.Smtp;
 using RustyTech.Server.Models.Auth;
+using RustyTech.Server.Services.Interfaces;
 
 namespace RustyTech.Server.Services
 {

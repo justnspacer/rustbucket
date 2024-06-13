@@ -1,13 +1,13 @@
-﻿using System.Net;
+﻿using RustyTech.Server.Services.Interfaces;
 
 namespace RustyTech.Server.Services
 {
     public class UserService : IUserService
     {
-        private readonly ILogger<UserService> _logger;
+        private readonly ILogger<IUserService> _logger;
         private readonly DataContext _context;
 
-        public UserService(DataContext context, ILogger<UserService> logger)
+        public UserService(DataContext context, ILogger<IUserService> logger)
         {
             _context = context;
             _logger = logger;
@@ -69,7 +69,7 @@ namespace RustyTech.Server.Services
                 return "User not found";
             }
             _context.Users.Remove(user);
-            _logger.LogInformation($"User deleted");
+            _logger.LogInformation($"User {id} deleted");
             return $"User deleted";
         }
     }

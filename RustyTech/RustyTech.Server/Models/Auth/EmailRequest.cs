@@ -9,7 +9,7 @@ namespace RustyTech.Server.Models.Auth
         public string? To { get; set; }
 
         [Required]
-        [StringLength(100, MinimumLength = 5)]
+        [StringLength(100)]
         public string? Subject { get; set; }
 
         [Required]

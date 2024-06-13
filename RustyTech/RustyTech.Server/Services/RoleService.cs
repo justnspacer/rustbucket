@@ -1,11 +1,14 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using RustyTech.Server.Interfaces;
 using RustyTech.Server.Models.Role;
 
 namespace RustyTech.Server.Services
 {
-    public class RoleService
+    public class RoleService : IRoleService
     {
         private readonly DataContext _context;
+
+        public RoleService() { }
 
         public RoleService(DataContext context)
         {
