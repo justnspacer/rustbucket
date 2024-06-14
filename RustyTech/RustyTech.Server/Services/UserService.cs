@@ -61,17 +61,17 @@ namespace RustyTech.Server.Services
         {
             if (id == Guid.Empty)
             {
-                return "id is required";
+                return Constants.Messages.IdRequired;
             }
             var user = await _context.Users.FirstOrDefaultAsync(user => user.Id == id);
             if (user == null)
             {
-                return "User not found";
+                return Constants.Messages.Info.UserNotFound;
             }
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();
             _logger.LogInformation($"User {id} deleted");
-            return $"User deleted";
+            return Constants.Messages.Info.UserDeleted;
         }
     }
 }

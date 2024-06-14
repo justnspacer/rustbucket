@@ -63,7 +63,7 @@ namespace RustyTech.Tests
 
             // Assert
             Assert.IsTrue(response.IsSuccess);
-            Assert.That(response.Message, Is.EqualTo(Message.UserRegistered));
+            Assert.That(response.Message, Is.EqualTo(Messages.Info.UserRegistered));
 
             var user = await _dataContext.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
             Assert.IsNotNull(user);
