@@ -15,73 +15,72 @@ using Microsoft.OpenApi.Models;
 using RustyTech.Server.Services.Interfaces;
 using RustyTech.Server.Interfaces;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args); // Create a WebApplication builder instance.
 
 // Add services to the container.
 
-builder.Services.AddMemoryCache();
+builder.Services.AddMemoryCache(); // Add in-memory caching services.
 
-//rate limiting
-builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimiting"));
-builder.Services.Configure<IpRateLimitPolicies>(builder.Configuration.GetSection("IpRateLimitPolicies"));
-builder.Services.AddInMemoryRateLimiting();
+// Rate limiting configuration.
+builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimiting")); // Configure IP rate limit options from configuration.
+builder.Services.Configure<IpRateLimitPolicies>(builder.Configuration.GetSection("IpRateLimitPolicies")); // Configure IP rate limit policies from configuration.
+builder.Services.AddInMemoryRateLimiting(); // Add in-memory rate limiting services.
 
 // Add CORS policy
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("MyCorsPolicy", policy =>
     {
-        policy.WithOrigins("https://localhost:5173")
-              .AllowAnyHeader()
-              .AllowAnyMethod();
+        policy.WithOrigins("https://localhost:5173") // Allow requests from this origin.
+              .AllowAnyHeader() // Allow any header.
+              .AllowAnyMethod(); // Allow any HTTP method.
     });
 });
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(); // Add services for controllers.
 builder.Services.AddAntiforgery(options =>
 {
-    options.HeaderName = "X-CSRF-TOKEN"; // Set the header name to be used in AJAX requests
+    options.HeaderName = "X-CSRF-TOKEN"; // Set the header name for CSRF tokens in AJAX requests.
 });
-
 
 // Add authentication
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultAuthenticateScheme = "Bearer";
-    options.DefaultChallengeScheme = "Bearer";
+    options.DefaultAuthenticateScheme = "Bearer"; // Set the default authentication scheme to "Bearer".
+    options.DefaultChallengeScheme = "Bearer"; // Set the default challenge scheme to "Bearer".
 })
 .AddJwtBearer("Bearer", options =>
 {
-    options.Authority = "https://some-authentication-authority.com";
-    options.Audience = "some-audience";
+    options.Authority = "https://some-authentication-authority.com"; // Set the authority for token validation.
+    options.Audience = "some-audience"; // Set the expected audience for the token.
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateAudience = true,
-        ValidateIssuer = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration.GetSection("Jwt:Issuer").Value,
-        ValidAudience = builder.Configuration.GetSection("Jwt:Audience").Value,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("Jwt:Key").Value))
+        ValidateAudience = true, // Validate the audience in the token.
+        ValidateIssuer = true, // Validate the issuer in the token.
+        ValidateLifetime = true, // Validate the token's lifetime.
+        ValidateIssuerSigningKey = true, // Validate the token's signing key.
+        ValidIssuer = builder.Configuration.GetSection("Jwt:Issuer").Value, // Set the valid issuer from configuration.
+        ValidAudience = builder.Configuration.GetSection("Jwt:Audience").Value, // Set the valid audience from configuration.
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("Jwt:Key").Value)) // Set the signing key from configuration.
     };
 });
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(); // Add authorization services.
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddRouting(options => options.LowercaseUrls = true);
+builder.Services.AddEndpointsApiExplorer(); // Add endpoint API explorer for Swagger.
+builder.Services.AddRouting(options => options.LowercaseUrls = true); // Configure routing to use lowercase URLs.
 builder.Services.AddSwaggerGen(config =>
 {
-    config.SwaggerDoc("v1", new() { Title = "RustyTech.Server", Version = "v1" });
+    config.SwaggerDoc("v1", new() { Title = "RustyTech.Server", Version = "v1" }); // Configure Swagger document.
 
     config.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        In = ParameterLocation.Header,
-        Description = "Please enter JWT with Bearer into field",
-        Name = "Authorization",
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer"
+        In = ParameterLocation.Header, // Define the location of the security scheme (header).
+        Description = "Please enter JWT with Bearer into field", // Description for the security scheme.
+        Name = "Authorization", // Name of the security scheme.
+        Type = SecuritySchemeType.ApiKey, // Type of the security scheme (API key).
+        Scheme = "Bearer" // The scheme name (Bearer).
     });
 
     config.AddSecurityRequirement(new OpenApiSecurityRequirement {
@@ -90,86 +89,86 @@ builder.Services.AddSwaggerGen(config =>
                 {
                     Reference = new OpenApiReference
                     {
-                        Type = ReferenceType.SecurityScheme,
-                        Id = "Bearer"
+                        Type = ReferenceType.SecurityScheme, // Reference type is a security scheme.
+                        Id = "Bearer" // The ID of the security scheme.
                     }
                 },
-                new string[] { }
+                new string[] { } // Required scopes for the security scheme.
             }
         });
 });
 
-builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-builder.Services.AddIdentityCore<User>().AddRoles<IdentityRole>().AddEntityFrameworkStores<DataContext>();
+builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))); // Add Entity Framework Core services with SQL Server configuration.
+builder.Services.AddIdentityCore<User>().AddRoles<IdentityRole>().AddEntityFrameworkStores<DataContext>(); // Add ASP.NET Core Identity services with roles and EF Core store.
 
-builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IRoleService, RoleService>();
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>(); // Add rate limit configuration as a singleton.
+builder.Services.AddScoped<IAuthService, AuthService>(); // Add authentication service with scoped lifetime.
+builder.Services.AddScoped<IRoleService, RoleService>(); // Add role service with scoped lifetime.
+builder.Services.AddScoped<IUserService, UserService>(); // Add user service with scoped lifetime.
+builder.Services.AddScoped<IEmailService, EmailService>(); // Add email service with scoped lifetime.
 
 builder.Services.Configure<RequestLocalizationOptions>(options =>
 {
     var supportedCultures = new[]
     {
-        new CultureInfo("en-US"),
-        new CultureInfo("es-ES"),
+        new CultureInfo("en-US"), // Add US English culture.
+        new CultureInfo("es-ES"), // Add Spanish culture.
     };
-    options.DefaultRequestCulture = new RequestCulture("en-US");
-    options.SupportedCultures = supportedCultures;
-    options.SupportedUICultures = supportedCultures;
+    options.DefaultRequestCulture = new RequestCulture("en-US"); // Set default request culture to US English.
+    options.SupportedCultures = supportedCultures; // Set supported cultures.
+    options.SupportedUICultures = supportedCultures; // Set supported UI cultures.
 });
 
-builder.Logging.ClearProviders();
-builder.Logging.AddNLog();
-builder.Logging.AddConsole();
-builder.Logging.AddDebug();
+builder.Logging.ClearProviders(); // Clear default logging providers.
+builder.Logging.AddNLog(); // Add NLog provider for logging.
+builder.Logging.AddConsole(); // Add console provider for logging.
+builder.Logging.AddDebug(); // Add debug provider for logging.
 
-var app = builder.Build();
+var app = builder.Build(); // Build the WebApplication.
 
-//middleware
+// Middleware to use CORS policy.
 app.UseCors("MyCorsPolicy");
 
-app.UseDefaultFiles();
-app.UseStaticFiles();
+app.UseDefaultFiles(); // Enable default file mapping for the app.
+app.UseStaticFiles(); // Enable static file serving.
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
+    app.UseSwagger(); // Enable Swagger middleware.
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "RustyTech.Server v1");
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "RustyTech.Server v1"); // Configure Swagger endpoint.
     });
 }
 
-//middleware
-app.UseMiddleware<ResponseMiddleware>();
-app.UseMiddleware<ExceptionMiddleware>();
+// Middleware for handling responses and exceptions.
+app.UseMiddleware<ResponseMiddleware>(); // Use custom response middleware.
+app.UseMiddleware<ExceptionMiddleware>(); // Use custom exception middleware.
 
-app.UseIpRateLimiting();
+app.UseIpRateLimiting(); // Enable IP rate limiting.
 
-app.UseHttpsRedirection();
+app.UseHttpsRedirection(); // Redirect HTTP requests to HTTPS.
 
-app.UseAuthentication();
+app.UseAuthentication(); // Enable authentication middleware.
 
-app.UseRouting();
+app.UseRouting(); // Enable routing middleware.
 
-app.UseAuthorization();
+app.UseAuthorization(); // Enable authorization middleware.
 
-app.MapControllers();
+app.MapControllers(); // Map controller routes.
 
-app.MapFallbackToFile("/index.html");
+app.MapFallbackToFile("/index.html"); // Map fallback route to serve index.html for SPA.
 
-//role management
+// Role management
 using (var scope = app.Services.CreateScope())
 {
-    var roleService = scope.ServiceProvider.GetRequiredService<IRoleService>();
-    var roles = new[] { "Admin", "Manager", "User", "Guest" };
+    var roleService = scope.ServiceProvider.GetRequiredService<IRoleService>(); // Get role service from DI.
+    var roles = new[] { "Admin", "Manager", "User", "Guest" }; // Define roles.
     foreach (var role in roles)
     {
-        await roleService.CreateRoleAsync(role);
+        await roleService.CreateRoleAsync(role); // Create roles if they don't exist.
     }
 }
 
-app.Run();
+app.Run(); // Run the application.
