@@ -10,6 +10,8 @@ namespace RustyTech.Server.Services.Interfaces
         Task<ResponseBase> VerifyEmailAsync(ConfirmEmailRequest request);
         ResponseBase VerifyJwtToken(string token);
         ResponseBase ResendEmailAsync(string email);
+        string GenerateJwtToken(Guid id, string email, List<string> userRoles);
+        void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt);
         Task<ResponseBase> ForgotPasswordAsync(string email);
         Task<ResponseBase> ResetPasswordAsync(ResetPasswordRequest request);
         Task<ResponseBase> UpdateUserAsync(UserUpdateDto userDto);

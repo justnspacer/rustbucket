@@ -338,7 +338,40 @@ namespace RustyTech.Server.Services
         }
 
         //helper methods
-        private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
+        public string GenerateJwtToken(Guid id, string email, List<string> userRoles)
+        {
+            var key = _configuration["Jwt:Key"];
+            var issuer = _configuration["Jwt:Issuer"];
+            var audience = _configuration["Jwt:Audience"];
+            var expires = _configuration["Jwt:ExpiresInMinutes"];
+
+            //need a key and expiration time to generate token
+            if (key != null && expires != null)
+            {
+                SymmetricSecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
+                SigningCredentials credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+                List<Claim> claims = new List<Claim>
+                {
+                new Claim(ClaimTypes.NameIdentifier, id.ToString()),
+                new Claim(ClaimTypes.Email, email),
+                new Claim(ClaimTypes.Role, string.Join(",", userRoles)),
+                };
+
+                JwtSecurityToken token = new JwtSecurityToken(
+                    issuer: issuer,
+                    audience: audience,
+                    claims: claims,
+                    expires: DateTime.UtcNow.AddMinutes(int.Parse(expires)),
+                    signingCredentials: credentials);
+
+                return new JwtSecurityTokenHandler().WriteToken(token);
+
+            }
+            return "Error generating token";
+        }
+
+        public void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
             using (var hmac = new HMACSHA512())
             {
@@ -375,39 +408,6 @@ namespace RustyTech.Server.Services
                 return Constants.Messages.Token.Invalid;
             }
             return decodedToken;
-        }
-
-        private string GenerateJwtToken(Guid id, string email, List<string> userRoles)
-        {
-            var key = _configuration["Jwt:Key"];
-            var issuer = _configuration["Jwt:Issuer"];
-            var audience = _configuration["Jwt:Audience"];
-            var expires = _configuration["Jwt:ExpiresInMinutes"];
-
-            //need a key and expiration time to generate token
-            if (key != null && expires != null)
-            {
-                SymmetricSecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
-                SigningCredentials credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
-                List<Claim> claims = new List<Claim>
-                {
-                new Claim(ClaimTypes.NameIdentifier, id.ToString()),
-                new Claim(ClaimTypes.Email, email),
-                new Claim(ClaimTypes.Role, string.Join(",", userRoles)),
-                };
-
-                JwtSecurityToken token = new JwtSecurityToken(
-                    issuer: issuer,
-                    audience: audience,
-                    claims: claims,
-                    expires: DateTime.UtcNow.AddMinutes(int.Parse(expires)),
-                    signingCredentials: credentials);
-
-                return new JwtSecurityTokenHandler().WriteToken(token);
-
-            }
-            return "Error generating token";
         }
 
         private string CreateConfirmEmailBody(Guid id, string token)

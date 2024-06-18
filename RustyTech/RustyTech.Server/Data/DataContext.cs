@@ -13,7 +13,6 @@ namespace RustyTech.Server.Data
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
-            optionsBuilder.UseSqlServer("Server=.\\Rustbucket;Database=RustyTech;Trusted_Connection=True;TrustServerCertificate=True");
         }
 
         public DbSet<User> Users { get; set; }

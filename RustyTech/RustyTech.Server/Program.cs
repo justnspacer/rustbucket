@@ -99,6 +99,8 @@ builder.Services.AddSwaggerGen(config =>
 });
 
 builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))); // Add Entity Framework Core services with SQL Server configuration.
+
+
 builder.Services.AddIdentityCore<User>().AddRoles<IdentityRole>().AddEntityFrameworkStores<DataContext>(); // Add ASP.NET Core Identity services with roles and EF Core store.
 
 builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>(); // Add rate limit configuration as a singleton.
