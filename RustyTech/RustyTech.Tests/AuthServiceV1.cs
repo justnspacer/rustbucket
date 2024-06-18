@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Identity.Data;
 namespace RustyTech.Tests
 {
     [TestFixture]
-    public class Tests
+    public class AuthServiceV1
     {
         private DataContext _context;
         private IAuthService _authService;
