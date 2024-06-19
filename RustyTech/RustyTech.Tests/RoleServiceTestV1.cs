@@ -11,7 +11,7 @@ using RustyTech.Server.Models.Role;
 
 namespace RustyTech.Tests
 {
-    public class RoleServiceV1
+    public class RoleServiceTestV1
     {
         private DataContext _context;
         private IRoleService _roleService;

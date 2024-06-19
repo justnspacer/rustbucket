@@ -10,12 +10,14 @@ namespace RustyTech.Server.Services
     public class EmailService : IEmailService
     {
         private readonly IConfiguration _configuration;
+        private readonly ISmtpClient _smtpClient;
         private readonly int _smtpPort = 587;
         private readonly SecureSocketOptions _secureSocketOptions = SecureSocketOptions.StartTls;
 
-        public EmailService(IConfiguration configuration)
+        public EmailService(IConfiguration configuration, ISmtpClient smtpClient)
         {
             _configuration = configuration;
+            _smtpClient = smtpClient;
         }
 
         public async Task SendEmailAsync(EmailRequest request)
@@ -28,17 +30,24 @@ namespace RustyTech.Server.Services
                 email.Subject = request.Subject;
                 email.Body = new TextPart(TextFormat.Html) { Text = request.Body };
 
-                using var smtp = new SmtpClient();
-                await smtp.ConnectAsync(_configuration["Email:Host"], _smtpPort, _secureSocketOptions);
-                await smtp.AuthenticateAsync(_configuration["Email:Username"], _configuration["Email:Password"]);
-                await smtp.SendAsync(email);
-                await smtp.DisconnectAsync(true);
+                await _smtpClient.ConnectAsync(_configuration["Email:Host"], _smtpPort, _secureSocketOptions);
+                await _smtpClient.AuthenticateAsync(_configuration["Email:Username"], _configuration["Email:Password"]);
+                await _smtpClient.SendAsync(email);
+                await _smtpClient.DisconnectAsync(true);
                 Console.WriteLine("Email sent successfully");
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Error sending email: " + ex.Message);
             }
+        }
+
+        public interface ISmtpClient : IDisposable
+        {
+            Task ConnectAsync(string? host, int port, SecureSocketOptions options);
+            Task AuthenticateAsync(string? userName, string? password);
+            Task SendAsync(MimeMessage message);
+            Task DisconnectAsync(bool quit);
         }
     }
 }

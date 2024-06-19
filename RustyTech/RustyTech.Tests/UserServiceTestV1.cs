@@ -10,7 +10,7 @@ using RustyTech.Server.Services.Interfaces;
 namespace RustyTech.Tests
 {
     [TestFixture]
-    public class UserServiceV1
+    public class UserServiceTestV1
     {
         private DataContext _context;
         private IUserService _userService;
