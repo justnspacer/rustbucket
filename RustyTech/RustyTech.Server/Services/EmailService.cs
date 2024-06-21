@@ -1,7 +1,6 @@
 ﻿using MailKit.Security;
 using MimeKit.Text;
 using MimeKit;
-using MailKit.Net.Smtp;
 using RustyTech.Server.Models.Auth;
 using RustyTech.Server.Services.Interfaces;
 
@@ -10,11 +9,11 @@ namespace RustyTech.Server.Services
     public class EmailService : IEmailService
     {
         private readonly IConfiguration _configuration;
-        private readonly ISmtpClient _smtpClient;
+        private readonly ISmtpClientService _smtpClient;
         private readonly int _smtpPort = 587;
         private readonly SecureSocketOptions _secureSocketOptions = SecureSocketOptions.StartTls;
 
-        public EmailService(IConfiguration configuration, ISmtpClient smtpClient)
+        public EmailService(IConfiguration configuration, ISmtpClientService smtpClient)
         {
             _configuration = configuration;
             _smtpClient = smtpClient;
@@ -40,14 +39,6 @@ namespace RustyTech.Server.Services
             {
                 Console.WriteLine("Error sending email: " + ex.Message);
             }
-        }
-
-        public interface ISmtpClient : IDisposable
-        {
-            Task ConnectAsync(string? host, int port, SecureSocketOptions options);
-            Task AuthenticateAsync(string? userName, string? password);
-            Task SendAsync(MimeMessage message);
-            Task DisconnectAsync(bool quit);
         }
     }
 }

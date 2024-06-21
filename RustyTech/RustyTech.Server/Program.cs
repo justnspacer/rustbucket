@@ -14,6 +14,7 @@ using System.Text;
 using Microsoft.OpenApi.Models;
 using RustyTech.Server.Services.Interfaces;
 using RustyTech.Server.Interfaces;
+using MailKit.Net.Smtp;
 
 var builder = WebApplication.CreateBuilder(args); // Create a WebApplication builder instance.
 
@@ -108,6 +109,7 @@ builder.Services.AddScoped<IAuthService, AuthService>(); // Add authentication s
 builder.Services.AddScoped<IRoleService, RoleService>(); // Add role service with scoped lifetime.
 builder.Services.AddScoped<IUserService, UserService>(); // Add user service with scoped lifetime.
 builder.Services.AddScoped<IEmailService, EmailService>(); // Add email service with scoped lifetime.
+builder.Services.AddScoped<ISmtpClientService, SmtpClientService>(); // Add smtp client service with scoped lifetime.
 
 builder.Services.Configure<RequestLocalizationOptions>(options =>
 {

@@ -12,7 +12,7 @@ namespace RustyTech.Tests
     public class EmailServiceTestV1
     {
         private IEmailService _emailService;
-        private Mock<EmailService.ISmtpClient> _smtpClientMock;
+        private Mock<ISmtpClientService> _smtpClientMock;
 
         [SetUp]
         public void Setup()
@@ -22,7 +22,7 @@ namespace RustyTech.Tests
             configMock.SetupGet(x => x["Email:Host"]).Returns("smtp.example.com");
             configMock.SetupGet(x => x["Email:Password"]).Returns("password");
 
-            _smtpClientMock = new Mock<EmailService.ISmtpClient>();
+            _smtpClientMock = new Mock<ISmtpClientService>();
             _smtpClientMock.Setup(smtp => smtp.ConnectAsync("smtp.example.com", 587, SecureSocketOptions.StartTls)).Returns(Task.CompletedTask);
             _smtpClientMock.Setup(smtp => smtp.AuthenticateAsync("test@example.com", "password")).Returns(Task.CompletedTask);
             _smtpClientMock.Setup(smtp => smtp.SendAsync(It.IsAny<MimeMessage>())).Returns(Task.CompletedTask);
@@ -50,33 +50,6 @@ namespace RustyTech.Tests
             _smtpClientMock.Verify(smtp => smtp.AuthenticateAsync("test@example.com", "password"), Times.Once);
             _smtpClientMock.Verify(smtp => smtp.SendAsync(It.Is<MimeMessage>(m => m.Subject == "Test Email" && m.To.ToString() == "recipient@example.com")), Times.Once);
             _smtpClientMock.Verify(smtp => smtp.DisconnectAsync(true), Times.Once);
-        }
-    }
-
-    public class MockSmtpClient : EmailService.ISmtpClient
-    {
-        public Task ConnectAsync(string? host, int port, SecureSocketOptions options)
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task AuthenticateAsync(string? username, string? password)
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task SendAsync(MimeMessage message)
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task DisconnectAsync(bool quit)
-        {
-            return Task.CompletedTask;
-        }
-
-        public void Dispose()
-        {
         }
     }
 }
