@@ -6,8 +6,8 @@ const Home: React.FC = () => {
 
     return (
         <><main>
-            {message && <p>{message}</p>}
             <h1>Home Component</h1>
+            {message && <p>{message}</p>}
             <section>
             </section>
         </main>
