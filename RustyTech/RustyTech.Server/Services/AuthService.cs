@@ -9,6 +9,8 @@ using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using RustyTech.Server.Services.Interfaces;
 using RustyTech.Server.Interfaces;
+using System.Net.Mail;
+using RustyTech.Server.Utilities;
 
 namespace RustyTech.Server.Services
 {
@@ -34,7 +36,12 @@ namespace RustyTech.Server.Services
         {
             if (_context.Users.Any(user => user.Email == request.Email))
             {
-                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Info.UserExists };
+                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Error.BadRequest };
+            }
+
+            if (!EmailValidator.IsValidEmail(request.Email))
+            {
+                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Error.InvalidEmail };
             }
 
             if (request.Password != request.ConfirmPassword)

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using RustyTech.Server.Constants;
@@ -25,7 +26,6 @@ namespace RustyTech.Tests
                 .UseInMemoryDatabase(databaseName: "TestDatabase")
                 .Options;
             _context = new DataContext(options);
-
             _userService = new UserService(_context, loggerMock.Object);
         }
 
@@ -117,48 +117,6 @@ namespace RustyTech.Tests
         }
 
         [Test]
-        public async Task FindByEmailAsync_ShouldReturnUserDto_WhenEmailIsValid()
-        {
-            // Arrange
-            var userEmail = "user@example.com";
-            var user = new User { Id = Guid.NewGuid(), Email = userEmail, EmailConfirmed = true };
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
-            // Act
-            var result = await _userService.FindByEmailAsync(userEmail);
-
-            // Assert
-            Assert.IsNotNull(result);
-            Assert.That(result.Id, Is.EqualTo(user.Id));
-            Assert.That(result.Email, Is.EqualTo(userEmail));
-
-        }
-
-        [Test]
-        public async Task FindByEmailAsync_ShouldReturnNull_WhenEmailIsEmpty()
-        {
-            // Act
-            var result = await _userService.FindByEmailAsync(string.Empty);
-
-            // Assert
-            Assert.IsNull(result);
-        }
-
-        [Test]
-        public async Task FindByEmailAsync_ShouldReturnNull_WhenUserNotFound()
-        {
-            // Arrange
-            var userEmail = "user@example.com";
-
-            // Act
-            var result = await _userService.FindByEmailAsync(userEmail);
-
-            // Assert
-            Assert.IsNull(result);
-        }
-
-        [Test]
         public async Task DeleteAsync_ShouldReturnUserDeletedMessage_WhenIdIsValid()
         {
             // Arrange
@@ -171,7 +129,7 @@ namespace RustyTech.Tests
             var result = await _userService.DeleteAsync(userId);
 
             // Assert
-            Assert.That(result, Is.EqualTo(Messages.Info.UserDeleted));
+            Assert.That(result.Message, Is.EqualTo(Messages.Info.UserDeleted));
             Assert.IsNull(await _context.Users.FindAsync(userId));
         }
 
@@ -182,11 +140,11 @@ namespace RustyTech.Tests
             var result = await _userService.DeleteAsync(Guid.Empty);
 
             // Assert
-            Assert.That(result, Is.EqualTo(Messages.IdRequired));
+            Assert.That(result.Message, Is.EqualTo(Messages.IdRequired));
         }
 
         [Test]
-        public async Task DeleteAsync_ShouldReturnUserNotFoundMessage_WhenUserNotFound()
+        public async Task DeleteAsync_ShouldReturnUserBadRequestMessage_WhenUserNotFound()
         {
             // Arrange
             var userId = Guid.NewGuid();
@@ -195,7 +153,7 @@ namespace RustyTech.Tests
             var result = await _userService.DeleteAsync(userId);
 
             // Assert
-            Assert.That(result, Is.EqualTo(Messages.Info.UserNotFound));
+            Assert.That(result.Message, Is.EqualTo(Messages.Error.BadRequest));
         }
     }
 }

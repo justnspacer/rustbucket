@@ -22,24 +22,21 @@ namespace RustyTech.Tests
         [SetUp]
         public void Setup()
         {
-            // Mock dependencies
             var emailServiceMock = new Mock<IEmailService>();
             var roleServiceMock = new Mock<IRoleService>();
             var configurationMock = new Mock<IConfiguration>();
             var loggerMock = new Mock<ILogger<IAuthService>>();
 
-            configurationMock.SetupGet(x => x[It.Is<string>(s => s == "Jwt:Key")]).Returns("J277A871-D6B8-4167-CDF3-D85F255901CE");
-            configurationMock.SetupGet(x => x[It.Is<string>(s => s == "Jwt:Issuer")]).Returns("https://localhost:7164");
-            configurationMock.SetupGet(x => x[It.Is<string>(s => s == "Jwt:Audience")]).Returns("https://localhost:7164");
+            configurationMock.SetupGet(x => x[It.Is<string>(s => s == "Jwt:Key")]).Returns("J277A871-CDF3-D6B8-4167-D6B8-D85F255901CE");
+            configurationMock.SetupGet(x => x[It.Is<string>(s => s == "Jwt:Issuer")]).Returns("https://testhost:7111");
+            configurationMock.SetupGet(x => x[It.Is<string>(s => s == "Jwt:Audience")]).Returns("https://testhost:7111");
             configurationMock.SetupGet(x => x[It.Is<string>(s => s == "Jwt:ExpiresInMinutes")]).Returns("30");
 
-            // Create in-memory database
             var options = new DbContextOptionsBuilder<DataContext>()
                 .UseInMemoryDatabase(databaseName: "TestDatabase")
                 .Options;
             _context = new DataContext(options);
 
-            // Initialize AuthService with mocked dependencies and in-memory database
             _authService = new AuthService(emailServiceMock.Object, roleServiceMock.Object, configurationMock.Object, loggerMock.Object, _context);
         }
 
@@ -68,6 +65,44 @@ namespace RustyTech.Tests
             // Assert
             Assert.IsTrue(response.IsSuccess);
             Assert.That(response.Message, Is.EqualTo(Messages.Info.UserRegistered));
+        }
+
+        [Test]
+        public async Task RegisterAsync_PasswordMismatch_ReturnsResponseBaseWithErrorMessage()
+        {
+            // Arrange
+            var request = new UserRegister
+            {
+                Email = "request@example.com",
+                Password = "Password123",
+                ConfirmPassword = "Password12"
+            };
+
+            // Act
+            var response = await _authService.RegisterAsync(request);
+
+            // Assert
+            Assert.IsFalse(response.IsSuccess);
+            Assert.That(response.Message, Is.EqualTo(Messages.Error.PasswordMismatch));
+        }
+
+        [Test]
+        public async Task RegisterAsync_BadEmail_ReturnsResponseBaseWithErrorMessage()
+        {
+            // Arrange
+            var request = new UserRegister
+            {
+                Email = "request@example.",
+                Password = "Password123",
+                ConfirmPassword = "Password123"
+            };
+
+            // Act
+            var response = await _authService.RegisterAsync(request);
+
+            // Assert
+            Assert.IsFalse(response.IsSuccess);
+            Assert.That(response.Message, Is.EqualTo(Messages.Error.InvalidEmail));
         }
 
         [Test]
@@ -128,7 +163,7 @@ namespace RustyTech.Tests
         public void VerifyJwtToken_ValidToken_ReturnsResponseBaseWithSuccessMessage()
         {
             // Arrange
-            var token = _authService.GenerateJwtToken(Guid.NewGuid(), "testemail@example.com", new List<string>() { "Manager" });
+            var token = _authService.GenerateJwtToken(Guid.NewGuid(), "testemail@example.com", new List<string>() { "Test" });
 
             // Act
             var response = _authService.VerifyJwtToken(token);
@@ -178,7 +213,6 @@ namespace RustyTech.Tests
             Assert.IsTrue(response.IsSuccess);
             Assert.That(response.Message, Is.EqualTo(Messages.Info.UserPasswordReset));
         }
-
 
         [Test]
         public async Task ResetPasswordAsync_SuccessfulRequest_ReturnsResponseBaseWithSuccessMessage()
@@ -244,6 +278,7 @@ namespace RustyTech.Tests
             Assert.That(updatedUser.Email, Is.EqualTo(userDto.Email));
             Assert.That(updatedUser.BirthYear, Is.EqualTo(userDto.BirthYear));
         }
+
         [Test]
         public async Task EnableTwoFactorAuthenticationAsync_SuccessfulRequest_ReturnsResponseBaseWithSuccessMessage()
         {

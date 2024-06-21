@@ -1,11 +1,12 @@
-﻿using RustyTech.Server.Services.Interfaces;
+﻿using RustyTech.Server.Models.Auth;
+using RustyTech.Server.Services.Interfaces;
 
 namespace RustyTech.Server.Services
 {
     public class UserService : IUserService
     {
-        private readonly ILogger<IUserService> _logger;
         private readonly DataContext _context;
+        private readonly ILogger<IUserService> _logger;
 
         public UserService(DataContext context, ILogger<IUserService> logger)
         {
@@ -42,36 +43,22 @@ namespace RustyTech.Server.Services
             return userDto;
         }
 
-        public async Task<UserDto?> FindByEmailAsync(string email)
-        {
-            if (string.IsNullOrEmpty(email))
-            {
-                return null;
-            }
-            var user = await _context.Users.FirstOrDefaultAsync(user => user.Email == email);
-            if (user == null)
-            {
-                return null;
-            }
-            var userDto = new UserDto { Id = user.Id, Email = user.Email };
-            return userDto;
-        }
-
-        public async Task<string> DeleteAsync(Guid id)
+        public async Task<ResponseBase> DeleteAsync(Guid id)
         {
             if (id == Guid.Empty)
             {
-                return Constants.Messages.IdRequired;
+                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.IdRequired };
             }
-            var user = await _context.Users.FirstOrDefaultAsync(user => user.Id == id);
-            if (user == null)
+
+            var userToDelete = await _context.Users.FirstOrDefaultAsync(user => user.Id == id);
+            if (userToDelete == null)
             {
-                return Constants.Messages.Info.UserNotFound;
+                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Error.BadRequest };
             }
-            _context.Users.Remove(user);
+            _context.Users.Remove(userToDelete);
             await _context.SaveChangesAsync();
             _logger.LogInformation($"User {id} deleted");
-            return Constants.Messages.Info.UserDeleted;
+            return new ResponseBase() { IsSuccess = true, Message = Constants.Messages.Info.UserDeleted };
         }
     }
 }

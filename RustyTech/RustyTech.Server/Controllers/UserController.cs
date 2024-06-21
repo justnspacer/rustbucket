@@ -30,14 +30,6 @@ namespace RustyTech.Server.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpGet("find/{email}")]
-        public async Task<IActionResult> FindByEmailAsync(string email)
-        {
-            var user = await _userService.FindByEmailAsync(email);
-            return Ok(user);
-        }
-
-        [Authorize(Roles = "Admin")]
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeleteAsync(Guid id)
         {

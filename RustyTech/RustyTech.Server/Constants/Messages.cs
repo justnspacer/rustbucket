@@ -43,6 +43,8 @@
             public const string BadRequest = "Bad request";
             public const string PasswordError = "Password must contain at least 6 characters, one lowercase letter, one uppercase letter, one digit, and one special character";
             public const string PasswordMismatch = "Password and confirm password mismatch";
+            public const string InvalidEmail = "Invaild email";
+            public const string Unauthorized = "Unauthorized";
         }
 
         // Token Messages
