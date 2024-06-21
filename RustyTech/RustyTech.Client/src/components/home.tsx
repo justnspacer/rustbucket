@@ -8,7 +8,8 @@ const Home: React.FC = () => {
         <><main>
             {message && <p>{message}</p>}
             <h1>Home Component</h1>
-
+            <section>
+            </section>
         </main>
         </>
     );

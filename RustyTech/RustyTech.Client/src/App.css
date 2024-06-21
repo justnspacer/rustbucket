@@ -7,45 +7,41 @@ main {
     padding: 2rem;
 }
 
-tr:nth-child(even) {
-    background: #F2F2F2;
-}
-
-tr:nth-child(odd) {
-    background: #FFF;
-}
-
-th, td {
-    padding-left: 1rem;
-    padding-right: 1rem;
-}
-
 nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 1rem;
-    background-color: #333;
     color: white;
 }
 
 footer {
-    display: flex;
-    justify-content: center;
-    align-items: center;
     padding: 1rem;
-    background-color: #333;
     color: white;
 }
 
-.logo a:link, .logo a:visited {
+    footer div {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: .5rem;
+    }
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
     color: #fff;
-    text-decoration: none;
 }
+
+    .logo a:link, .logo a:visited {
+        color: #fff;
+        text-decoration: none;
+    }
 
 .username {
     color: #fff;
-    font-weight: bold;
+    cursor: pointer;
 }
 
     .username a:link, .username a:visited {
@@ -119,6 +115,23 @@ label {
     animation: spin 1s ease infinite;
 }
 
+.register-line {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+
+.login-link {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    text-transform: capitalize;
+}
+
+a.login-link:link, a.login-link:visited {
+    color: #fff;
+}
+
 @keyframes spin {
     0% {
         transform: rotate(0deg);
@@ -128,3 +141,19 @@ label {
         transform: rotate(360deg);
     }
 }
+
+.dropdown {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    background-color: #fff;
+    box-shadow: 4px 4px rgba(0,0,0,0.4);
+    width: 150px;
+}
+
+    .dropdown a:link, .dropdown a:visited {
+        color: #000;
+        text-decoration: none;
+        padding: 10px 10px 10px 5px;
+    }
