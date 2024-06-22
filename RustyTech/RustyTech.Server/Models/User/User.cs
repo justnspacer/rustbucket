@@ -15,5 +15,12 @@ namespace RustyTech.Server.Models.User
         public DateTime? ResetTokenExpires { get; set; }
         public int BirthYear { get; set; }
         public override bool TwoFactorEnabled { get; set; }
+
+        public ICollection<Post> Posts { get; set; } // Navigation property
+
+        public User()
+        {
+            Posts = new List<Post>();
+        }
     }
 }

@@ -110,6 +110,7 @@ builder.Services.AddScoped<IRoleService, RoleService>(); // Add role service wit
 builder.Services.AddScoped<IUserService, UserService>(); // Add user service with scoped lifetime.
 builder.Services.AddScoped<IEmailService, EmailService>(); // Add email service with scoped lifetime.
 builder.Services.AddScoped<ISmtpClientService, SmtpClientService>(); // Add smtp client service with scoped lifetime.
+builder.Services.AddScoped<IPostService, PostService>(); // Add post service with scoped lifetime.
 
 builder.Services.Configure<RequestLocalizationOptions>(options =>
 {
