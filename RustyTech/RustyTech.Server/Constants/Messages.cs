@@ -20,6 +20,8 @@
             public const string UserRegistered = "User registered, please check email for confirmation";
             public const string PasswordReset = "Password can be reset";
             public const string UserDeleted = "User deleted";
+            public const string PostCreated = "Post created";
+            public const string PostNotFound = "Post not found";
         }
 
         // Role Messages

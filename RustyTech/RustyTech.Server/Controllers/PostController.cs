@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using RustyTech.Server.Interfaces;
 using RustyTech.Server.Services.Interfaces;
 
 namespace RustyTech.Server.Controllers
@@ -8,9 +10,12 @@ namespace RustyTech.Server.Controllers
     public class PostController : ControllerBase
     {
         private readonly IPostService _postService;
-        public PostController(IPostService postService)
+        private readonly IRoleService _roleService;
+
+        public PostController(IPostService postService, IRoleService roleService)
         {
             _postService = postService;
+            _roleService = roleService;
         }
 
         [HttpGet("get/all")]
@@ -18,6 +23,13 @@ namespace RustyTech.Server.Controllers
         {
             var posts = await _postService.GetAllAsync(published);
             return Ok(posts);
+        }
+
+        [HttpGet("get/{postId}")]
+        public async Task<IActionResult> GetPostByIdAsync(int postId)
+        {
+            var post = await _postService.GetPostByIdAsync(postId);
+            return Ok(post);
         }
 
         [HttpPost("create/blog")]
@@ -39,6 +51,14 @@ namespace RustyTech.Server.Controllers
         {
             var post = await _postService.CreateVideoPostAsync(request);
             return Ok(post);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("publish")]
+        public async Task<IActionResult> TogglePostPublishedStatusAsync(int postId)
+        {
+            var result = await _postService.TogglePostPublishedStatusAsync<Post>(postId);
+            return Ok(result);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using RustyTech.Server.Models.Auth;
 using RustyTech.Server.Services.Interfaces;
 
 namespace RustyTech.Server.Services
@@ -18,89 +19,91 @@ namespace RustyTech.Server.Services
             _logger = logger;
         }
 
-        public async Task<BlogPost?> CreateBlogPostAsync(BlogPost post)
+        public async Task<ResponseBase> CreateBlogPostAsync(BlogPost post)
         {
-
             if (post == null)
             {
-                return null;
+                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Error.BadRequest };
             }
             if (post.UserId == Guid.Empty)
             {
-                return null;
+                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.IdRequired };
             }
             var user = await _userService.GetByIdAsync(post.UserId);
             if (user == null)
             {
-                return null;
+                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Info.UserNotFound };
             }
+            DateTime date = DateTime.UtcNow;
             post.Title = post.Title;
             post.Content = post.Content;
             post.ImageUrls = post.ImageUrls;
-            post.CreatedAt = DateTime.UtcNow;
-            post.UpdatedAt = DateTime.UtcNow;
+            post.CreatedAt = date;
+            post.UpdatedAt = date;
             post.UserId = user.Id;
             post.IsPublished = true;
             await _context.BlogPosts.AddAsync(post);
             await _context.SaveChangesAsync();
             _logger.LogInformation($"Blog post {post.Id} created");
-            return post;
+            return new ResponseBase() { IsSuccess = true, Message = Constants.Messages.Info.PostCreated };
         }
 
-        public async Task<ImagePost?> CreateImagePostAsync(ImagePost post)
+        public async Task<ResponseBase> CreateImagePostAsync(ImagePost post)
         {
             if (post == null)
             {
-                return null;
+                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Error.BadRequest };
             }
             if (post.UserId == Guid.Empty)
             {
-                return null;
+                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.IdRequired };
             }
             var user = await _userService.GetByIdAsync(post.UserId);
             if (user == null)
             {
-                return null;
+                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Info.UserNotFound };
             }
+            DateTime date = DateTime.UtcNow;
             post.Title = post.Title;
             post.Content = post.Content;
             post.ImageUrl = post.ImageUrl;
-            post.CreatedAt = DateTime.UtcNow;
-            post.UpdatedAt = DateTime.UtcNow;
+            post.CreatedAt = date;
+            post.UpdatedAt = date;
             post.UserId = user.Id;
             post.IsPublished = true;
             await _context.ImagePosts.AddAsync(post);
             await _context.SaveChangesAsync();
             _logger.LogInformation($"Image post {post.Id} created");
-            return post;
+            return new ResponseBase() { IsSuccess = true, Message = Constants.Messages.Info.PostCreated };
         }
 
-        public async Task<VideoPost?> CreateVideoPostAsync(VideoPost post)
+        public async Task<ResponseBase> CreateVideoPostAsync(VideoPost post)
         {
             if (post == null)
             {
-                return null;
+                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Error.BadRequest };
             }
             if (post.UserId == Guid.Empty)
             {
-                return null;
+                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.IdRequired };
             }
             var user = await _userService.GetByIdAsync(post.UserId);
             if (user == null)
             {
-                return null;
+                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Info.UserNotFound };
             }
+            DateTime date = DateTime.UtcNow;
             post.Title = post.Title;
             post.Content = post.Content;
             post.VideoUrl = post.VideoUrl;
-            post.CreatedAt = DateTime.UtcNow;
-            post.UpdatedAt = DateTime.UtcNow;
+            post.CreatedAt = date;
+            post.UpdatedAt = date;
             post.UserId = user.Id;
             post.IsPublished = true;
             await _context.VideoPosts.AddAsync(post);
             await _context.SaveChangesAsync();
             _logger.LogInformation($"Video post {post.Id} created");
-            return post;
+            return new ResponseBase() { IsSuccess = true, Message = Constants.Messages.Info.PostCreated };
         }
 
         public async Task<List<PostDto>> GetAllAsync(bool published = true)
@@ -141,7 +144,44 @@ namespace RustyTech.Server.Services
             return allPosts;
         }
 
+        public async Task<PostDto?> GetPostByIdAsync(int postId)
+        {
+            BlogPost blogPost = await _context.BlogPosts.FindAsync(postId);
+            if (blogPost != null)
+            {
+                return _mapper.Map<BlogPost, PostDto>(blogPost);
+            }
 
+            ImagePost imagePost = await _context.ImagePosts.FindAsync(postId);
+            if (imagePost != null)
+            {
+                return _mapper.Map<ImagePost, PostDto>(imagePost);
+            }
 
+            VideoPost videoPost = await _context.VideoPosts.FindAsync(postId);
+            if (videoPost != null)
+            {
+                return _mapper.Map<VideoPost, PostDto>(videoPost);
+            }
+
+            return null;
+        }
+
+        public async Task<ResponseBase> TogglePostPublishedStatusAsync<T>(int postId) where T : Post
+        {
+            var post = await _context.Set<T>().FindAsync(postId);
+            if (post == null)
+            {
+                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Info.PostNotFound };
+            }
+
+            post.IsPublished = !post.IsPublished;
+            post.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation($"Post {post.Id} is published? {post.IsPublished}");
+
+            return new ResponseBase() { IsSuccess = true, Message = $"Post {post.Id} publish status: {post.IsPublished}" };
+        }
     }
 }
