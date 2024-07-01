@@ -1,4 +1,5 @@
-﻿using RustyTech.Server.Models.Auth;
+﻿using AutoMapper;
+using RustyTech.Server.Models.Auth;
 using RustyTech.Server.Services.Interfaces;
 
 namespace RustyTech.Server.Services
@@ -6,11 +7,13 @@ namespace RustyTech.Server.Services
     public class UserService : IUserService
     {
         private readonly DataContext _context;
+        private readonly IMapper _mapper;
         private readonly ILogger<IUserService> _logger;
 
-        public UserService(DataContext context, ILogger<IUserService> logger)
+        public UserService(DataContext context, IMapper mapper, ILogger<IUserService> logger)
         {
             _context = context;
+            _mapper = mapper;
             _logger = logger;
         }
 
@@ -19,11 +22,11 @@ namespace RustyTech.Server.Services
             var users = new List<UserDto>();
             if (active)
             {
-                users = await _context.Users.Where(confirmed => confirmed.EmailConfirmed).Select(user => new UserDto { Id = user.Id, Email = user.Email }).ToListAsync();
+                users = await _context.Users.Where(confirmed => confirmed.EmailConfirmed).Select(user => _mapper.Map<UserDto>(user)).ToListAsync();
             }
             else
             {
-                users = await _context.Users.Select(user => new UserDto { Id = user.Id, Email = user.Email }).ToListAsync();
+                users = await _context.Users.Select(user => _mapper.Map<UserDto>(user)).ToListAsync();
             }
             return users;
         }
@@ -39,7 +42,7 @@ namespace RustyTech.Server.Services
             {
                 return null;
             }
-            var userDto = new UserDto { Id = user.Id, Email = user.Email };
+            var userDto = _mapper.Map<UserDto>(user);
             return userDto;
         }
 

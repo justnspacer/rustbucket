@@ -104,6 +104,8 @@ builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(build
 
 builder.Services.AddIdentityCore<User>().AddRoles<IdentityRole>().AddEntityFrameworkStores<DataContext>(); // Add ASP.NET Core Identity services with roles and EF Core store.
 
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
 builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>(); // Add rate limit configuration as a singleton.
 builder.Services.AddScoped<IAuthService, AuthService>(); // Add authentication service with scoped lifetime.
 builder.Services.AddScoped<IRoleService, RoleService>(); // Add role service with scoped lifetime.

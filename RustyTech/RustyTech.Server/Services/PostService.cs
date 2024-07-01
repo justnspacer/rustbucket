@@ -1,16 +1,19 @@
-﻿using RustyTech.Server.Services.Interfaces;
+﻿using AutoMapper;
+using RustyTech.Server.Services.Interfaces;
 
 namespace RustyTech.Server.Services
 {
     public class PostService : IPostService
     {
         private DataContext _context;
+        private readonly IMapper _mapper;
         private IUserService _userService;
         private ILogger<IPostService> _logger;
 
-        public PostService(DataContext context, IUserService userService, ILogger<IPostService> logger)
+        public PostService(DataContext context, IMapper mapper, IUserService userService, ILogger<IPostService> logger)
         {
             _context = context;
+            _mapper = mapper;
             _userService = userService;
             _logger = logger;
         }
@@ -22,7 +25,7 @@ namespace RustyTech.Server.Services
             {
                 return null;
             }
-            if (post.User == null)
+            if (post.UserId == Guid.Empty)
             {
                 return null;
             }
@@ -50,7 +53,7 @@ namespace RustyTech.Server.Services
             {
                 return null;
             }
-            if (post.User == null)
+            if (post.UserId == Guid.Empty)
             {
                 return null;
             }
@@ -78,7 +81,7 @@ namespace RustyTech.Server.Services
             {
                 return null;
             }
-            if (post.User == null)
+            if (post.UserId == Guid.Empty)
             {
                 return null;
             }
@@ -100,32 +103,38 @@ namespace RustyTech.Server.Services
             return post;
         }
 
-        public async Task<List<Post>> GetAllAsync(bool published = true)
+        public async Task<List<PostDto>> GetAllAsync(bool published = true)
         {
-            List<Post> allPosts = new List<Post>();
+            List<PostDto> allPosts = new List<PostDto>();
             if (published)
             {
                 List<BlogPost> blogPosts = await _context.BlogPosts.Where(p => p.IsPublished == true).ToListAsync();
-                allPosts.AddRange(blogPosts);
+                var blogMap = _mapper.Map<List<BlogPost>, List<PostDto>>(blogPosts);
+                allPosts.AddRange(blogMap);
 
                 List<ImagePost> imagePosts = await _context.ImagePosts.Where(p => p.IsPublished == true).ToListAsync();
-                allPosts.AddRange(imagePosts);
+                var imageMap = _mapper.Map<List<ImagePost>, List<PostDto>>(imagePosts);
+                allPosts.AddRange(imageMap);
 
                 List<VideoPost> videoPosts = await _context.VideoPosts.Where(p => p.IsPublished == true).ToListAsync();
-                allPosts.AddRange(videoPosts);
+                var videoMap = _mapper.Map<List<VideoPost>, List<PostDto>>(videoPosts);
+                allPosts.AddRange(videoMap);
                 _logger.LogInformation($"All published posts retrieved");
 
             }
             else
             {
                 List<BlogPost> blogPosts = await _context.BlogPosts.ToListAsync();
-                allPosts.AddRange(blogPosts);
+                var blogMap = _mapper.Map<List<BlogPost>, List<PostDto>>(blogPosts);
+                allPosts.AddRange(blogMap);
 
                 List<ImagePost> imagePosts = await _context.ImagePosts.ToListAsync();
-                allPosts.AddRange(imagePosts);
+                var imageMap = _mapper.Map<List<ImagePost>, List<PostDto>>(imagePosts);
+                allPosts.AddRange(imageMap);
 
                 List<VideoPost> videoPosts = await _context.VideoPosts.ToListAsync();
-                allPosts.AddRange(videoPosts);
+                var videoMap = _mapper.Map<List<VideoPost>, List<PostDto>>(videoPosts);
+                allPosts.AddRange(videoMap);
                 _logger.LogInformation($"All posts retrieved");
             }
 

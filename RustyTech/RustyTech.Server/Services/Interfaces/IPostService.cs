@@ -5,6 +5,6 @@
         Task<BlogPost?> CreateBlogPostAsync(BlogPost post);
         Task<ImagePost?> CreateImagePostAsync(ImagePost post);
         Task<VideoPost?> CreateVideoPostAsync(VideoPost post);
-        Task<List<Post>> GetAllAsync(bool published);
+        Task<List<PostDto>> GetAllAsync(bool published);
     }
 }

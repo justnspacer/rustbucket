@@ -1,4 +1,6 @@
-﻿namespace RustyTech.Server.Models.User
+﻿using System.Text.Json.Serialization;
+
+namespace RustyTech.Server.Models.User
 {
     public abstract class Post
     {
@@ -11,7 +13,8 @@
 
         public Guid UserId { get; set; } // Foreign key
 
-        public UserDto? User { get; set; } // Navigation property
+        [JsonIgnore]
+        public User? User { get; set; } // Navigation property
 
         public abstract void Display();
     }

@@ -12,8 +12,8 @@ using RustyTech.Server.Data;
 namespace RustyTech.Server.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240622061821_AddingIsPublished")]
-    partial class AddingIsPublished
+    [Migration("20240701051207_NewPosts2")]
+    partial class NewPosts2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

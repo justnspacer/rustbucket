@@ -193,23 +193,6 @@ namespace RustyTech.Server.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("RustyTech.Server.Models.User.UserDto", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("UserDto");
-                });
-
             modelBuilder.Entity("RustyTech.Server.Models.User.BlogPost", b =>
                 {
                     b.HasBaseType("RustyTech.Server.Models.User.Post");
@@ -243,7 +226,7 @@ namespace RustyTech.Server.Migrations
 
             modelBuilder.Entity("RustyTech.Server.Models.User.Post", b =>
                 {
-                    b.HasOne("RustyTech.Server.Models.User.UserDto", "User")
+                    b.HasOne("RustyTech.Server.Models.User.User", "User")
                         .WithMany("Posts")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -252,12 +235,7 @@ namespace RustyTech.Server.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("RustyTech.Server.Models.User.UserId", b =>
-                {
-                    b.Navigation("Posts");
-                });
-
-            modelBuilder.Entity("RustyTech.Server.Models.User.UserId", b =>
+            modelBuilder.Entity("RustyTech.Server.Models.User.User", b =>
                 {
                     b.Navigation("Posts");
                 });

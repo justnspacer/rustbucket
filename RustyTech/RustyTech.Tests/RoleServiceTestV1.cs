@@ -117,7 +117,7 @@ namespace RustyTech.Tests
         public async Task GetRoleByIdAsync_WhenIdIsNullOrEmpty_ShouldReturnNull()
         {
             // Arrange
-            string id = null;
+            string id = string.Empty;
 
             // Act
             var result = await _roleService.GetRoleByIdAsync(id);

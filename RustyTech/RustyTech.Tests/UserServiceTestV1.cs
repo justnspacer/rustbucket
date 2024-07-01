@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -19,14 +20,23 @@ namespace RustyTech.Tests
         [SetUp]
         public void Setup()
         {
+            var mapperMock = new Mock<IMapper>();
             var loggerMock = new Mock<ILogger<IUserService>>();
+
+            mapperMock.Setup(m => m.Map<UserDto>(It.IsAny<User>()))
+          .Returns((User source) => new UserDto
+          {
+              Id = source.Id,
+              Email = source.Email,
+              // Map other properties as needed
+          });
 
             // Create in-memory database
             var options = new DbContextOptionsBuilder<DataContext>()
                 .UseInMemoryDatabase(databaseName: "TestDatabase")
                 .Options;
             _context = new DataContext(options);
-            _userService = new UserService(_context, loggerMock.Object);
+            _userService = new UserService(_context, mapperMock.Object, loggerMock.Object);
         }
 
         [TearDown]

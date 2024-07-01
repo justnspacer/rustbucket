@@ -6,23 +6,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace RustyTech.Server.Migrations
 {
     /// <inheritdoc />
-    public partial class posts : Migration
+    public partial class NewPosts2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "ApplicationName",
-                table: "Logins");
-
-            migrationBuilder.DropColumn(
-                name: "LoginProvider",
-                table: "Logins");
-
-            migrationBuilder.DropColumn(
-                name: "ProviderKey",
-                table: "Logins");
-
             migrationBuilder.CreateTable(
                 name: "Post",
                 columns: table => new
@@ -31,6 +19,7 @@ namespace RustyTech.Server.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Content = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsPublished = table.Column<bool>(type: "bit", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -61,24 +50,6 @@ namespace RustyTech.Server.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Post");
-
-            migrationBuilder.AddColumn<string>(
-                name: "ApplicationName",
-                table: "Logins",
-                type: "nvarchar(max)",
-                nullable: true);
-
-            migrationBuilder.AddColumn<string>(
-                name: "LoginProvider",
-                table: "Logins",
-                type: "nvarchar(max)",
-                nullable: true);
-
-            migrationBuilder.AddColumn<string>(
-                name: "ProviderKey",
-                table: "Logins",
-                type: "nvarchar(max)",
-                nullable: true);
         }
     }
 }
