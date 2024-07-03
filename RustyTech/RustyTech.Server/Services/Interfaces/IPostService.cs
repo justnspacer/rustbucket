@@ -4,9 +4,7 @@ namespace RustyTech.Server.Services.Interfaces
 {
     public interface IPostService
     {
-        Task<ResponseBase> CreateBlogPostAsync(BlogPost post);
-        Task<ResponseBase> CreateImagePostAsync(ImagePost post);
-        Task<ResponseBase> CreateVideoPostAsync(VideoPost post);
+        Task<ResponseBase> CreatePostAsync<T>(T post) where T : Post;
         Task<List<PostDto>> GetAllAsync(bool published);
         Task<ResponseBase> TogglePostPublishedStatusAsync<T>(int postId) where T : Post;
         Task<PostDto?> GetPostByIdAsync(int postId);
