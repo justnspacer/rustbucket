@@ -1,4 +1,5 @@
 ﻿using MailKit.Security;
+using MailKit.Net.Smtp;
 using MimeKit.Text;
 using MimeKit;
 using RustyTech.Server.Models.Auth;
@@ -9,14 +10,14 @@ namespace RustyTech.Server.Services
     public class EmailService : IEmailService
     {
         private readonly IConfiguration _configuration;
-        private readonly ISmtpClientService _smtpClient;
+        private readonly ISmtpClientService _smtpClientService;
         private readonly int _smtpPort = 587;
         private readonly SecureSocketOptions _secureSocketOptions = SecureSocketOptions.StartTls;
 
-        public EmailService(IConfiguration configuration, ISmtpClientService smtpClient)
+        public EmailService(IConfiguration configuration, ISmtpClientService smtpClientService)
         {
             _configuration = configuration;
-            _smtpClient = smtpClient;
+            _smtpClientService = smtpClientService;
         }
 
         public async Task SendEmailAsync(EmailRequest request)
@@ -29,10 +30,11 @@ namespace RustyTech.Server.Services
                 email.Subject = request.Subject;
                 email.Body = new TextPart(TextFormat.Html) { Text = request.Body };
 
-                await _smtpClient.ConnectAsync(_configuration["Email:Host"], _smtpPort, _secureSocketOptions);
-                await _smtpClient.AuthenticateAsync(_configuration["Email:Username"], _configuration["Email:Password"]);
-                await _smtpClient.SendAsync(email);
-                await _smtpClient.DisconnectAsync(true);
+                await _smtpClientService.ConnectAsync(_configuration["Email:Host"], _smtpPort, _secureSocketOptions);
+                await _smtpClientService.AuthenticateAsync(_configuration["Email:Username"], _configuration["Email:Password"]);
+                await _smtpClientService.SendAsync(email);
+                await _smtpClientService.DisconnectAsync(true);
+                _smtpClientService.Dispose();
                 Console.WriteLine("Email sent successfully");
             }
             catch (Exception ex)

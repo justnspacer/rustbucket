@@ -14,6 +14,7 @@ namespace RustyTech.Tests
         private IEmailService _emailService;
         private Mock<ISmtpClientService> _smtpClientMock;
 
+
         [SetUp]
         public void Setup()
         {

@@ -7,14 +7,26 @@ namespace RustyTech.Server.Services
 {
     public class SmtpClientService : ISmtpClientService
     {
-        private readonly SmtpClient _smtpClient = new SmtpClient();
+        private readonly SmtpClient _smtpClient;
+        private readonly ILogger<SmtpClientService> _logger;
 
-        public async Task ConnectAsync(string? host, int port, SecureSocketOptions options)
+        public SmtpClientService(ILogger<SmtpClientService> logger)
         {
-            await _smtpClient.ConnectAsync(host, port, options);
+            _smtpClient = new SmtpClient();
+            _logger = logger;
         }
 
-        public async Task AuthenticateAsync(string? username, string? password)
+        public async Task ConnectAsync(string host, int port, SecureSocketOptions options)
+        {
+            await _smtpClient.ConnectAsync(host, port, options);
+            if (!_smtpClient.IsConnected)
+            {
+                _logger.LogError($"Connection to host {host} on port {port} failed");
+
+            }
+        }
+
+        public async Task AuthenticateAsync(string username, string password)
         {
             await _smtpClient.AuthenticateAsync(username, password);
         }

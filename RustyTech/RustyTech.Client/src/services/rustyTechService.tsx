@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getCSRFToken } from '../utils/getCSRFToken';
 
 const API_URL = 'https://localhost:7262/api';
 
@@ -40,10 +41,14 @@ interface User {
     email: string;
 }
 
-
 export const registerEP = async (data: RegisterRequest) => {
     try {
-        const response = await axios.post<ApiResponse>(`${API_URL}/auth/register`, data);
+        const csrfToken = getCSRFToken();
+        const response = await axios.post<ApiResponse>(`${API_URL}/auth/register`, data, {
+            headers: {
+                'X-CSRF-TOKEN': csrfToken || '',
+            }
+        });
         return response;
     } catch (e) {
         console.error('error with user registration: ', e);
@@ -52,7 +57,12 @@ export const registerEP = async (data: RegisterRequest) => {
 
 export const loginEP = async (data: LoginRequest) => {
     try {
-        const response = await axios.post<ApiResponse>(`${API_URL}/auth/login`, data);
+        const csrfToken = getCSRFToken();
+        const response = await axios.post<ApiResponse>(`${API_URL}/auth/login`, data, {
+            headers: {
+                'X-CSRF-TOKEN': csrfToken || '',
+            }
+        });
         return response;
     } catch (e) {
         console.error('error with user login: ', e);
@@ -61,9 +71,11 @@ export const loginEP = async (data: LoginRequest) => {
 
 export const verifyTokenEP = async (token: string) => {
     try {
+        const csrfToken = getCSRFToken();
         const response = await axios.get<VerifyResponse>(`${API_URL}/auth/verify/token`, {
             headers: {
                 'Authorization': `Bearer ${token}`,
+                'X-CSRF-TOKEN': csrfToken || '',
             }
         });        
         return response.data.data.isSuccess;

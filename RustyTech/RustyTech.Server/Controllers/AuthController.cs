@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Antiforgery;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using RustyTech.Server.Models.Auth;
@@ -12,13 +11,11 @@ namespace RustyTech.Server.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
-        private readonly IAntiforgery _antiforgery;
         private readonly ILogger<AuthController> _logger;
 
-        public AuthController(IAuthService authService, IAntiforgery antiforgery, ILogger<AuthController> logger)
+        public AuthController(IAuthService authService, ILogger<AuthController> logger)
         {
             _authService = authService;
-            _antiforgery = antiforgery;
             _logger = logger;
         }
 
@@ -67,7 +64,7 @@ namespace RustyTech.Server.Controllers
             return Ok(result);
         }
 
-        [HttpPost("resend/email")]
+        [HttpPost("resend")]
         public IActionResult ResendEmailAsync(string email)
         {
             var result = _authService.ResendEmailAsync(email);
@@ -124,15 +121,6 @@ namespace RustyTech.Server.Controllers
             var result = _authService.LogoutAsync();
             Response.Cookies.Delete("AuthToken");
             return Ok(result);
-        }
-
-        [Authorize]
-        [HttpGet("csrf/token")]
-        public IActionResult GetCsrfToken()
-        {
-            var token = _antiforgery.GetAndStoreTokens(HttpContext).RequestToken;
-            _logger.LogInformation($"Af token requested");
-            return Ok(new { token });
         }
     }
 }

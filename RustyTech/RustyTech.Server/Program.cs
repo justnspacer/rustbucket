@@ -14,7 +14,7 @@ using System.Text;
 using Microsoft.OpenApi.Models;
 using RustyTech.Server.Services.Interfaces;
 using RustyTech.Server.Interfaces;
-using MailKit.Net.Smtp;
+using Microsoft.AspNetCore.Antiforgery;
 
 var builder = WebApplication.CreateBuilder(args); // Create a WebApplication builder instance.
 
@@ -42,6 +42,8 @@ builder.Services.AddControllers(); // Add services for controllers.
 builder.Services.AddAntiforgery(options =>
 {
     options.HeaderName = "X-CSRF-TOKEN"; // Set the header name for CSRF tokens in AJAX requests.
+    options.Cookie.Name = "XSRF-TOKEN";
+    options.FormFieldName = "XSRF-TOKEN";
 });
 
 // Add authentication
@@ -107,11 +109,11 @@ builder.Services.AddIdentityCore<User>().AddRoles<IdentityRole>().AddEntityFrame
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>(); // Add rate limit configuration as a singleton.
+builder.Services.AddScoped<ISmtpClientService, SmtpClientService>(); // Add smtp client service with scoped lifetime.
 builder.Services.AddScoped<IAuthService, AuthService>(); // Add authentication service with scoped lifetime.
 builder.Services.AddScoped<IRoleService, RoleService>(); // Add role service with scoped lifetime.
 builder.Services.AddScoped<IUserService, UserService>(); // Add user service with scoped lifetime.
 builder.Services.AddScoped<IEmailService, EmailService>(); // Add email service with scoped lifetime.
-builder.Services.AddScoped<ISmtpClientService, SmtpClientService>(); // Add smtp client service with scoped lifetime.
 builder.Services.AddScoped<IPostService, PostService>(); // Add post service with scoped lifetime.
 
 builder.Services.Configure<RequestLocalizationOptions>(options =>
@@ -162,6 +164,16 @@ app.UseAuthentication(); // Enable authentication middleware.
 app.UseRouting(); // Enable routing middleware.
 
 app.UseAuthorization(); // Enable authorization middleware.
+
+//CSRF token is generated and stored in a cookie named XSRF-TOKEN
+app.Use(next => context =>
+{
+    var antiforgery = context.RequestServices.GetRequiredService<IAntiforgery>();
+    var tokens = antiforgery.GetAndStoreTokens(context);
+    context.Response.Cookies.Append("XSRF-TOKEN", tokens.RequestToken!, new CookieOptions { HttpOnly = false });
+
+    return next(context);
+});
 
 app.MapControllers(); // Map controller routes.
 
