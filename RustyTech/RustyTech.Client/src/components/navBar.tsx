@@ -46,7 +46,7 @@ const NavBar: React.FC = () => {
                 ) : (
                     <>
                         <Link className="login-link" to="/login">
-                            <i className="fa-solid fa-user icon"></i>
+                            <i className="fa-solid fa-person icon"></i>
                             Login
                         </Link>
                     </>

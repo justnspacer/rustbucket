@@ -11,7 +11,7 @@ interface VerifyResponse {
     };
 }
 
-interface ApiResponse {
+export interface ApiResponse {
     status_code: number;
     message: string;
     data: {
@@ -22,6 +22,12 @@ interface ApiResponse {
         token: string;
         message: string;
     };
+}
+
+export interface ApiResponseGetPost {
+    status_code: number;
+    message: string;
+    data: PostDto[];
 }
 
 interface RegisterRequest {
@@ -39,6 +45,19 @@ interface LoginRequest {
 interface User {
     id: string;
     email: string;
+}
+
+export interface PostDto {
+    id: number;
+    title: string;
+    content: string;
+    imageUrls: string[];
+    imageUrl: string;
+    videoUrl: string;
+    isPublished: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+    userId: string;
 }
 
 export const registerEP = async (data: RegisterRequest) => {
@@ -83,4 +102,21 @@ export const verifyTokenEP = async (token: string) => {
         console.error('error verifying token: ', e);
         return false;
     }
+};
+
+
+export const getAllPosts = async (): Promise<ApiResponseGetPost> => {
+    try {
+        const csrfToken = getCSRFToken();
+        const response = await axios.get<ApiResponseGetPost>(`${API_URL}/post/get/all`, {
+            headers: {
+                'X-CSRF-TOKEN': csrfToken || '',
+            }
+        });
+        return response.data;
+
+    } catch (e) {
+        console.error('Error fetching posts:', e);
+        throw e;
+    }    
 };
