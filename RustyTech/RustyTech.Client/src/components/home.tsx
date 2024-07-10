@@ -9,7 +9,6 @@ const Home: React.FC = () => {
         <><main>
             {message && <p>{message}</p>}
             <h1>Welcome</h1>
-            <h2>Posts</h2>
             <PostsList />
         </main>
         </>

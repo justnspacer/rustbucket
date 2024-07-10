@@ -18,14 +18,14 @@ namespace RustyTech.Server.Controllers
             _roleService = roleService;
         }
 
-        [HttpGet("get/all")]
+        [HttpGet("all")]
         public async Task<IActionResult> GetAllAsync(bool published = true)
         {
             var posts = await _postService.GetAllAsync(published);
             return Ok(posts);
         }
 
-        [HttpGet("get/{postId}")]
+        [HttpGet("{postId}")]
         public async Task<IActionResult> GetPostByIdAsync(int postId)
         {
             var post = await _postService.GetPostByIdAsync(postId);

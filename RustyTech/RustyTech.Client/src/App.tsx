@@ -7,6 +7,7 @@ import Home from './components/home';
 import AuthProvider from './contexts/authContext';
 import Navbar from './components/navBar';
 import Footer from './components/footer';
+import Post from './components/post';
 
 function App() {
     useEffect(() => {
@@ -17,6 +18,7 @@ function App() {
             <BrowserRouter>
                 <Navbar />
                 <Routes>
+                    <Route path="/posts/get/:id" Component={Post} />
                     <Route path="/login" Component={LoginForm} />
                     <Route path="/register" Component={RegisterForm} />
                     <Route path="/" Component={Home} />
