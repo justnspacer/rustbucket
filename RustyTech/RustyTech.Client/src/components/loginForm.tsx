@@ -21,7 +21,7 @@ const LoginForm: React.FC = () => {
 
     return (
         <form onSubmit={handleLogin} id="loginForm">
-            <h1 className="header-one">Login here</h1>
+            <h1 className="header-one">Login</h1>
 
             <label htmlFor="email">Email</label>
             <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />

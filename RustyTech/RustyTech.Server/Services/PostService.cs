@@ -112,6 +112,30 @@ namespace RustyTech.Server.Services
             return null;
         }
 
+        public async Task<ResponseBase> EditPostAsync<T>(int postId, T updatedPost, Guid userId) where T : Post
+        {
+            var post = await _context.Set<T>().FindAsync(postId);
+            if (post == null)
+            {
+                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Info.PostNotFound };
+            }
+
+            if (post.UserId != userId)
+            {
+                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Error.Unauthorized };
+            }
+
+            post.Title = updatedPost.Title;
+            post.Content = updatedPost.Content;
+            post.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation($"{typeof(T).Name} post {post.Id} updated");
+
+            return new ResponseBase() { IsSuccess = true, Message = Constants.Messages.Info.PostUpdated };
+        }
+
         public async Task<ResponseBase> TogglePostPublishedStatusAsync<T>(int postId) where T : Post
         {
             var post = await _context.Set<T>().FindAsync(postId);

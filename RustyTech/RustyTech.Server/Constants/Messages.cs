@@ -22,6 +22,7 @@
             public const string UserDeleted = "User deleted";
             public const string PostCreated = "Post created";
             public const string PostNotFound = "Post not found";
+            public const string PostUpdated = "Post updated";
         }
 
         // Role Messages

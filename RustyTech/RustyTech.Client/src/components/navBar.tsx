@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/authContext';
+import rustyImageblk from '../assets/rusty-blk.png';
 
 const NavBar: React.FC = () => {
     const { isAuthenticated, isTokenValid, logout, user } = useAuth();
@@ -27,7 +28,9 @@ const NavBar: React.FC = () => {
     return (
         <nav>
             <Link className="logo" to="/">
-                <i className="fa-solid fa-robot icon"></i>
+                <div>
+                    <img className='mainlogo' src={rustyImageblk} alt="Rusty Logo" />
+                </div>
                 Rust Bucket
             </Link>
             <div className="links">
@@ -46,7 +49,7 @@ const NavBar: React.FC = () => {
                 ) : (
                     <>
                         <Link className="login-link" to="/login">
-                            <i className="fa-solid fa-person icon"></i>
+                            <i className="fa-solid fa-user icon"></i>
                             Login
                         </Link>
                     </>
