@@ -128,12 +128,11 @@ body {
 
 nav {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    position: fixed;
-    width: 100%;
     background-color: var(--prussian-blue);
-    z-index: 1000;
+    padding: 16px;
+    gap: 20px;
+    margin-bottom: 20px;
 }
 
 footer {
@@ -149,6 +148,7 @@ footer {
 
 .mainlogo {
     width: 25px;
+    height: 25px;
 }
 
 .logo {
@@ -158,7 +158,7 @@ footer {
     color: var(--white-color);
 }
 
-    .logo span {
+    .logo div {
         font-size: 2rem;
         font-weight: 900;
     }
@@ -263,7 +263,7 @@ label {
 }
 
 a.login-link:link, a.login-link:visited {
-    color: var(--black-color);
+    color: var(--white-color);
 }
 
 @keyframes spin {
@@ -280,16 +280,24 @@ a.login-link:link, a.login-link:visited {
     position: absolute;
     display: flex;
     flex-direction: column;
-    gap: .5rem;
     background-color: var(--timberwolf);
     box-shadow: 4px 4px rgba(0,0,0,0.4);
     width: 150px;
+    border-radius: 4px;
+    overflow: hidden;
 }
 
     .dropdown a:link, .dropdown a:visited {
         color: var(--black-color);
         text-decoration: none;
         padding: 10px 10px 10px 5px;
+        border-bottom: 1px solid var(--charcoal);
+    }
+
+    .dropdown a:hover {
+        background-color: var(--jasper);
+        color: var(--white-color);
+        
     }
 
 

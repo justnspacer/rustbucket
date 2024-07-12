@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/authContext';
-import rustyImage from '../assets/rusty.png';
 
 const NavBar: React.FC = () => {
     const { isAuthenticated, isTokenValid, logout, user } = useAuth();
@@ -28,10 +27,7 @@ const NavBar: React.FC = () => {
     return (
         <nav>
             <Link className="logo" to="/">
-                <div>
-                    <img className='mainlogo' src={rustyImage} alt="Rusty Logo" />
-                </div>
-                <span>Rust Bucket</span>
+                <div>Rust Bucket</div>
             </Link>
             <div className="links">
                 {isAuthenticated && isTokenValid ? (

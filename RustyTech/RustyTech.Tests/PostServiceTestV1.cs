@@ -44,7 +44,7 @@ namespace RustyTech.Tests
         public async Task CreatePostAsync_WithValidPost_ReturnsSuccessResponse()
         {
             // Arrange
-            var post = new BlogPost
+            var post = new Blog
             {
                 Id = 1,
                 UserId = Guid.NewGuid(),
@@ -77,7 +77,7 @@ namespace RustyTech.Tests
         public async Task CreatePostAsync_WithNullPost_ReturnsBadRequestResponse()
         {
             // Arrange
-            BlogPost post = null;
+            Blog post = null;
 
             // Act
             var response = await _postService.CreatePostAsync(post);
@@ -91,9 +91,9 @@ namespace RustyTech.Tests
         public async Task GetAllAsync_ReturnsAllPosts()
         {
             // Arrange
-            var blogPosts = new List<BlogPost>
+            var blogPosts = new List<Blog>
             {
-                new BlogPost
+                new Blog
                 {
                     Id = 1,
                     UserId = Guid.NewGuid(),
@@ -103,7 +103,7 @@ namespace RustyTech.Tests
                     UpdatedAt = new DateTime(2022, 1, 1),
                     IsPublished = true
                 },
-                new BlogPost
+                new Blog
                 {
                     Id = 2,
                     UserId = Guid.NewGuid(),
@@ -115,9 +115,9 @@ namespace RustyTech.Tests
                 }
             };
 
-            var imagePosts = new List<ImagePost>
+            var imagePosts = new List<Image>
             {
-                new ImagePost
+                new Image
                 {
                     Id = 3,
                     UserId = Guid.NewGuid(),
@@ -127,7 +127,7 @@ namespace RustyTech.Tests
                     UpdatedAt = new DateTime(2022, 1, 3),
                     IsPublished = true
                 },
-                new ImagePost
+                new Image
                 {
                     Id = 4,
                     UserId = Guid.NewGuid(),
@@ -139,9 +139,9 @@ namespace RustyTech.Tests
                 }
             };
 
-            var videoPosts = new List<VideoPost>
+            var videoPosts = new List<Video>
             {
-                new VideoPost
+                new Video
                 {
                     Id = 5,
                     UserId = Guid.NewGuid(),
@@ -151,7 +151,7 @@ namespace RustyTech.Tests
                     UpdatedAt = new DateTime(2022, 1, 5),
                     IsPublished = true
                 },
-                new VideoPost
+                new Video
                 {
                     Id = 6,
                     UserId = Guid.NewGuid(),
@@ -186,7 +186,7 @@ namespace RustyTech.Tests
         {
             // Arrange
             var postId = 1;
-            var blogPost = new BlogPost
+            var blogPost = new Blog
             {
                 Id = postId,
                 UserId = Guid.NewGuid(),
@@ -216,7 +216,7 @@ namespace RustyTech.Tests
         {
             // Arrange
             var postId = 1;
-            var blogPost = new BlogPost
+            var blogPost = new Blog
             {
                 Id = postId,
                 UserId = Guid.NewGuid(),
@@ -230,7 +230,7 @@ namespace RustyTech.Tests
             _context.SaveChanges();
 
             // Act
-            var response = await _postService.TogglePostPublishedStatusAsync<BlogPost>(postId);
+            var response = await _postService.TogglePostPublishedStatusAsync<Blog>(postId);
 
             // Assert
             Assert.IsTrue(response.IsSuccess);

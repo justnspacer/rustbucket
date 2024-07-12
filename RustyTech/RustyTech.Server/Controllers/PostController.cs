@@ -33,21 +33,21 @@ namespace RustyTech.Server.Controllers
         }
 
         [HttpPost("create/blog")]
-        public async Task<IActionResult> CreateBlogPostAsync([FromBody] BlogPost request)
+        public async Task<IActionResult> CreateBlogPostAsync([FromBody] Blog request)
         {
             var post = await _postService.CreatePostAsync(request);
             return Ok(post);
         }
 
         [HttpPost("create/image")]
-        public async Task<IActionResult> CreateImagePostAsync([FromBody] ImagePost request)
+        public async Task<IActionResult> CreateImagePostAsync([FromBody] Image request)
         {
             var post = await _postService.CreatePostAsync(request);
             return Ok(post);
         }
 
         [HttpPost("create/video")]
-        public async Task<IActionResult> CreateVideoPostAsync([FromBody] VideoPost request)
+        public async Task<IActionResult> CreateVideoPostAsync([FromBody] Video request)
         {
             var post = await _postService.CreatePostAsync(request);
             return Ok(post);

@@ -11,6 +11,7 @@ namespace RustyTech.Server.Models.User
         public string? ImageUrl { get; set; }
         public string? VideoUrl { get; set; }
         public bool IsPublished { get; set; }
+        public List<string>? Keywords { get; set; }
 
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }

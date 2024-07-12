@@ -1,10 +1,10 @@
 ﻿namespace RustyTech.Server.Models.User
 {
-    public class BlogPost : Post
+    public class Blog : Post
     {
         public List<string> ImageUrls { get; set; }
 
-        public BlogPost()
+        public Blog()
         {
             ImageUrls = new List<string>();
         }

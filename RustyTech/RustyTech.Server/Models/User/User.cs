@@ -18,9 +18,6 @@ namespace RustyTech.Server.Models.User
 
         public ICollection<Post> Posts { get; set; } // Navigation property
 
-        public User()
-        {
-            Posts = new List<Post>();
-        }
+        public User() => Posts = new List<Post>();
     }
 }

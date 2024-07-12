@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using RustyTech.Server.Models.Auth;
 using RustyTech.Server.Services.Interfaces;
+using RustyTech.Server.Utilities;
 using System.Linq.Expressions;
 
 namespace RustyTech.Server.Services
@@ -50,17 +51,35 @@ namespace RustyTech.Server.Services
             post.UserId = user.Id;
             post.IsPublished = true;
 
+            if (post.Keywords != null)
+            {
+                foreach (var keyword in post.Keywords)
+                {
+                    var obj = await GetKeywordAsync(keyword);
+                    if (obj == null)
+                    {
+                        var newKeyword = new Keyword() { Text = keyword.Text };
+                        if (newKeyword.Text != null)
+                        {
+                            var normalizedKeyword = KeywordNormalizer.Normalize(newKeyword.Text);
+                            await AddKeywordAsync(newKeyword);
+                        }
+                        
+                    }
+                }
+            }
+
             switch (post)
             {
-                case BlogPost blogPost:
+                case Blog blogPost:
                     SetBlogPostProperties(blogPost);
                     await _context.BlogPosts.AddAsync(blogPost);
                     break;
-                case ImagePost imagePost:
+                case Image imagePost:
                     SetImagePostProperties(imagePost);
                     await _context.ImagePosts.AddAsync(imagePost);
                     break;
-                case VideoPost videoPost:
+                case Video videoPost:
                     SetVideoPostProperties(videoPost);
                     await _context.VideoPosts.AddAsync(videoPost);
                     break;
@@ -79,17 +98,17 @@ namespace RustyTech.Server.Services
 
             if (published)
             {
-                await AddPostsByType<BlogPost>(_context.BlogPosts, allPosts, p => p.IsPublished == true);
-                await AddPostsByType<ImagePost>(_context.ImagePosts, allPosts, p => p.IsPublished == true);
-                await AddPostsByType<VideoPost>(_context.VideoPosts, allPosts, p => p.IsPublished == true);
+                await AddPostsByType<Blog>(_context.BlogPosts, allPosts, p => p.IsPublished == true);
+                await AddPostsByType<Image>(_context.ImagePosts, allPosts, p => p.IsPublished == true);
+                await AddPostsByType<Video>(_context.VideoPosts, allPosts, p => p.IsPublished == true);
 
                 _logger.LogInformation("All published posts retrieved");
             }
             else
             {
-                await AddPostsByType<BlogPost>(_context.BlogPosts, allPosts, p => true);
-                await AddPostsByType<ImagePost>(_context.ImagePosts, allPosts, p => true);
-                await AddPostsByType<VideoPost>(_context.VideoPosts, allPosts, p => true);
+                await AddPostsByType<Blog>(_context.BlogPosts, allPosts, p => true);
+                await AddPostsByType<Image>(_context.ImagePosts, allPosts, p => true);
+                await AddPostsByType<Video>(_context.VideoPosts, allPosts, p => true);
 
                 _logger.LogInformation("All posts retrieved");
             }
@@ -100,14 +119,14 @@ namespace RustyTech.Server.Services
 
         public async Task<PostDto?> GetPostByIdAsync(int postId)
         {
-            var bp = await GetPostById<BlogPost>(postId);
-            if (bp != null) return _mapper.Map<BlogPost, PostDto>(bp);
+            var bp = await GetPostById<Blog>(postId);
+            if (bp != null) return _mapper.Map<Blog, PostDto>(bp);
 
-            var ip = await GetPostById<ImagePost>(postId);
-            if (ip != null) return _mapper.Map<ImagePost, PostDto>(ip);
+            var ip = await GetPostById<Image>(postId);
+            if (ip != null) return _mapper.Map<Image, PostDto>(ip);
 
-            var vp = await GetPostById<VideoPost>(postId);
-            if (vp != null) return _mapper.Map<VideoPost, PostDto>(vp);
+            var vp = await GetPostById<Video>(postId);
+            if (vp != null) return _mapper.Map<Video, PostDto>(vp);
 
             return null;
         }
@@ -128,6 +147,24 @@ namespace RustyTech.Server.Services
             post.Title = updatedPost.Title;
             post.Content = updatedPost.Content;
             post.UpdatedAt = DateTime.UtcNow;
+
+            if (updatedPost.Keywords != null && updatedPost.Keywords != post.Keywords)
+            {
+                foreach (var keyword in updatedPost.Keywords)
+                {
+                    var obj = await GetKeywordAsync(keyword);
+                    if (obj == null)
+                    {
+                        var newKeyword = new Keyword() { Text = keyword.Text };
+                        if (newKeyword.Text != null)
+                        {
+                            var normalizedKeyword = KeywordNormalizer.Normalize(newKeyword.Text);
+                            await AddKeywordAsync(newKeyword);
+                        }
+
+                    }
+                }
+            }
 
             await _context.SaveChangesAsync();
 
@@ -153,6 +190,17 @@ namespace RustyTech.Server.Services
             return new ResponseBase() { IsSuccess = true, Message = $"Post {post.Id} publish status: {post.IsPublished}" };
         }
 
+        private async Task<Keyword?> GetKeywordAsync(Keyword keyword)
+        {
+            return await _context.Keywords.FirstOrDefaultAsync(key => key.Text == keyword.Text);
+        }
+
+        private async Task AddKeywordAsync(Keyword keyword)
+        {
+            _context.Keywords.Add(keyword);
+            await _context.SaveChangesAsync();
+        }
+
         private async Task AddPostsByType<T>(DbSet<T> dbSet, List<PostDto> allPosts, Expression<Func<T, bool>> predicate) where T : class
         {
             var posts = await dbSet.Where(predicate).ToListAsync();
@@ -165,17 +213,17 @@ namespace RustyTech.Server.Services
             return await _context.Set<T>().FindAsync(postId);
         }
 
-        private void SetBlogPostProperties(BlogPost post)
+        private void SetBlogPostProperties(Blog post)
         {
             post.ImageUrls = post.ImageUrls;
         }
 
-        private void SetImagePostProperties(ImagePost post)
+        private void SetImagePostProperties(Image post)
         {
             post.ImageUrl = post.ImageUrl;
         }
 
-        private void SetVideoPostProperties(VideoPost post)
+        private void SetVideoPostProperties(Video post)
         {
             post.VideoUrl = post.VideoUrl;
         }

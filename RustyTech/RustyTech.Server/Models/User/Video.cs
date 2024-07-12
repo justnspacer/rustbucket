@@ -1,13 +1,13 @@
 ﻿namespace RustyTech.Server.Models.User
 {
-    public class ImagePost : Post
+    public class Video : Post
     {
-        public string? ImageUrl { get; set; }
+        public string? VideoUrl { get; set; }
         public override void Display()
         {
             Console.WriteLine($"Title: {Title}");
             Console.WriteLine($"Content: {Content}");
-            Console.WriteLine($"Image Url: {ImageUrl}");
+            Console.WriteLine($"Video Url: {VideoUrl}");
             Console.WriteLine($"IsPublished: {IsPublished}");
             Console.WriteLine($"Created At: {CreatedAt}");
             Console.WriteLine($"Updated At: {UpdatedAt}");
