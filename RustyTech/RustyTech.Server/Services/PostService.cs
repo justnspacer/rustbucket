@@ -131,26 +131,27 @@ namespace RustyTech.Server.Services
             return null;
         }
 
-        public async Task<ResponseBase> EditPostAsync<T>(int postId, T updatedPost, Guid userId) where T : Post
+        public async Task<ResponseBase> EditPostAsync<T>(PostEditRequest request) where T : Post
         {
-            var post = await _context.Set<T>().FindAsync(postId);
+            var post = await _context.Set<T>().FindAsync(request.PostId);
             if (post == null)
             {
                 return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Info.PostNotFound };
             }
 
-            if (post.UserId != userId)
+            if (post.UserId != request.UserId)
             {
                 return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Error.Unauthorized };
             }
 
-            post.Title = updatedPost.Title;
-            post.Content = updatedPost.Content;
+            post.Title = request.UpdatedPost?.Title;
+            post.Content = request.UpdatedPost?.Content;
             post.UpdatedAt = DateTime.UtcNow;
+            var updatedKeywords = request.UpdatedPost?.Keywords;
 
-            if (updatedPost.Keywords != null && updatedPost.Keywords != post.Keywords)
+            if (updatedKeywords != null && updatedKeywords != post.Keywords)
             {
-                foreach (var keyword in updatedPost.Keywords)
+                foreach (var keyword in updatedKeywords)
                 {
                     var obj = await GetKeywordAsync(keyword);
                     if (obj == null)
@@ -190,7 +191,7 @@ namespace RustyTech.Server.Services
             return new ResponseBase() { IsSuccess = true, Message = $"Post {post.Id} publish status: {post.IsPublished}" };
         }
 
-        private async Task<Keyword?> GetKeywordAsync(Keyword keyword)
+        public async Task<Keyword?> GetKeywordAsync(Keyword keyword)
         {
             return await _context.Keywords.FirstOrDefaultAsync(key => key.Text == keyword.Text);
         }

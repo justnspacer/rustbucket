@@ -60,5 +60,19 @@ namespace RustyTech.Server.Controllers
             var result = await _postService.TogglePostPublishedStatusAsync<Post>(postId);
             return Ok(result);
         }
+
+        [HttpPut("edit")]
+        public async Task<IActionResult> EditPostAsync([FromBody] PostEditRequest request)
+        {
+            var result = await _postService.EditPostAsync<Post>(request);
+            return Ok(result);
+        }
+
+        [HttpGet("keyword")]
+        public async Task<IActionResult> GetKeywordAsync(Keyword keyword)
+        {
+            var result = await _postService.GetKeywordAsync(keyword);
+            return Ok(result);
+        }
     }
 }
