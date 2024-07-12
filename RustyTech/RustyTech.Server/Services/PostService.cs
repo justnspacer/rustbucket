@@ -38,7 +38,8 @@ namespace RustyTech.Server.Services
             {
                 return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Info.UserNotFound };
 
-            }else if (DateTime.Equals(user.VerifiedAt, null))
+            }
+            else if (DateTime.Equals(user.VerifiedAt, null))
             {
                 return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Info.UserNotVerified };
             }
@@ -64,7 +65,7 @@ namespace RustyTech.Server.Services
                             var normalizedKeyword = KeywordNormalizer.Normalize(newKeyword.Text);
                             await AddKeywordAsync(newKeyword);
                         }
-                        
+
                     }
                 }
             }
@@ -191,10 +192,8 @@ namespace RustyTech.Server.Services
             return new ResponseBase() { IsSuccess = true, Message = $"Post {post.Id} publish status: {post.IsPublished}" };
         }
 
-        public async Task<Keyword?> GetKeywordAsync(Keyword keyword)
-        {
-            return await _context.Keywords.FirstOrDefaultAsync(key => key.Text == keyword.Text);
-        }
+        public async Task<List<string?>> GetAllKeywordsAsync() => await _context.Keywords.Select(k => k.Text).ToListAsync();
+        private async Task<Keyword?> GetKeywordAsync(Keyword keyword) => await _context.Keywords.FirstOrDefaultAsync(key => key.Text == keyword.Text);
 
         private async Task AddKeywordAsync(Keyword keyword)
         {

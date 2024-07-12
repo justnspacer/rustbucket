@@ -68,10 +68,10 @@ namespace RustyTech.Server.Controllers
             return Ok(result);
         }
 
-        [HttpGet("keyword")]
-        public async Task<IActionResult> GetKeywordAsync(Keyword keyword)
+        [HttpGet("keywords")]
+        public async Task<IActionResult> GetKeywordsAsync()
         {
-            var result = await _postService.GetKeywordAsync(keyword);
+            var result = await _postService.GetAllKeywordsAsync();
             return Ok(result);
         }
     }

@@ -9,6 +9,6 @@ namespace RustyTech.Server.Services.Interfaces
         Task<ResponseBase> TogglePostPublishedStatusAsync<T>(int postId) where T : Post;
         Task<PostDto?> GetPostByIdAsync(int postId);
         Task<ResponseBase> EditPostAsync<T>(PostEditRequest request) where T : Post;
-        Task<Keyword?> GetKeywordAsync(Keyword keyword);
+        Task<List<string?>> GetAllKeywordsAsync();
     }
 }
