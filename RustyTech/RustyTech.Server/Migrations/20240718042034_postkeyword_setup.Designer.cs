@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RustyTech.Server.Data;
 
@@ -11,9 +12,11 @@ using RustyTech.Server.Data;
 namespace RustyTech.Server.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20240718042034_postkeyword_setup")]
+    partial class postkeyword_setup
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -43,11 +46,9 @@ namespace RustyTech.Server.Migrations
 
             modelBuilder.Entity("RustyTech.Server.Models.Auth.LoginInfo", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("LoginTime")
                         .HasColumnType("datetime2");
@@ -87,6 +88,9 @@ namespace RustyTech.Server.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("PostId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Text")
                         .HasColumnType("nvarchar(max)");
@@ -152,11 +156,16 @@ namespace RustyTech.Server.Migrations
                     b.Property<int>("PostId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("PostKeywordId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("KeywordId");
 
                     b.HasIndex("PostId");
+
+                    b.HasIndex("PostKeywordId");
 
                     b.ToTable("PostKeywords");
                 });
@@ -289,6 +298,10 @@ namespace RustyTech.Server.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("RustyTech.Server.Models.User.PostKeyword", null)
+                        .WithMany("PostKeywords")
+                        .HasForeignKey("PostKeywordId");
+
                     b.Navigation("Keyword");
 
                     b.Navigation("Post");
@@ -297,6 +310,11 @@ namespace RustyTech.Server.Migrations
             modelBuilder.Entity("RustyTech.Server.Models.User.Post", b =>
                 {
                     b.Navigation("Keywords");
+                });
+
+            modelBuilder.Entity("RustyTech.Server.Models.User.PostKeyword", b =>
+                {
+                    b.Navigation("PostKeywords");
                 });
 
             modelBuilder.Entity("RustyTech.Server.Models.User.User", b =>

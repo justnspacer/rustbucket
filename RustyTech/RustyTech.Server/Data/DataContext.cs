@@ -29,7 +29,14 @@ namespace RustyTech.Server.Data
             modelBuilder.Entity<Post>()
                 .HasOne(p => p.User)
                 .WithMany(u => u.Posts)
-                .HasForeignKey(p => p.UserId);
+                .HasForeignKey(p => p.UserId)
+                .OnDelete(DeleteBehavior.Cascade); // Delete all posts when a user is deleted
+
+            modelBuilder.Entity<PostKeyword>()
+                .HasOne(pk => pk.Post)
+                .WithMany(p => p.Keywords)
+                .HasForeignKey(p => p.PostId)
+                .OnDelete(DeleteBehavior.Cascade); // Delete all keywords when a post is deleted
         }
 
         public DbSet<User> Users { get; set; }
@@ -41,5 +48,6 @@ namespace RustyTech.Server.Data
         public DbSet<Image> ImagePosts { get; set; }
         public DbSet<Video> VideoPosts { get; set; }
         public DbSet<Keyword> Keywords { get; set; }
+        public DbSet<PostKeyword> PostKeywords { get; set; }
     }
 }

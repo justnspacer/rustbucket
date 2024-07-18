@@ -44,7 +44,7 @@ namespace RustyTech.Tests
         public async Task CreatePostAsync_WithValidPost_ReturnsSuccessResponse()
         {
             // Arrange
-            var post = new Blog
+            var post = new BlogDto()
             {
                 Id = 1,
                 UserId = Guid.NewGuid(),
@@ -77,7 +77,7 @@ namespace RustyTech.Tests
         public async Task CreatePostAsync_WithNullPost_ReturnsBadRequestResponse()
         {
             // Arrange
-            Blog post = null;
+            BlogDto post = new BlogDto();
 
             // Act
             var response = await _postService.CreatePostAsync(post);

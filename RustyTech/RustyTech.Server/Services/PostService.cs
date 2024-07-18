@@ -21,7 +21,7 @@ namespace RustyTech.Server.Services
             _logger = logger;
         }
 
-        public async Task<ResponseBase> CreatePostAsync<T>(T post) where T : Post
+        public async Task<ResponseBase> CreatePostAsync(PostDto post)
         {
             if (post == null)
             {
@@ -44,58 +44,30 @@ namespace RustyTech.Server.Services
                 return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Info.UserNotVerified };
             }
 
-            post.Title = post.Title;
-            post.Content = post.Content;
-            DateTime date = DateTime.UtcNow;
-            post.CreatedAt = date;
-            post.UpdatedAt = date;
-            post.UserId = user.Id;
-            post.IsPublished = true;
-
-            if (post.Keywords != null)
-            {
-                foreach (var keyword in post.Keywords)
-                {
-                    var obj = await GetKeywordAsync(keyword);
-                    if (obj == null)
-                    {
-                        var newKeyword = new Keyword() { Text = keyword.Text };
-                        if (newKeyword.Text != null)
-                        {
-                            var normalizedKeyword = KeywordNormalizer.Normalize(newKeyword.Text);
-                            await AddKeywordAsync(newKeyword);
-                        }
-
-                    }
-                }
-            }
-
             switch (post)
             {
-                case Blog blogPost:
-                    SetBlogPostProperties(blogPost);
-                    await _context.BlogPosts.AddAsync(blogPost);
+                case BlogDto blogDto:
+                    await CreateBlogPost(blogDto, user);
                     break;
-                case Image imagePost:
-                    SetImagePostProperties(imagePost);
-                    await _context.ImagePosts.AddAsync(imagePost);
+                case ImageDto imageDto:
+                    await CreateImagePost(imageDto, user);
                     break;
-                case Video videoPost:
-                    SetVideoPostProperties(videoPost);
-                    await _context.VideoPosts.AddAsync(videoPost);
+                case VideoDto videoDto:
+                    await CreateVideoPost(videoDto, user);
                     break;
                 default:
                     return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Error.InvalidRequest };
             }
-
-            await _context.SaveChangesAsync();
-            _logger.LogInformation($"{typeof(T).Name} post {post.Id} created");
+            _logger.LogInformation($"Post {post.Id} created");
             return new ResponseBase() { IsSuccess = true, Message = Constants.Messages.Info.PostCreated };
         }
 
         public async Task<List<PostDto>> GetAllAsync(bool published = true)
         {
             List<PostDto> allPosts = new List<PostDto>();
+            List<BlogDto> blogs = new List<BlogDto>();
+            List<ImageDto> images = new List<ImageDto>();
+            List<VideoDto> videos = new List<VideoDto>();
 
             if (published)
             {
@@ -132,45 +104,36 @@ namespace RustyTech.Server.Services
             return null;
         }
 
-        public async Task<ResponseBase> EditPostAsync<T>(PostEditRequest request) where T : Post
+        public async Task<ResponseBase> EditPostAsync<T>(PostDto newData) where T : Post
         {
-            var post = await _context.Set<T>().FindAsync(request.PostId);
-            if (post == null)
+            var currentPost = await _context.Set<T>().FindAsync(newData.Id);
+            if (currentPost == null)
             {
                 return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Info.PostNotFound };
             }
 
-            if (post.UserId != request.UserId)
+            if (currentPost.UserId != newData.UserId)
             {
                 return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Error.Unauthorized };
             }
 
-            post.Title = request.UpdatedPost?.Title;
-            post.Content = request.UpdatedPost?.Content;
-            post.UpdatedAt = DateTime.UtcNow;
-            var updatedKeywords = request.UpdatedPost?.Keywords;
+            currentPost.Title = newData.Title;
+            currentPost.Content = newData.Content;
 
-            if (updatedKeywords != null && updatedKeywords != post.Keywords)
+            var existingKeywords = currentPost.Keywords.Select(pk => pk).ToList();
+            var newKeywords = newData.Keywords?.Except(existingKeywords.Select(pk => pk.Keyword.Text)).ToList();
+
+            RemoveKeywords(currentPost, existingKeywords, newData);
+
+            if (newKeywords != null)
             {
-                foreach (var keyword in updatedKeywords)
-                {
-                    var obj = await GetKeywordAsync(keyword);
-                    if (obj == null)
-                    {
-                        var newKeyword = new Keyword() { Text = keyword.Text };
-                        if (newKeyword.Text != null)
-                        {
-                            var normalizedKeyword = KeywordNormalizer.Normalize(newKeyword.Text);
-                            await AddKeywordAsync(newKeyword);
-                        }
-
-                    }
-                }
+                await AddKeywords(currentPost, newKeywords);
             }
 
+            currentPost.UpdatedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
 
-            _logger.LogInformation($"{typeof(T).Name} post {post.Id} updated");
+            _logger.LogInformation($"{typeof(T).Name} post {newData.Id} updated");
 
             return new ResponseBase() { IsSuccess = true, Message = Constants.Messages.Info.PostUpdated };
         }
@@ -193,12 +156,93 @@ namespace RustyTech.Server.Services
         }
 
         public async Task<List<string?>> GetAllKeywordsAsync() => await _context.Keywords.Select(k => k.Text).ToListAsync();
-        private async Task<Keyword?> GetKeywordAsync(Keyword keyword) => await _context.Keywords.FirstOrDefaultAsync(key => key.Text == keyword.Text);
 
-        private async Task AddKeywordAsync(Keyword keyword)
+        private async Task CreateVideoPost(VideoDto videoDto, UserDto user)
         {
-            _context.Keywords.Add(keyword);
+            var video = new Video()
+            {
+                Title = videoDto.Title,
+                Content = videoDto.Content,
+                VideoUrl = videoDto.VideoUrl,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+                UserId = user.Id,
+                IsPublished = true
+            };
+
+            await AddKeywords(video, videoDto.Keywords);
+            await _context.VideoPosts.AddAsync(video);
             await _context.SaveChangesAsync();
+
+        }
+
+        private async Task CreateImagePost(ImageDto imageDto, UserDto user)
+        {
+            var image = new Image()
+            {
+                Title = imageDto.Title,
+                Content = imageDto.Content,
+                ImageUrl = imageDto.ImageUrl,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+                UserId = user.Id,
+                IsPublished = true
+            };
+
+            await AddKeywords(image, imageDto.Keywords);
+            await _context.ImagePosts.AddAsync(image);
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task CreateBlogPost(BlogDto blogDto, UserDto user)
+        {
+            var blog = new Blog()
+            {
+                Title = blogDto.Title,
+                Content = blogDto.Content,
+                ImageUrls = blogDto.ImageUrls,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+                UserId = user.Id,
+                IsPublished = true
+            };
+
+            await AddKeywords(blog, blogDto.Keywords);
+            await _context.BlogPosts.AddAsync(blog);
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task AddKeywords(Post post, List<string>? keywords)
+        {
+            if (keywords != null)
+            {
+                var normailizedKeywords = KeywordNormalizer.NormalizeKeywords(keywords);
+                foreach (var text in normailizedKeywords)
+                {
+                    var currentKeyword = _context.Keywords.FirstOrDefault(k => k.Text == text);
+                    if (currentKeyword == null)
+                    {
+                        Keyword keyword = new Keyword { Text = text };
+                        PostKeyword postKeyword = new PostKeyword { Post = post, Keyword = keyword };
+                        post.Keywords.Add(postKeyword);
+                        await _context.Keywords.AddAsync(keyword);
+                    }
+                }
+            }
+        }
+
+        private void RemoveKeywords(Post currentPost, List<PostKeyword> existingKeywords, PostDto newData)
+        {
+            var removedKeywords = existingKeywords.Select(pk => pk.Keyword?.Text).Except(newData.Keywords).ToList();
+
+            foreach (var keywordText in removedKeywords)
+            {
+                var postKeyword = currentPost.Keywords.SingleOrDefault(k => k.Keyword?.Text == keywordText);
+                if (postKeyword != null)
+                {
+                    currentPost.Keywords.Remove(postKeyword);
+                }
+            }
         }
 
         private async Task AddPostsByType<T>(DbSet<T> dbSet, List<PostDto> allPosts, Expression<Func<T, bool>> predicate) where T : class
@@ -211,21 +255,6 @@ namespace RustyTech.Server.Services
         private async Task<T?> GetPostById<T>(int postId) where T : class
         {
             return await _context.Set<T>().FindAsync(postId);
-        }
-
-        private void SetBlogPostProperties(Blog post)
-        {
-            post.ImageUrls = post.ImageUrls;
-        }
-
-        private void SetImagePostProperties(Image post)
-        {
-            post.ImageUrl = post.ImageUrl;
-        }
-
-        private void SetVideoPostProperties(Video post)
-        {
-            post.VideoUrl = post.VideoUrl;
         }
     }
 }

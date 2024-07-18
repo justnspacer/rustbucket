@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RustyTech.Server.Data;
 
@@ -11,9 +12,11 @@ using RustyTech.Server.Data;
 namespace RustyTech.Server.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20240716052003_keyword_relationship")]
+    partial class keyword_relationship
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -43,11 +46,9 @@ namespace RustyTech.Server.Migrations
 
             modelBuilder.Entity("RustyTech.Server.Models.Auth.LoginInfo", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("LoginTime")
                         .HasColumnType("datetime2");
@@ -87,6 +88,9 @@ namespace RustyTech.Server.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("PostId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Text")
                         .HasColumnType("nvarchar(max)");
@@ -140,23 +144,15 @@ namespace RustyTech.Server.Migrations
 
             modelBuilder.Entity("RustyTech.Server.Models.User.PostKeyword", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<int>("PostId")
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("KeywordId")
                         .HasColumnType("int");
 
-                    b.Property<int>("PostId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
+                    b.HasKey("PostId", "KeywordId");
 
                     b.HasIndex("KeywordId");
-
-                    b.HasIndex("PostId");
 
                     b.ToTable("PostKeywords");
                 });
@@ -239,6 +235,7 @@ namespace RustyTech.Server.Migrations
                     b.HasBaseType("RustyTech.Server.Models.User.Post");
 
                     b.Property<string>("ImageUrls")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasDiscriminator().HasValue("BlogPost");
@@ -278,7 +275,7 @@ namespace RustyTech.Server.Migrations
             modelBuilder.Entity("RustyTech.Server.Models.User.PostKeyword", b =>
                 {
                     b.HasOne("RustyTech.Server.Models.User.Keyword", "Keyword")
-                        .WithMany()
+                        .WithMany("PostKeywords")
                         .HasForeignKey("KeywordId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -292,6 +289,11 @@ namespace RustyTech.Server.Migrations
                     b.Navigation("Keyword");
 
                     b.Navigation("Post");
+                });
+
+            modelBuilder.Entity("RustyTech.Server.Models.User.Keyword", b =>
+                {
+                    b.Navigation("PostKeywords");
                 });
 
             modelBuilder.Entity("RustyTech.Server.Models.User.Post", b =>

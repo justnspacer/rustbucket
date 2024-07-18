@@ -7,9 +7,6 @@ namespace RustyTech.Server.Models.User
         public int Id { get; set; }
         public string? Title { get; set; }
         public string? Content { get; set; }
-        public List<string>? ImageUrls { get; set; }
-        public string? ImageUrl { get; set; }
-        public string? VideoUrl { get; set; }
         public bool IsPublished { get; set; }
         public List<string>? Keywords { get; set; }
 

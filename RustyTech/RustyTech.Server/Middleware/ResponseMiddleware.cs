@@ -29,13 +29,13 @@ namespace RustyTech.Server.Middleware
 
                     context.Response.Body = originalBodyStream;
 
-                    ApiResponse<object> response = new ApiResponse<object>(context.Response.StatusCode, null, JsonConvert.DeserializeObject(readBuffer));
+                    ApiResponse<object> response = new ApiResponse<object>(JsonConvert.DeserializeObject(readBuffer));
                     await WriteResponse(response, context);
                 }
             }
             catch (Exception ex)
             {
-                ApiResponse<object> response = new ApiResponse<object>(context.Response.StatusCode, ex.Message, null);
+                ApiResponse<object> response = new ApiResponse<object>(ex.Message);
                 await WriteResponse(response, context);
             }
         }

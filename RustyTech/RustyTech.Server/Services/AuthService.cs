@@ -442,6 +442,7 @@ namespace RustyTech.Server.Services
         {
             var loginInfo = new LoginInfo
             {
+
                 UserId = userId,
                 LoginTime = DateTime.UtcNow,
             };

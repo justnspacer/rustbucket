@@ -33,21 +33,21 @@ namespace RustyTech.Server.Controllers
         }
 
         [HttpPost("create/blog")]
-        public async Task<IActionResult> CreateBlogPostAsync([FromBody] Blog request)
+        public async Task<IActionResult> CreateBlogPostAsync([FromBody] BlogDto request)
         {
             var post = await _postService.CreatePostAsync(request);
             return Ok(post);
         }
 
         [HttpPost("create/image")]
-        public async Task<IActionResult> CreateImagePostAsync([FromBody] Image request)
+        public async Task<IActionResult> CreateImagePostAsync([FromBody] ImageDto request)
         {
             var post = await _postService.CreatePostAsync(request);
             return Ok(post);
         }
 
         [HttpPost("create/video")]
-        public async Task<IActionResult> CreateVideoPostAsync([FromBody] Video request)
+        public async Task<IActionResult> CreateVideoPostAsync([FromBody] VideoDto request)
         {
             var post = await _postService.CreatePostAsync(request);
             return Ok(post);
@@ -62,7 +62,7 @@ namespace RustyTech.Server.Controllers
         }
 
         [HttpPut("edit")]
-        public async Task<IActionResult> EditPostAsync([FromBody] PostEditRequest request)
+        public async Task<IActionResult> EditPostAsync([FromBody] PostDto request)
         {
             var result = await _postService.EditPostAsync<Post>(request);
             return Ok(result);
