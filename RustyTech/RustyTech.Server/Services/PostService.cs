@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using RustyTech.Server.Models.Auth;
+using RustyTech.Server.Models.User;
 using RustyTech.Server.Services.Interfaces;
 using RustyTech.Server.Utilities;
 using System.Linq.Expressions;
@@ -65,9 +66,6 @@ namespace RustyTech.Server.Services
         public async Task<List<PostDto>> GetAllAsync(bool published = true)
         {
             List<PostDto> allPosts = new List<PostDto>();
-            List<BlogDto> blogs = new List<BlogDto>();
-            List<ImageDto> images = new List<ImageDto>();
-            List<VideoDto> videos = new List<VideoDto>();
 
             if (published)
             {
@@ -92,21 +90,42 @@ namespace RustyTech.Server.Services
 
         public async Task<PostDto?> GetPostByIdAsync(int postId)
         {
-            var bp = await GetPostById<Blog>(postId);
-            if (bp != null) return _mapper.Map<Blog, PostDto>(bp);
+            var blog = await GetPostById<Blog>(postId);
+            if (blog != null)
+            {
+                var blogDto = _mapper.Map<Blog, PostDto>(blog);
+                blogDto.PostType = "Blog";
+                var keywords = await GetPostKeywordsAsync(blogDto.Id);
+                blogDto.Keywords = keywords;
+                return blogDto;
+            }
 
-            var ip = await GetPostById<Image>(postId);
-            if (ip != null) return _mapper.Map<Image, PostDto>(ip);
+            var image = await GetPostById<Image>(postId);
+            if (image != null)
+            {
+                var imageDto = _mapper.Map<Image, PostDto>(image);
+                imageDto.PostType = "Image";
+                var keywords = await GetPostKeywordsAsync(imageDto.Id);
+                imageDto.Keywords = keywords;
+                return imageDto;
+            }
 
-            var vp = await GetPostById<Video>(postId);
-            if (vp != null) return _mapper.Map<Video, PostDto>(vp);
-
+            var video = await GetPostById<Video>(postId);
+            if (video != null)
+            {
+                var videoDto = _mapper.Map<Video, PostDto>(video);
+                videoDto.PostType = "Video";
+                var keywords = await GetPostKeywordsAsync(videoDto.Id);
+                videoDto.Keywords = keywords;
+                return videoDto;
+            }
             return null;
         }
 
         public async Task<ResponseBase> EditPostAsync<T>(PostDto newData) where T : Post
         {
             var currentPost = await _context.Set<T>().FindAsync(newData.Id);
+            var currentPostKeywords = _context.PostKeywords.Where(pk => pk.PostId == newData.Id).ToList();
             if (currentPost == null)
             {
                 return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Info.PostNotFound };
@@ -119,15 +138,12 @@ namespace RustyTech.Server.Services
 
             currentPost.Title = newData.Title;
             currentPost.Content = newData.Content;
+            currentPost.Keywords = currentPostKeywords;
 
-            var existingKeywords = currentPost.Keywords.Select(pk => pk).ToList();
-            var newKeywords = newData.Keywords?.Except(existingKeywords.Select(pk => pk.Keyword.Text)).ToList();
-
-            RemoveKeywords(currentPost, existingKeywords, newData);
-
-            if (newKeywords != null)
+            if (currentPost.Keywords.Count > 0)
             {
-                await AddKeywords(currentPost, newKeywords);
+                RemoveKeywords(currentPost, newData);
+                AddKeywords(currentPost, newData.Keywords);
             }
 
             currentPost.UpdatedAt = DateTime.UtcNow;
@@ -155,7 +171,9 @@ namespace RustyTech.Server.Services
             return new ResponseBase() { IsSuccess = true, Message = $"Post {post.Id} publish status: {post.IsPublished}" };
         }
 
-        public async Task<List<string?>> GetAllKeywordsAsync() => await _context.Keywords.Select(k => k.Text).ToListAsync();
+        public async Task<List<string>> GetAllKeywordsAsync() => await _context.Keywords.Select(k => k.Text).ToListAsync();
+
+        public async Task<List<string>> GetPostKeywordsAsync(int id) => await _context.PostKeywords.Where(pk => pk.PostId == id).Select(k => k.Keyword.Text).ToListAsync();
 
         private async Task CreateVideoPost(VideoDto videoDto, UserDto user)
         {
@@ -170,7 +188,7 @@ namespace RustyTech.Server.Services
                 IsPublished = true
             };
 
-            await AddKeywords(video, videoDto.Keywords);
+            AddKeywords(video, videoDto.Keywords);
             await _context.VideoPosts.AddAsync(video);
             await _context.SaveChangesAsync();
 
@@ -189,7 +207,7 @@ namespace RustyTech.Server.Services
                 IsPublished = true
             };
 
-            await AddKeywords(image, imageDto.Keywords);
+            AddKeywords(image, imageDto.Keywords);
             await _context.ImagePosts.AddAsync(image);
             await _context.SaveChangesAsync();
         }
@@ -207,12 +225,12 @@ namespace RustyTech.Server.Services
                 IsPublished = true
             };
 
-            await AddKeywords(blog, blogDto.Keywords);
+            AddKeywords(blog, blogDto.Keywords);
             await _context.BlogPosts.AddAsync(blog);
             await _context.SaveChangesAsync();
         }
 
-        private async Task AddKeywords(Post post, List<string>? keywords)
+        private async void AddKeywords(Post post, List<string>? keywords)
         {
             if (keywords != null)
             {
@@ -223,24 +241,33 @@ namespace RustyTech.Server.Services
                     if (currentKeyword == null)
                     {
                         Keyword keyword = new Keyword { Text = text };
+                        await _context.Keywords.AddAsync(keyword);
+
                         PostKeyword postKeyword = new PostKeyword { Post = post, Keyword = keyword };
                         post.Keywords.Add(postKeyword);
-                        await _context.Keywords.AddAsync(keyword);
+                    }
+                    else
+                    {
+                        PostKeyword postKeyword = new PostKeyword { Post = post, Keyword = currentKeyword };
+                        post.Keywords.Add(postKeyword);
                     }
                 }
             }
         }
-
-        private void RemoveKeywords(Post currentPost, List<PostKeyword> existingKeywords, PostDto newData)
+        //TODO: FINSIH THIS
+        private void RemoveKeywords(Post currentPost, PostDto newData)
         {
-            var removedKeywords = existingKeywords.Select(pk => pk.Keyword?.Text).Except(newData.Keywords).ToList();
-
-            foreach (var keywordText in removedKeywords)
+            if (newData.Keywords != null)
             {
-                var postKeyword = currentPost.Keywords.SingleOrDefault(k => k.Keyword?.Text == keywordText);
-                if (postKeyword != null)
+                var normailizedKeywords = KeywordNormalizer.NormalizeKeywords(newData.Keywords);
+                var keywordsToRemove = currentPost.Keywords
+                    .Where(pk => normailizedKeywords.Any(nk => pk.Keyword.Text.Contains(nk)))
+                    .ToList();
+
+                foreach (var postKeyword in keywordsToRemove)
                 {
                     currentPost.Keywords.Remove(postKeyword);
+                    _context.PostKeywords.Remove(postKeyword);
                 }
             }
         }
@@ -249,6 +276,16 @@ namespace RustyTech.Server.Services
         {
             var posts = await dbSet.Where(predicate).ToListAsync();
             var postDtos = _mapper.Map<List<T>, List<PostDto>>(posts);
+
+            //add type and keywords to each post
+            foreach (var postDto in postDtos)
+            {
+                postDto.PostType = typeof(T).Name;
+
+                var keywords = await GetPostKeywordsAsync(postDto.Id);
+                postDto.Keywords = keywords;
+            }
+
             allPosts.AddRange(postDtos);
         }
 

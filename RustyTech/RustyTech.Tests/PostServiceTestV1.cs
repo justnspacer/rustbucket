@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using RustyTech.Server.Constants;
 using RustyTech.Server.Data;
-using RustyTech.Server.MappingProfiles;
+using RustyTech.Server.AutoMapper;
 using RustyTech.Server.Models.User;
 using RustyTech.Server.Services;
 using RustyTech.Server.Services.Interfaces;
