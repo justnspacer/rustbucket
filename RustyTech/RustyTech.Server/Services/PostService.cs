@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using RustyTech.Server.Models.Auth;
-using RustyTech.Server.Models.User;
 using RustyTech.Server.Services.Interfaces;
 using RustyTech.Server.Utilities;
 using System.Linq.Expressions;
@@ -124,8 +123,7 @@ namespace RustyTech.Server.Services
 
         public async Task<ResponseBase> EditPostAsync<T>(PostDto newData) where T : Post
         {
-            var currentPost = await _context.Set<T>().FindAsync(newData.Id);
-            var currentPostKeywords = _context.PostKeywords.Where(pk => pk.PostId == newData.Id).ToList();
+            var currentPost = await _context.Set<T>().Include(k => k.Keywords).ThenInclude(t => t.Keyword).FirstOrDefaultAsync(p => p.Id == newData.Id);
             if (currentPost == null)
             {
                 return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Info.PostNotFound };
@@ -138,13 +136,13 @@ namespace RustyTech.Server.Services
 
             currentPost.Title = newData.Title;
             currentPost.Content = newData.Content;
-            currentPost.Keywords = currentPostKeywords;
 
             if (currentPost.Keywords.Count > 0)
             {
                 RemoveKeywords(currentPost, newData);
-                AddKeywords(currentPost, newData.Keywords);
             }
+
+            AddKeywords(currentPost, newData.Keywords);
 
             currentPost.UpdatedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
@@ -237,33 +235,43 @@ namespace RustyTech.Server.Services
                 var normailizedKeywords = KeywordNormalizer.NormalizeKeywords(keywords);
                 foreach (var text in normailizedKeywords)
                 {
-                    var currentKeyword = _context.Keywords.FirstOrDefault(k => k.Text == text);
-                    if (currentKeyword == null)
+                    var existingKeyword = _context.Keywords.FirstOrDefault(k => k.Text == text);
+                    if (existingKeyword == null)
                     {
                         Keyword keyword = new Keyword { Text = text };
                         await _context.Keywords.AddAsync(keyword);
 
                         PostKeyword postKeyword = new PostKeyword { Post = post, Keyword = keyword };
                         post.Keywords.Add(postKeyword);
+                        _context.PostKeywords.Add(postKeyword);
                     }
                     else
                     {
-                        PostKeyword postKeyword = new PostKeyword { Post = post, Keyword = currentKeyword };
-                        post.Keywords.Add(postKeyword);
+                        PostKeyword postKeyword = new PostKeyword { Post = post, Keyword = existingKeyword };
+                        _context.PostKeywords.Add(postKeyword);
+                        //check keywords before add to avoid duplication
+                        foreach (var ck in post.Keywords)
+                        {
+                            if (ck.Keyword != null)
+                            {
+                                if (ck.Keyword.Text != existingKeyword.Text)
+                                {
+                                    post.Keywords.Add(postKeyword);
+
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
-        //TODO: FINSIH THIS
+
         private void RemoveKeywords(Post currentPost, PostDto newData)
         {
             if (newData.Keywords != null)
             {
                 var normailizedKeywords = KeywordNormalizer.NormalizeKeywords(newData.Keywords);
-                var keywordsToRemove = currentPost.Keywords
-                    .Where(pk => normailizedKeywords.Any(nk => pk.Keyword.Text.Contains(nk)))
-                    .ToList();
-
+                var keywordsToRemove = _context.PostKeywords.Where(pk => !normailizedKeywords.Contains(pk.Keyword.Text)).ToList();
                 foreach (var postKeyword in keywordsToRemove)
                 {
                     currentPost.Keywords.Remove(postKeyword);

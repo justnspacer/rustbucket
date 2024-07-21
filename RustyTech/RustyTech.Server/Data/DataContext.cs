@@ -37,6 +37,11 @@ namespace RustyTech.Server.Data
                 .WithMany(p => p.Keywords)
                 .HasForeignKey(p => p.PostId)
                 .OnDelete(DeleteBehavior.Cascade); // Delete all keywords when a post is deleted
+
+            modelBuilder.Entity<PostKeyword>()
+                .HasOne(pk => pk.Keyword)
+                .WithMany(k => k.PostKeywords)
+                .HasForeignKey(k => k.KeywordId);
         }
 
         public DbSet<User> Users { get; set; }
