@@ -1,4 +1,4 @@
-﻿namespace RustyTech.Server.Models.Role
+﻿namespace RustyTech.Server.Models.Dtos
 {
     public class RoleDto
     {

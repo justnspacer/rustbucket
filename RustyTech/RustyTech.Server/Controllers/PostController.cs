@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RustyTech.Server.Interfaces;
+using RustyTech.Server.Models.Dtos;
+using RustyTech.Server.Models.Posts;
 using RustyTech.Server.Services.Interfaces;
 
 namespace RustyTech.Server.Controllers

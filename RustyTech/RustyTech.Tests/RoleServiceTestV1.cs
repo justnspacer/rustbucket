@@ -6,8 +6,8 @@ using RustyTech.Server.Services;
 using RustyTech.Server.Interfaces;
 using RustyTech.Server.Constants;
 using Microsoft.AspNetCore.Identity;
-using RustyTech.Server.Models.User;
 using RustyTech.Server.Models.Role;
+using RustyTech.Server.Models;
 
 namespace RustyTech.Tests
 {

@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace RustyTech.Server.Models.User
+namespace RustyTech.Server.Models.Posts
 {
     public abstract class Post
     {

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using RustyTech.Server.Interfaces;
+using RustyTech.Server.Models.Dtos;
 using RustyTech.Server.Models.Role;
 
 namespace RustyTech.Server.Services

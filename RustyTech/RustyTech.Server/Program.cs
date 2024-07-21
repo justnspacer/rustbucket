@@ -1,5 +1,5 @@
 global using Microsoft.EntityFrameworkCore;
-global using RustyTech.Server.Models.User;
+global using RustyTech.Server.Models;
 global using RustyTech.Server.Data;
 
 using AspNetCoreRateLimit;

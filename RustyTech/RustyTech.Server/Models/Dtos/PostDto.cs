@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace RustyTech.Server.Models.User
+namespace RustyTech.Server.Models.Dtos
 {
     public class PostDto
     {

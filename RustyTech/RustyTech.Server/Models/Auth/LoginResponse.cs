@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using RustyTech.Server.Models.Dtos;
+using System.Text.Json.Serialization;
 
 namespace RustyTech.Server.Models.Auth
 {

@@ -9,8 +9,8 @@ using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using RustyTech.Server.Services.Interfaces;
 using RustyTech.Server.Interfaces;
-using System.Net.Mail;
 using RustyTech.Server.Utilities;
+using RustyTech.Server.Models.Dtos;
 
 namespace RustyTech.Server.Services
 {

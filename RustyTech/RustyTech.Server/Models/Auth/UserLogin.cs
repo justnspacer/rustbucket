@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace RustyTech.Server.Models.User
+namespace RustyTech.Server.Models.Auth
 {
     public class UserLogin
     {

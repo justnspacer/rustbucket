@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using RustyTech.Server.Models.Auth;
+using RustyTech.Server.Models.Posts;
 using RustyTech.Server.Models.Role;
 
 namespace RustyTech.Server.Data
@@ -35,8 +36,7 @@ namespace RustyTech.Server.Data
             modelBuilder.Entity<PostKeyword>()
                 .HasOne(pk => pk.Post)
                 .WithMany(p => p.Keywords)
-                .HasForeignKey(p => p.PostId)
-                .OnDelete(DeleteBehavior.Cascade); // Delete all keywords when a post is deleted
+                .HasForeignKey(p => p.PostId);
 
             modelBuilder.Entity<PostKeyword>()
                 .HasOne(pk => pk.Keyword)

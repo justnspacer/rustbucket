@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using RustyTech.Server.Models.Auth;
+using RustyTech.Server.Models.Dtos;
+using RustyTech.Server.Models.Posts;
 using RustyTech.Server.Services.Interfaces;
 using RustyTech.Server.Utilities;
 using System.Linq.Expressions;
@@ -169,9 +171,11 @@ namespace RustyTech.Server.Services
             return new ResponseBase() { IsSuccess = true, Message = $"Post {post.Id} publish status: {post.IsPublished}" };
         }
 
+        //keyword functions
         public async Task<List<string>> GetAllKeywordsAsync() => await _context.Keywords.Select(k => k.Text).ToListAsync();
 
         public async Task<List<string>> GetPostKeywordsAsync(int id) => await _context.PostKeywords.Where(pk => pk.PostId == id).Select(k => k.Keyword.Text).ToListAsync();
+        //keyword functions end
 
         private async Task CreateVideoPost(VideoDto videoDto, UserDto user)
         {
@@ -228,58 +232,6 @@ namespace RustyTech.Server.Services
             await _context.SaveChangesAsync();
         }
 
-        private async void AddKeywords(Post post, List<string>? keywords)
-        {
-            if (keywords != null)
-            {
-                var normailizedKeywords = KeywordNormalizer.NormalizeKeywords(keywords);
-                foreach (var text in normailizedKeywords)
-                {
-                    var existingKeyword = _context.Keywords.FirstOrDefault(k => k.Text == text);
-                    if (existingKeyword == null)
-                    {
-                        Keyword keyword = new Keyword { Text = text };
-                        await _context.Keywords.AddAsync(keyword);
-
-                        PostKeyword postKeyword = new PostKeyword { Post = post, Keyword = keyword };
-                        post.Keywords.Add(postKeyword);
-                        _context.PostKeywords.Add(postKeyword);
-                    }
-                    else
-                    {
-                        PostKeyword postKeyword = new PostKeyword { Post = post, Keyword = existingKeyword };
-                        _context.PostKeywords.Add(postKeyword);
-                        //check keywords before add to avoid duplication
-                        foreach (var ck in post.Keywords)
-                        {
-                            if (ck.Keyword != null)
-                            {
-                                if (ck.Keyword.Text != existingKeyword.Text)
-                                {
-                                    post.Keywords.Add(postKeyword);
-
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        private void RemoveKeywords(Post currentPost, PostDto newData)
-        {
-            if (newData.Keywords != null)
-            {
-                var normailizedKeywords = KeywordNormalizer.NormalizeKeywords(newData.Keywords);
-                var keywordsToRemove = _context.PostKeywords.Where(pk => !normailizedKeywords.Contains(pk.Keyword.Text)).ToList();
-                foreach (var postKeyword in keywordsToRemove)
-                {
-                    currentPost.Keywords.Remove(postKeyword);
-                    _context.PostKeywords.Remove(postKeyword);
-                }
-            }
-        }
-
         private async Task AddPostsByType<T>(DbSet<T> dbSet, List<PostDto> allPosts, Expression<Func<T, bool>> predicate) where T : class
         {
             var posts = await dbSet.Where(predicate).ToListAsync();
@@ -300,6 +252,55 @@ namespace RustyTech.Server.Services
         private async Task<T?> GetPostById<T>(int postId) where T : class
         {
             return await _context.Set<T>().FindAsync(postId);
+        }
+
+        //keyword helpers
+        private async void AddKeywords(Post post, List<string>? keywords)
+        {
+            if (keywords != null)
+            {
+                var normalizedKeywords = KeywordNormalizer.NormalizeKeywords(keywords);
+                foreach (var text in normalizedKeywords)
+                {
+                    var existingKeyword = _context.Keywords.FirstOrDefault(k => k.Text == text);
+                    if (existingKeyword == null)
+                    {
+                        Keyword keyword = new Keyword { Text = text };
+                        await _context.Keywords.AddAsync(keyword);
+                        await AddPostKeyword(post, keyword);
+                    }
+                    else
+                    {
+                        // Check if the post already has the keyword
+                        var postKeywordExists = post.Keywords.Any(pk => pk.KeywordId == existingKeyword.Id);
+                        if (!postKeywordExists)
+                        {
+                            await AddPostKeyword(post, existingKeyword);
+                        }
+                    }
+                }
+            }
+        }
+
+        private async Task AddPostKeyword(Post post, Keyword keyword)
+        {
+            PostKeyword postKeyword = new PostKeyword { Post = post, Keyword = keyword };
+            post.Keywords.Add(postKeyword);
+            await _context.PostKeywords.AddAsync(postKeyword);
+        }
+
+        private void RemoveKeywords(Post currentPost, PostDto newData)
+        {
+            if (newData.Keywords != null)
+            {
+                var normailizedKeywords = KeywordNormalizer.NormalizeKeywords(newData.Keywords);
+                var keywordsToRemove = _context.PostKeywords.Where(pk => !normailizedKeywords.Contains(pk.Keyword.Text)).ToList();
+                foreach (var postKeyword in keywordsToRemove)
+                {
+                    currentPost.Keywords.Remove(postKeyword);
+                    _context.PostKeywords.Remove(postKeyword);
+                }
+            }
         }
     }
 }

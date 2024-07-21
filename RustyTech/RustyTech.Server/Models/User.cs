@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using RustyTech.Server.Models.Posts;
 
-namespace RustyTech.Server.Models.User
+namespace RustyTech.Server.Models
 {
     public class User : IdentityUser
     {

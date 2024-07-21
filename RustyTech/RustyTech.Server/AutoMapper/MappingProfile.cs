@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using RustyTech.Server.Models.Dtos;
+using RustyTech.Server.Models.Posts;
 
 namespace RustyTech.Server.AutoMapper
 {

@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using RustyTech.Server.Constants;
 using RustyTech.Server.Data;
-using RustyTech.Server.Models.User;
+using RustyTech.Server.Models;
+using RustyTech.Server.Models.Dtos;
 using RustyTech.Server.Services;
 using RustyTech.Server.Services.Interfaces;
 

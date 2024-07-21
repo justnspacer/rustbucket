@@ -1,4 +1,4 @@
-﻿namespace RustyTech.Server.Models.User
+﻿namespace RustyTech.Server.Models.Posts
 {
     public class Blog : Post
     {

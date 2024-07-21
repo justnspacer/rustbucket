@@ -5,9 +5,11 @@ using Moq;
 using RustyTech.Server.Constants;
 using RustyTech.Server.Data;
 using RustyTech.Server.AutoMapper;
-using RustyTech.Server.Models.User;
 using RustyTech.Server.Services;
 using RustyTech.Server.Services.Interfaces;
+using RustyTech.Server.Models.Posts;
+using RustyTech.Server.Models;
+using RustyTech.Server.Models.Dtos;
 
 namespace RustyTech.Tests
 {

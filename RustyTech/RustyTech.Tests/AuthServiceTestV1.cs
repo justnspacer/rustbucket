@@ -1,4 +1,3 @@
-using RustyTech.Server.Models.User;
 using RustyTech.Server.Services.Interfaces;
 using RustyTech.Server.Constants;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +9,8 @@ using Moq;
 using RustyTech.Server.Interfaces;
 using RustyTech.Server.Models.Auth;
 using Microsoft.AspNetCore.Identity.Data;
+using RustyTech.Server.Models;
+using RustyTech.Server.Models.Dtos;
 
 namespace RustyTech.Tests
 {

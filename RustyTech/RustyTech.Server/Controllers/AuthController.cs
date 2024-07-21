@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using RustyTech.Server.Models.Auth;
+using RustyTech.Server.Models.Dtos;
 using RustyTech.Server.Services.Interfaces;
 
 namespace RustyTech.Server.Controllers
