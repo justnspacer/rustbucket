@@ -19,7 +19,7 @@ namespace RustyTech.Server.Models.Dtos
         public UserDto? User { get; set; }
 
         public string? VideoUrl { get; set; }
-        public string? ImageUrl { get; set; }
+        public IFormFile? ImageUrl { get; set; }
         public List<string>? ImageUrls { get; set; }
     }
 }

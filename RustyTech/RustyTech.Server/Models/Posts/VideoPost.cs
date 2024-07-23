@@ -1,6 +1,6 @@
 ﻿namespace RustyTech.Server.Models.Posts
 {
-    public class Video : Post
+    public class VideoPost : Post
     {
         public string? VideoUrl { get; set; }
         public override void Display()

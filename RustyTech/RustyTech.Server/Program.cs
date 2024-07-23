@@ -109,12 +109,15 @@ builder.Services.AddIdentityCore<User>().AddRoles<IdentityRole>().AddEntityFrame
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>(); // Add rate limit configuration as a singleton.
+builder.Services.AddSingleton<Ganss.Xss.HtmlSanitizer>();
 builder.Services.AddScoped<ISmtpClientService, SmtpClientService>(); // Add smtp client service with scoped lifetime.
 builder.Services.AddScoped<IAuthService, AuthService>(); // Add authentication service with scoped lifetime.
 builder.Services.AddScoped<IRoleService, RoleService>(); // Add role service with scoped lifetime.
 builder.Services.AddScoped<IUserService, UserService>(); // Add user service with scoped lifetime.
 builder.Services.AddScoped<IEmailService, EmailService>(); // Add email service with scoped lifetime.
 builder.Services.AddScoped<IPostService, PostService>(); // Add post service with scoped lifetime.
+builder.Services.AddScoped<IImageService, ImageService>(); // Add image service with scoped lifetime.
+builder.Services.AddScoped<IVideoService, VideoService>(); // Add video service with scoped lifetime.
 
 builder.Services.Configure<RequestLocalizationOptions>(options =>
 {

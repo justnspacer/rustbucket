@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Ganss.Xss;
 using RustyTech.Server.Models.Auth;
 using RustyTech.Server.Models.Dtos;
 using RustyTech.Server.Models.Posts;
@@ -14,13 +15,19 @@ namespace RustyTech.Server.Services
         private readonly IMapper _mapper;
         private IUserService _userService;
         private ILogger<IPostService> _logger;
+        private readonly HtmlSanitizer _htmlSanitizer;
+        private IImageService _imageService;
 
-        public PostService(DataContext context, IMapper mapper, IUserService userService, ILogger<IPostService> logger)
+        public PostService(DataContext context, IMapper mapper, 
+            IUserService userService, ILogger<IPostService> logger, 
+            HtmlSanitizer htmlSanitizer, IImageService imageService)
         {
             _context = context;
             _mapper = mapper;
             _userService = userService;
             _logger = logger;
+            _htmlSanitizer = htmlSanitizer;
+            _imageService = imageService;
         }
 
         public async Task<ResponseBase> CreatePostAsync(PostDto post)
@@ -70,17 +77,17 @@ namespace RustyTech.Server.Services
 
             if (published)
             {
-                await AddPostsByType<Blog>(_context.BlogPosts, allPosts, p => p.IsPublished == true);
-                await AddPostsByType<Image>(_context.ImagePosts, allPosts, p => p.IsPublished == true);
-                await AddPostsByType<Video>(_context.VideoPosts, allPosts, p => p.IsPublished == true);
+                await AddPostsByType<BlogPost>(_context.BlogPosts, allPosts, p => p.IsPublished == true);
+                await AddPostsByType<ImagePost>(_context.ImagePosts, allPosts, p => p.IsPublished == true);
+                await AddPostsByType<VideoPost>(_context.VideoPosts, allPosts, p => p.IsPublished == true);
 
                 _logger.LogInformation("All published posts retrieved");
             }
             else
             {
-                await AddPostsByType<Blog>(_context.BlogPosts, allPosts, p => true);
-                await AddPostsByType<Image>(_context.ImagePosts, allPosts, p => true);
-                await AddPostsByType<Video>(_context.VideoPosts, allPosts, p => true);
+                await AddPostsByType<BlogPost>(_context.BlogPosts, allPosts, p => true);
+                await AddPostsByType<ImagePost>(_context.ImagePosts, allPosts, p => true);
+                await AddPostsByType<VideoPost>(_context.VideoPosts, allPosts, p => true);
 
                 _logger.LogInformation("All posts retrieved");
             }
@@ -91,10 +98,10 @@ namespace RustyTech.Server.Services
 
         public async Task<PostDto?> GetPostByIdAsync(int postId)
         {
-            var blog = await GetPostById<Blog>(postId);
+            var blog = await GetPostById<BlogPost>(postId);
             if (blog != null)
             {
-                var blogDto = _mapper.Map<Blog, PostDto>(blog);
+                var blogDto = _mapper.Map<BlogPost, PostDto>(blog);
                 blogDto.PostType = "Blog";
                 var keywords = await GetPostKeywordsAsync(blogDto.Id);
                 blogDto.Keywords = keywords;
@@ -111,10 +118,10 @@ namespace RustyTech.Server.Services
                 return imageDto;
             }
 
-            var video = await GetPostById<Video>(postId);
+            var video = await GetPostById<VideoPost>(postId);
             if (video != null)
             {
-                var videoDto = _mapper.Map<Video, PostDto>(video);
+                var videoDto = _mapper.Map<VideoPost, PostDto>(video);
                 videoDto.PostType = "Video";
                 var keywords = await GetPostKeywordsAsync(videoDto.Id);
                 videoDto.Keywords = keywords;
@@ -179,10 +186,10 @@ namespace RustyTech.Server.Services
 
         private async Task CreateVideoPost(VideoDto videoDto, UserDto user)
         {
-            var video = new Video()
+            var video = new VideoPost()
             {
-                Title = videoDto.Title,
-                Content = videoDto.Content,
+                Title = SanitizeString(videoDto.Title),
+                Content = SanitizeString(videoDto.Content),
                 VideoUrl = videoDto.VideoUrl,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
@@ -198,11 +205,11 @@ namespace RustyTech.Server.Services
 
         private async Task CreateImagePost(ImageDto imageDto, UserDto user)
         {
-            var image = new Image()
+            var image = new ImagePost()
             {
-                Title = imageDto.Title,
-                Content = imageDto.Content,
-                ImageUrl = imageDto.ImageUrl,
+                Title = SanitizeString(imageDto.Title),
+                Content = SanitizeString(imageDto.Content),
+                ImageUrl = await _imageService.UploadImageAsync(imageDto.ImageUrl),
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
                 UserId = user.Id,
@@ -216,10 +223,10 @@ namespace RustyTech.Server.Services
 
         private async Task CreateBlogPost(BlogDto blogDto, UserDto user)
         {
-            var blog = new Blog()
+            var blog = new BlogPost()
             {
-                Title = blogDto.Title,
-                Content = blogDto.Content,
+                Title = SanitizeString(blogDto.Title),
+                Content = SanitizeString(blogDto.Content),
                 ImageUrls = blogDto.ImageUrls,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
@@ -230,6 +237,15 @@ namespace RustyTech.Server.Services
             AddKeywords(blog, blogDto.Keywords);
             await _context.BlogPosts.AddAsync(blog);
             await _context.SaveChangesAsync();
+        }
+
+        private string SanitizeString(string? text)
+        {
+            if (text != null)
+            {
+                return _htmlSanitizer.Sanitize(text);
+            }
+            return string.Empty;
         }
 
         private async Task AddPostsByType<T>(DbSet<T> dbSet, List<PostDto> allPosts, Expression<Func<T, bool>> predicate) where T : class

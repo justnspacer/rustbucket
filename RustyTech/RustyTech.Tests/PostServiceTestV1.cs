@@ -10,6 +10,7 @@ using RustyTech.Server.Services.Interfaces;
 using RustyTech.Server.Models.Posts;
 using RustyTech.Server.Models;
 using RustyTech.Server.Models.Dtos;
+using Ganss.Xss;
 
 namespace RustyTech.Tests
 {
@@ -19,11 +20,13 @@ namespace RustyTech.Tests
         private IMapper _mapper;
         private IUserService _userService;
         private IPostService _postService;
+        private IImageService _imageService;
 
         [SetUp]
         public void Setup()
         {
             var loggerMock = new Mock<ILogger<PostService>>();
+            var sanitizerMock = new Mock<HtmlSanitizer>();
 
             var options = new DbContextOptionsBuilder<DataContext>()
                 .UseInMemoryDatabase(databaseName: "TestDatabase")
@@ -32,7 +35,7 @@ namespace RustyTech.Tests
             _context = new DataContext(options);
             _mapper = new MapperConfiguration(cfg => cfg.AddProfile(new MappingProfile())).CreateMapper();
             _userService = new UserService(_context, _mapper, new Logger<UserService>(new LoggerFactory()));
-            _postService = new PostService(_context, _mapper, _userService, loggerMock.Object);
+            _postService = new PostService(_context, _mapper, _userService, loggerMock.Object, sanitizerMock.Object, _imageService);
         }
 
         [TearDown]
@@ -93,9 +96,9 @@ namespace RustyTech.Tests
         public async Task GetAllAsync_ReturnsAllPosts()
         {
             // Arrange
-            var blogPosts = new List<Blog>
+            var blogPosts = new List<BlogPost>
             {
-                new Blog
+                new BlogPost
                 {
                     Id = 1,
                     UserId = Guid.NewGuid(),
@@ -105,7 +108,7 @@ namespace RustyTech.Tests
                     UpdatedAt = new DateTime(2022, 1, 1),
                     IsPublished = true
                 },
-                new Blog
+                new BlogPost
                 {
                     Id = 2,
                     UserId = Guid.NewGuid(),
@@ -117,9 +120,9 @@ namespace RustyTech.Tests
                 }
             };
 
-            var imagePosts = new List<Image>
+            var imagePosts = new List<ImagePost>
             {
-                new Image
+                new ImagePost
                 {
                     Id = 3,
                     UserId = Guid.NewGuid(),
@@ -129,7 +132,7 @@ namespace RustyTech.Tests
                     UpdatedAt = new DateTime(2022, 1, 3),
                     IsPublished = true
                 },
-                new Image
+                new ImagePost
                 {
                     Id = 4,
                     UserId = Guid.NewGuid(),
@@ -141,9 +144,9 @@ namespace RustyTech.Tests
                 }
             };
 
-            var videoPosts = new List<Video>
+            var videoPosts = new List<VideoPost>
             {
-                new Video
+                new VideoPost
                 {
                     Id = 5,
                     UserId = Guid.NewGuid(),
@@ -153,7 +156,7 @@ namespace RustyTech.Tests
                     UpdatedAt = new DateTime(2022, 1, 5),
                     IsPublished = true
                 },
-                new Video
+                new VideoPost
                 {
                     Id = 6,
                     UserId = Guid.NewGuid(),
@@ -188,7 +191,7 @@ namespace RustyTech.Tests
         {
             // Arrange
             var postId = 1;
-            var blogPost = new Blog
+            var blogPost = new BlogPost
             {
                 Id = postId,
                 UserId = Guid.NewGuid(),
@@ -218,7 +221,7 @@ namespace RustyTech.Tests
         {
             // Arrange
             var postId = 1;
-            var blogPost = new Blog
+            var blogPost = new BlogPost
             {
                 Id = postId,
                 UserId = Guid.NewGuid(),
@@ -232,7 +235,7 @@ namespace RustyTech.Tests
             _context.SaveChanges();
 
             // Act
-            var response = await _postService.TogglePostPublishedStatusAsync<Blog>(postId);
+            var response = await _postService.TogglePostPublishedStatusAsync<BlogPost>(postId);
 
             // Assert
             Assert.IsTrue(response.IsSuccess);
