@@ -60,7 +60,7 @@ namespace RustyTech.Server.Controllers
         }
 
         [Authorize(Roles = "Admin,Manager")]
-        [HttpPost("publish")]
+        [HttpPost("publish/{postId}")]
         public async Task<IActionResult> TogglePostPublishedStatusAsync(int postId)
         {
             var result = await _postService.TogglePostPublishedStatusAsync<Post>(postId);
