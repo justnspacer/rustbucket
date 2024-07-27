@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { ApiResponseGetSinglePost, getPost } from '../services/rustyTechService';
 import Spinner from './spinner';
+import { ApiResponseGetSinglePost, getPostById } from '../services/postService';
 import { useParams } from 'react-router-dom';
 
 const formatDate = (datetime: Date) => {
@@ -19,7 +19,7 @@ const Post: React.FC = () => {
     useEffect(() => {
         const fetchPost = async (id: number) => {
             try {
-                const data = await getPost(id);
+                const data = await getPostById(id);
                 setPost(data);
             } catch (err) {
                 setError('Failed to fetch post');

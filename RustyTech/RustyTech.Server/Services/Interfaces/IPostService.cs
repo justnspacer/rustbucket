@@ -12,6 +12,6 @@ namespace RustyTech.Server.Services.Interfaces
         Task<PostDto?> GetPostByIdAsync(int postId);
         Task<ResponseBase> EditPostAsync<T>(PostDto post) where T : Post;
         Task<List<string>> GetAllKeywordsAsync();
-        Task<List<string>> GetPostKeywordsAsync(int id);
+        Task<List<string>> GetPostKeywordsAsync(int? id);
     }
 }

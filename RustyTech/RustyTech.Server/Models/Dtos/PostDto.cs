@@ -4,9 +4,10 @@ namespace RustyTech.Server.Models.Dtos
 {
     public class PostDto
     {
-        public int Id { get; set; }
+        public int? Id { get; set; }
         public string? Title { get; set; }
         public string? Content { get; set; }
+        public string? PlainTextContent { get; set; }
         public bool IsPublished { get; set; }
         public List<string>? Keywords { get; set; }
         public string? PostType { get; set; }

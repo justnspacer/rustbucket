@@ -6,6 +6,8 @@ using RustyTech.Server.Models.Posts;
 using RustyTech.Server.Services.Interfaces;
 using RustyTech.Server.Utilities;
 using System.Linq.Expressions;
+using HtmlAgilityPack;
+
 
 namespace RustyTech.Server.Services
 {
@@ -184,44 +186,55 @@ namespace RustyTech.Server.Services
         //keyword functions
         public async Task<List<string>> GetAllKeywordsAsync() => await _context.Keywords.Select(k => k.Text).ToListAsync();
 
-        public async Task<List<string>> GetPostKeywordsAsync(int id) => await _context.PostKeywords.Where(pk => pk.PostId == id).Select(k => k.Keyword.Text).ToListAsync();
+        public async Task<List<string>> GetPostKeywordsAsync(int? id) => await _context.PostKeywords.Where(pk => pk.PostId == id).Select(k => k.Keyword.Text).ToListAsync();
         //keyword functions end
 
         private async Task CreateVideoPost(VideoDto videoDto, UserDto user)
         {
-            var video = new VideoPost()
+            if (videoDto.Content != null && videoDto.VideoUrl != null)
             {
-                Title = SanitizeString(videoDto.Title),
-                Content = SanitizeString(videoDto.Content),
-                VideoUrl = await _videoService.UploadVideoAsync(videoDto.VideoUrl),
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow,
-                UserId = user.Id,
-                IsPublished = true
-            };
+                var content = SanitizeString(videoDto.Content);
+                var date = DateTime.UtcNow;
+                var video = new VideoPost()
+                {
+                    Title = SanitizeString(videoDto.Title),
+                    Content = content,
+                    PlainTextContent = ConvertHtmlToPlainText(content),
+                    VideoUrl = await _videoService.UploadVideoAsync(videoDto.VideoUrl),
+                    CreatedAt = date,
+                    UpdatedAt = date,
+                    UserId = user.Id,
+                    IsPublished = true //maybe change this to false, need publish automation
+                };
 
-            AddKeywords(video, videoDto.Keywords);
-            await _context.VideoPosts.AddAsync(video);
-            await _context.SaveChangesAsync();
-
+                AddKeywords(video, videoDto.Keywords);
+                await _context.VideoPosts.AddAsync(video);
+                await _context.SaveChangesAsync();
+            }
         }
 
         private async Task CreateImagePost(ImageDto imageDto, UserDto user)
         {
-            var image = new ImagePost()
+            if (imageDto.Content != null && imageDto.ImageUrl != null)
             {
-                Title = SanitizeString(imageDto.Title),
-                Content = SanitizeString(imageDto.Content),
-                ImageUrl = await _imageService.UploadImageAsync(imageDto.ImageUrl),
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow,
-                UserId = user.Id,
-                IsPublished = true
-            };
+                var content = SanitizeString(imageDto.Content);
+                var date = DateTime.UtcNow;
+                var image = new ImagePost()
+                {
+                    Title = SanitizeString(imageDto.Title),
+                    Content = content,
+                    PlainTextContent = ConvertHtmlToPlainText(content),
+                    ImageUrl = await _imageService.UploadImageAsync(imageDto.ImageUrl),
+                    CreatedAt = date,
+                    UpdatedAt = date,
+                    UserId = user.Id,
+                    IsPublished = true
+                };
 
-            AddKeywords(image, imageDto.Keywords);
-            await _context.ImagePosts.AddAsync(image);
-            await _context.SaveChangesAsync();
+                AddKeywords(image, imageDto.Keywords);
+                await _context.ImagePosts.AddAsync(image);
+                await _context.SaveChangesAsync();
+            }
         }
 
         private async Task CreateBlogPost(BlogDto blogDto, UserDto user)
@@ -234,21 +247,26 @@ namespace RustyTech.Server.Services
                     imageUrls.Add(await _imageService.UploadImageAsync(imageUrl));
                 }
             }
-
-            var blog = new BlogPost()
+            if (blogDto.Content != null)
             {
-                Title = SanitizeString(blogDto.Title),
-                Content = SanitizeString(blogDto.Content),
-                ImageUrls = imageUrls,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow,
-                UserId = user.Id,
-                IsPublished = true
-            };
+                var content = SanitizeString(blogDto.Content);
+                var date = DateTime.UtcNow;
+                var blog = new BlogPost()
+                {
+                    Title = SanitizeString(blogDto.Title),
+                    Content = content,
+                    PlainTextContent = ConvertHtmlToPlainText(content),
+                    ImageUrls = imageUrls,
+                    CreatedAt = date,
+                    UpdatedAt = date,
+                    UserId = user.Id,
+                    IsPublished = true
+                };
 
-            AddKeywords(blog, blogDto.Keywords);
-            await _context.BlogPosts.AddAsync(blog);
-            await _context.SaveChangesAsync();
+                AddKeywords(blog, blogDto.Keywords);
+                await _context.BlogPosts.AddAsync(blog);
+                await _context.SaveChangesAsync();
+            }
         }
 
         private string SanitizeString(string? text)
@@ -258,6 +276,13 @@ namespace RustyTech.Server.Services
                 return _htmlSanitizer.Sanitize(text);
             }
             return string.Empty;
+        }
+
+        private string ConvertHtmlToPlainText(string htmlContent)
+        {
+            var htmlDoc = new HtmlDocument();
+            htmlDoc.LoadHtml(htmlContent);
+            return htmlDoc.DocumentNode.InnerText;
         }
 
         private async Task AddPostsByType<T>(DbSet<T> dbSet, List<PostDto> allPosts, Expression<Func<T, bool>> predicate) where T : class

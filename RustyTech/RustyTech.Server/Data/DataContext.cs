@@ -27,11 +27,20 @@ namespace RustyTech.Server.Data
                 .HasValue<VideoPost>("VideoPost")
                 .HasValue<BlogPost>("BlogPost");
 
-            modelBuilder.Entity<Post>()
-                .HasOne(p => p.User)
-                .WithMany(u => u.Posts)
-                .HasForeignKey(p => p.UserId)
-                .OnDelete(DeleteBehavior.Cascade); // Delete all posts when a user is deleted
+            modelBuilder.Entity<Post>(entity =>
+            {
+                entity.Property(p => p.Title)
+                    .HasMaxLength(60)
+                    .HasAnnotation("MinLength", 5);
+
+                entity.Property(p => p.Content)
+                .HasMaxLength(20000);
+
+                entity.HasOne(p => p.User)
+                    .WithMany(u => u.Posts)
+                    .HasForeignKey(p => p.UserId)
+                    .OnDelete(DeleteBehavior.Cascade); // Delete all posts when a user is deleted
+            });
 
             modelBuilder.Entity<PostKeyword>()
                 .HasOne(pk => pk.Post)
@@ -42,6 +51,10 @@ namespace RustyTech.Server.Data
                 .HasOne(pk => pk.Keyword)
                 .WithMany(k => k.PostKeywords)
                 .HasForeignKey(k => k.KeywordId);
+
+            modelBuilder.Entity<Keyword>()
+                .Property(k => k.Text)
+                .HasMaxLength(30);
         }
 
         public DbSet<User> Users { get; set; }

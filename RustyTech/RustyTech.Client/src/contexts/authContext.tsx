@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { registerEP, loginEP, verifyTokenEP } from '../services/rustyTechService';
+import { registerEP, loginEP, verifyTokenEP } from '../services/authService';
 import { getJwtClaims } from '../utils/getJwtClaims';
 import Spinner from '../components/spinner';
 

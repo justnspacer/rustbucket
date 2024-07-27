@@ -9,7 +9,7 @@ namespace RustyTech.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [RequestSizeLimit(50 * 1024 * 1024)]
+    [RequestSizeLimit(50 * 1024 * 1024)] //50MB limit for all requests
     public class PostController : ControllerBase
     {
         private readonly IPostService _postService;

@@ -29,7 +29,7 @@ namespace RustyTech.Server.Services
 
             var resizeImage = await ResizeImageAsync(file, 1024, 768);
 
-            var fileName = Path.GetFileNameWithoutExtension(file.FileName) + "_resized" + Path.GetExtension(file.FileName);
+            var fileName = Path.GetFileNameWithoutExtension(file.FileName) + "_" + Guid.NewGuid() + "_resized" + Path.GetExtension(file.FileName);
             var filePath = Path.Combine(_imagePath, fileName);
 
             using (var stream = new FileStream(filePath, FileMode.Create))

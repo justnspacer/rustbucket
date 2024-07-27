@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ApiResponseGetPost, getAllPosts, PostDto } from '../services/rustyTechService';
+import { getAllPosts, PostDto, ApiResponseGetPost } from '../services/postService';
 import Spinner from './spinner';
 
 const formatDate = (datetime: Date) => {
