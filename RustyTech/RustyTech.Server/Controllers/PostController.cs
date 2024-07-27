@@ -9,6 +9,7 @@ namespace RustyTech.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [RequestSizeLimit(50 * 1024 * 1024)]
     public class PostController : ControllerBase
     {
         private readonly IPostService _postService;
@@ -35,21 +36,24 @@ namespace RustyTech.Server.Controllers
         }
 
         [HttpPost("create/blog")]
-        public async Task<IActionResult> CreateBlogPostAsync([FromBody] BlogDto request)
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> CreateBlogPostAsync([FromForm] BlogDto request)
         {
             var post = await _postService.CreatePostAsync(request);
             return Ok(post);
         }
 
         [HttpPost("create/image")]
-        public async Task<IActionResult> CreateImagePostAsync([FromBody] ImageDto request)
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> CreateImagePostAsync([FromForm] ImageDto request)
         {
             var post = await _postService.CreatePostAsync(request);
             return Ok(post);
         }
 
         [HttpPost("create/video")]
-        public async Task<IActionResult> CreateVideoPostAsync([FromBody] VideoDto request)
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> CreateVideoPostAsync([FromForm] VideoDto request)
         {
             var post = await _postService.CreatePostAsync(request);
             return Ok(post);

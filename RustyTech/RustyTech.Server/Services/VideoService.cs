@@ -1,4 +1,5 @@
-﻿using RustyTech.Server.Services.Interfaces;
+﻿using RustyTech.Server.Models.Posts;
+using RustyTech.Server.Services.Interfaces;
 using Xabe.FFmpeg;
 
 namespace RustyTech.Server.Services
@@ -14,7 +15,7 @@ namespace RustyTech.Server.Services
             {
                 Directory.CreateDirectory(_videoPath);
             }
-            FFmpeg.SetExecutablesPath("path_to_ffmpeg");
+            FFmpeg.SetExecutablesPath("C:\\ffmpeg-n5.1-latest-win64-lgpl-shared-5.1\\bin"); //address when ffmpeg is installed
         }
 
         public async Task<string> UploadVideoAsync(IFormFile file)
@@ -22,17 +23,24 @@ namespace RustyTech.Server.Services
             if (file == null || file.Length == 0)
                 throw new ArgumentException("Invalid file");
 
-            var fileName = Path.GetFileNameWithoutExtension(file.FileName) + "_" + Guid.NewGuid() + Path.GetExtension(file.FileName);
-            var filePath = Path.Combine(_videoPath, fileName);
+            var cleanFileName = file.FileName.ToLower().Replace(" ", "_");
 
-            // Optionally convert the video to reduce size
-            //await ConvertToMp4(filePath);
-            var convertedFilePath = Path.Combine(_videoPath, Path.GetFileNameWithoutExtension(fileName) + "_converted.mp4");
-            //await ConvertVideoAsync(filePath, convertedFilePath, 1280, 720, 1000);
+            var fileName = Path.GetFileNameWithoutExtension(cleanFileName) + "_" + Guid.NewGuid() + Path.GetExtension(cleanFileName);
+            var originalFilePath = Path.Combine(_videoPath, fileName);
 
-            using (var stream = new FileStream(convertedFilePath, FileMode.Create))
+            using (var stream = new FileStream(originalFilePath, FileMode.Create))
             {
                 await file.CopyToAsync(stream);
+            }
+
+            // Optionally convert the video to reduce size
+            var convertedFilePath = Path.Combine(_videoPath, Path.GetFileNameWithoutExtension(fileName) + "_converted.mp4");
+            await ConvertVideoAsync(originalFilePath, convertedFilePath, 1280, 720, 1000);
+
+            // Delete the original uploaded file
+            if (File.Exists(originalFilePath))
+            {
+                File.Delete(originalFilePath);
             }
 
             return convertedFilePath;
@@ -40,20 +48,14 @@ namespace RustyTech.Server.Services
 
         public async Task<VideoMetadata> GetVideoMetadataAsync(string filePath)
         {
+
             var mediaInfo = await FFmpeg.GetMediaInfo(filePath);
             return new VideoMetadata
             {
                 Duration = mediaInfo.Duration,
-                Format = mediaInfo.ToString(), //double check this
+                Posted = mediaInfo.CreationTime,
                 Size = new FileInfo(filePath).Length
             };
-        }
-
-        private async Task ConvertToMp4(string filePath)
-        {
-            var outputFilePath = Path.ChangeExtension(filePath, ".mp4");
-            var conversion = await FFmpeg.Conversions.FromSnippet.Convert(filePath, outputFilePath);
-            await conversion.Start();
         }
 
         private async Task<string> ConvertVideoAsync(string inputFilePath, string outputFilePath, int maxWidth, int maxHeight, int maxBitrate)
@@ -67,12 +69,12 @@ namespace RustyTech.Server.Services
             await conversion.Start();
             return outputFilePath;
         }
-    }
 
-    public class VideoMetadata
-    {
-        public TimeSpan Duration { get; set; }
-        public string? Format { get; set; }
-        public long Size { get; set; }
+        private async Task ConvertToMp4(string filePath)
+        {
+            var outputFilePath = Path.ChangeExtension(filePath, ".mp4");
+            var conversion = await FFmpeg.Conversions.FromSnippet.Convert(filePath, outputFilePath);
+            await conversion.Start();
+        }
     }
 }

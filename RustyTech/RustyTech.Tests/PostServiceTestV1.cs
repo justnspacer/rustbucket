@@ -11,6 +11,7 @@ using RustyTech.Server.Models.Posts;
 using RustyTech.Server.Models;
 using RustyTech.Server.Models.Dtos;
 using Ganss.Xss;
+using Microsoft.AspNetCore.Http;
 
 namespace RustyTech.Tests
 {
@@ -21,6 +22,7 @@ namespace RustyTech.Tests
         private IUserService _userService;
         private IPostService _postService;
         private IImageService _imageService;
+        private IVideoService _videoService;
 
         [SetUp]
         public void Setup()
@@ -35,7 +37,7 @@ namespace RustyTech.Tests
             _context = new DataContext(options);
             _mapper = new MapperConfiguration(cfg => cfg.AddProfile(new MappingProfile())).CreateMapper();
             _userService = new UserService(_context, _mapper, new Logger<UserService>(new LoggerFactory()));
-            _postService = new PostService(_context, _mapper, _userService, loggerMock.Object, sanitizerMock.Object, _imageService);
+            _postService = new PostService(_context, _mapper, _userService, loggerMock.Object, sanitizerMock.Object, _imageService, _videoService);
         }
 
         [TearDown]

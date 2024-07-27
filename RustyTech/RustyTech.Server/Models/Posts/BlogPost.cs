@@ -2,7 +2,7 @@
 {
     public class BlogPost : Post
     {
-        public List<string>? ImageUrls { get; set; }
+        public List<string> ImageUrls { get; set; }
 
         public BlogPost()
         {

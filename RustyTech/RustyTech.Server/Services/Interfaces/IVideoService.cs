@@ -1,4 +1,6 @@
-﻿namespace RustyTech.Server.Services.Interfaces
+﻿using RustyTech.Server.Models.Posts;
+
+namespace RustyTech.Server.Services.Interfaces
 {
     public interface IVideoService
     {

@@ -2,6 +2,6 @@
 {
     public class BlogDto : PostDto
     {
-        public List<string>? ImageUrls { get; set; }
+        public new IEnumerable<IFormFile>? ImageUrls { get; set; }
     }
 }

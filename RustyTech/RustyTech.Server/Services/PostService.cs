@@ -17,10 +17,12 @@ namespace RustyTech.Server.Services
         private ILogger<IPostService> _logger;
         private readonly HtmlSanitizer _htmlSanitizer;
         private IImageService _imageService;
+        private IVideoService _videoService;
 
         public PostService(DataContext context, IMapper mapper, 
             IUserService userService, ILogger<IPostService> logger, 
-            HtmlSanitizer htmlSanitizer, IImageService imageService)
+            HtmlSanitizer htmlSanitizer, IImageService imageService,
+            IVideoService videoService)
         {
             _context = context;
             _mapper = mapper;
@@ -28,6 +30,7 @@ namespace RustyTech.Server.Services
             _logger = logger;
             _htmlSanitizer = htmlSanitizer;
             _imageService = imageService;
+            _videoService = videoService;
         }
 
         public async Task<ResponseBase> CreatePostAsync(PostDto post)
@@ -190,7 +193,7 @@ namespace RustyTech.Server.Services
             {
                 Title = SanitizeString(videoDto.Title),
                 Content = SanitizeString(videoDto.Content),
-                VideoUrl = videoDto.VideoUrl,
+                VideoUrl = await _videoService.UploadVideoAsync(videoDto.VideoUrl),
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
                 UserId = user.Id,
@@ -223,11 +226,20 @@ namespace RustyTech.Server.Services
 
         private async Task CreateBlogPost(BlogDto blogDto, UserDto user)
         {
+            var imageUrls = new List<string>();
+            if (blogDto.ImageUrls != null)
+            {
+                foreach (var imageUrl in blogDto.ImageUrls)
+                {
+                    imageUrls.Add(await _imageService.UploadImageAsync(imageUrl));
+                }
+            }
+
             var blog = new BlogPost()
             {
                 Title = SanitizeString(blogDto.Title),
                 Content = SanitizeString(blogDto.Content),
-                ImageUrls = blogDto.ImageUrls,
+                ImageUrls = imageUrls,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
                 UserId = user.Id,

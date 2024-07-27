@@ -15,6 +15,7 @@ using Microsoft.OpenApi.Models;
 using RustyTech.Server.Services.Interfaces;
 using RustyTech.Server.Interfaces;
 using Microsoft.AspNetCore.Antiforgery;
+using RustyTech.Server.Utilities;
 
 var builder = WebApplication.CreateBuilder(args); // Create a WebApplication builder instance.
 
@@ -76,6 +77,7 @@ builder.Services.AddRouting(options => options.LowercaseUrls = true); // Configu
 builder.Services.AddSwaggerGen(config =>
 {
     config.SwaggerDoc("v1", new() { Title = "RustyTech.Server", Version = "v1" }); // Configure Swagger document.
+    config.OperationFilter<AddFileUploadParams>(); // Add file upload parameters to Swagger UI.
 
     config.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
@@ -186,7 +188,7 @@ app.MapFallbackToFile("/index.html"); // Map fallback route to serve index.html 
 using (var scope = app.Services.CreateScope())
 {
     var roleService = scope.ServiceProvider.GetRequiredService<IRoleService>(); // Get role service from DI.
-    var roles = new[] { "Admin", "Manager", "User", "Guest" }; // Define roles.
+    var roles = new[] { "Admin", "Manager", "Developer", "User", "Guest" }; // Define roles.
     foreach (var role in roles)
     {
         await roleService.CreateRoleAsync(role); // Create roles if they don't exist.

@@ -18,8 +18,8 @@ namespace RustyTech.Server.Models.Dtos
         [JsonIgnore]
         public UserDto? User { get; set; }
 
-        public string? VideoUrl { get; set; }
+        public IFormFile? VideoUrl { get; set; }
         public IFormFile? ImageUrl { get; set; }
-        public List<string>? ImageUrls { get; set; }
+        public IEnumerable<IFormFile>? ImageUrls { get; set; }
     }
 }

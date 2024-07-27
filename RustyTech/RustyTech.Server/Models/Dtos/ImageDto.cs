@@ -2,6 +2,6 @@
 {
     public class ImageDto : PostDto
     {
-        public new required IFormFile ImageUrl { get; set; }
+        public new IFormFile? ImageUrl { get; set; }
     }
 }
