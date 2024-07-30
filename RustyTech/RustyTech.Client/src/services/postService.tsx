@@ -1,21 +1,22 @@
 import axios from 'axios';
 import { getCSRFToken } from '../utils/getCSRFToken';
-import { ResponseBase, PostDto } from '../types/apiResponse';
+import { ApiResponse, PostDto } from '../types/apiResponse';
 import { BASE_URL } from '../types/urls';
 
-export async function createPost(post: PostDto): Promise<ResponseBase> {
+export async function createPost(post: PostDto): Promise<ApiResponse | null> {
     try {
-        const response = await axios.post<ResponseBase>(`${BASE_URL}/posts`, post);
+        const response = await axios.post<ApiResponse>(`${BASE_URL}/posts`, post);
         return response.data;
     } catch (error) {
-        return { isSuccess: false, message: "unknown error" };
+        console.log('Error creating post:', error);
+        return null;
     }
 }
 
-export const getAllPosts = async (): Promise<PostDto[]> => {
+export const getAllPosts = async (): Promise<ApiResponse[] | null> => {
     try {
         const csrfToken = getCSRFToken();
-        const response = await axios.get<PostDto[]>(`${BASE_URL}/post/all`, {
+        const response = await axios.get<ApiResponse[]>(`${BASE_URL}/post/all`, {
             headers: {
                 'X-CSRF-TOKEN': csrfToken || '',
             }
@@ -23,14 +24,14 @@ export const getAllPosts = async (): Promise<PostDto[]> => {
         return response.data;
     } catch (e) {
         console.error('Error fetching posts:', e);
-        throw e;
+        return null;
     }
 }
 
-export const getPostById = async (postId: number): Promise<PostDto> => {
+export const getPostById = async (postId: number): Promise<ApiResponse | null> => {
     try {
         const csrfToken = getCSRFToken();
-        const response = await axios.get<PostDto>(`${BASE_URL}/post/${postId}`, {
+        const response = await axios.get<ApiResponse>(`${BASE_URL}/post/${postId}`, {
             headers: {
                 'X-CSRF-TOKEN': csrfToken || '',
             }
@@ -38,24 +39,26 @@ export const getPostById = async (postId: number): Promise<PostDto> => {
         return response.data;
     } catch (e) {
         console.error('Error fetching post:', e);
-        throw e;
+        return null;
     }
 }
 
-export async function editPost<T extends PostDto>(newData: T): Promise<ResponseBase> {
+export async function editPost<T extends PostDto>(newData: T): Promise<ApiResponse | null> {
     try {
-        const response = await axios.put<ResponseBase>(`${BASE_URL}/posts/${newData.id}`, newData);
+        const response = await axios.put<ApiResponse>(`${BASE_URL}/posts/${newData.id}`, newData);
         return response.data;
     } catch (error) {
-        return { isSuccess: false, message: "unknown error" };
+        console.error('Error editing post:', error);
+        return null;
     }
 }
 
-export async function togglePostPublishedStatus(postId: number): Promise<ResponseBase> {
+export async function togglePostPublishedStatus(postId: number): Promise<ApiResponse | null> {
     try {
-        const response = await axios.put<ResponseBase>(`${BASE_URL}/posts/publish/${postId}`);
+        const response = await axios.put<ApiResponse>(`${BASE_URL}/posts/publish/${postId}`);
         return response.data;
     } catch (error) {
-        return { isSuccess: false, message: "unknown error" };
+        console.error('Error toggling post published status:', error);
+        return null;
     }
 }

@@ -15,7 +15,9 @@ export interface User {
     email: string;
 }
 
-export interface ResponseBase {
+export interface ResponseBase
+{
+    statusCode: number;
     isSuccess: boolean;
     message: string;
 }
@@ -48,24 +50,30 @@ export interface PostDto {
     postType: string;
     userId: string;
     user: UserDto;
+    createdAt: Date;
+    updatedAt: Date;
+    isPublished: boolean;
+    imageUrl?: string;
+    videoUrl?: string;
+    imageUrls?: string[];
 }
 
-export interface BlogDto extends PostDto {
-    imageUrls: File[];
-}
+//export interface BlogDto extends PostDto {
+//    imageUrls?: File[];
+//}
 
-export interface VideoDto extends PostDto {
-    videoUrl: File;
-}
+//export interface VideoDto extends PostDto {
+//    videoUrl: File;
+//}
 
-export interface ImageDto extends PostDto {
-    imageUrl: File;
-}
+//export interface ImageDto extends PostDto {
+//    imageUrl: File;
+//}
 
 export interface ApiData<T> {
     data: T;
 }
 
-export type Data = RoleDto | VideoDto | ImageDto | BlogDto | UserUpdateDto | UserDto | PostDto | PostDto[] | ResponseBase | null;
+export type Data = RoleDto | UserUpdateDto | UserDto | PostDto | PostDto[] | ResponseBase | null;
 
 export interface ApiResponse extends ApiData<Data> { }

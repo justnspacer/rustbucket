@@ -84,7 +84,7 @@ namespace RustyTech.Tests
         public async Task CreatePostAsync_WithNullPost_ReturnsBadRequestResponse()
         {
             // Arrange
-            BlogDto post = new BlogDto();
+            BlogDto post = new BlogDto() { Content = "<p class='hey'>Wow!</p>" }; 
 
             // Act
             var response = await _postService.CreatePostAsync(post);

@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using RustyTech.Server.Models;
 using System.Text;
 
 namespace RustyTech.Server.Middleware

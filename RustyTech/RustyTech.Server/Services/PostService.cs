@@ -7,6 +7,7 @@ using RustyTech.Server.Services.Interfaces;
 using RustyTech.Server.Utilities;
 using System.Linq.Expressions;
 using HtmlAgilityPack;
+using System.Text;
 
 
 namespace RustyTech.Server.Services
@@ -21,8 +22,8 @@ namespace RustyTech.Server.Services
         private IImageService _imageService;
         private IVideoService _videoService;
 
-        public PostService(DataContext context, IMapper mapper, 
-            IUserService userService, ILogger<IPostService> logger, 
+        public PostService(DataContext context, IMapper mapper,
+            IUserService userService, ILogger<IPostService> logger,
             HtmlSanitizer htmlSanitizer, IImageService imageService,
             IVideoService videoService)
         {
@@ -219,6 +220,7 @@ namespace RustyTech.Server.Services
             {
                 var content = SanitizeString(imageDto.Content);
                 var date = DateTime.UtcNow;
+
                 var image = new ImagePost()
                 {
                     Title = SanitizeString(imageDto.Title),
@@ -268,6 +270,21 @@ namespace RustyTech.Server.Services
                 await _context.SaveChangesAsync();
             }
         }
+
+        public IFormFile CreateFormFileFromString(string content, string fileName)
+        {
+            // Convert the string content to a byte array
+            byte[] contentBytes = Encoding.UTF8.GetBytes(content);
+
+            // Create a memory stream from the byte array
+            MemoryStream stream = new MemoryStream(contentBytes);
+
+            // Create an IFormFile using the memory stream
+            IFormFile formFile = new FormFile(stream, 0, contentBytes.Length, "stringFile", fileName);
+
+            return formFile;
+        }
+
 
         private string SanitizeString(string? text)
         {

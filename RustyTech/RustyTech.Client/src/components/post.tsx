@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Spinner from './spinner';
-import { ApiResponseGetSinglePost, getPostById } from '../services/postService';
+import { getPostById } from '../services/postService';
+import { PostDto } from '../types/apiResponse';
 import { useParams } from 'react-router-dom';
 
 const formatDate = (datetime: Date) => {
@@ -10,7 +11,7 @@ const formatDate = (datetime: Date) => {
 };
 
 const Post: React.FC = () => {
-    const [post, setPost] = useState<ApiResponseGetSinglePost>();
+    const [post, setPost] = useState<PostDto>();
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -40,25 +41,25 @@ const Post: React.FC = () => {
     }
 
     return (
-        <div className='post' key={post?.data.id}>
-            <h2>{post?.data.title}</h2>
-            <p>{post?.data.userId}</p>
-            <span className='date'>{post?.data && formatDate(post.data.createdAt)}</span>
+        <div className='post' key={post?.id}>
+            <h2>{post?.title}</h2>
+            <p>{post?.userId}</p>
+            <span className='date'>{post && formatDate(post.createdAt)}</span>
 
 
-            {post?.data.createdAt != post?.data.updatedAt && (
+            {post?.createdAt != post?.updatedAt && (
                 <div>
-                    <span className='date'>{post?.data && formatDate(post.data.updatedAt)} (updated)</span>
+                    <span className='date'>{post && formatDate(post.updatedAt)} (updated)</span>
                 </div>
             )}
 
-            {post?.data.imageUrl && (
-                <img src={post?.data.imageUrl} alt={post?.data.title} />
+            {post?.imageUrl && (
+                <img src={post?.imageUrl} alt={post?.title} />
             )}
-            {post?.data.videoUrl && (
-                <video src={post?.data.videoUrl} controls />
+            {post?.videoUrl && (
+                <video src={post?.videoUrl} controls />
             )}
-            <p>{post?.data.content}</p>
+            <p>{post?.content}</p>
             <p>Images:</p>
         </div>
     );

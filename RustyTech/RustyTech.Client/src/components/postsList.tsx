@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { getAllPosts, PostDto, ApiResponseGetPost } from '../services/postService';
+import { getAllPosts } from '../services/postService';
+import { PostDto } from '../types/apiResponse';
 import Spinner from './spinner';
 
 const formatDate = (datetime: Date) => {
@@ -9,7 +10,7 @@ const formatDate = (datetime: Date) => {
 };
 
 const PostsList: React.FC = () => {
-    const [posts, setPosts] = useState<ApiResponseGetPost>();
+    const [posts, setPosts] = useState<PostDto[]>();
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -41,7 +42,7 @@ const PostsList: React.FC = () => {
         <div>
             <h1>Posts</h1>
             <ul className='postlist'>
-                {posts?.data.map((post: PostDto) => (
+                {posts?.map((post: PostDto) => (
                     <a className='postlink' href={`/posts/get/${post.id}`} key={post.id}>
                         <li className='post' >
                             <h2>{post.title}</h2>

@@ -4,6 +4,8 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { registerEP, loginEP, verifyTokenEP } from '../services/authService';
 import { getJwtClaims } from '../utils/getJwtClaims';
 import Spinner from '../components/spinner';
+import { RegisterRequest, LoginRequest, ApiResponse } from '../types/apiResponse';
+
 
 interface AuthState {
     isAuthenticated: boolean;
@@ -14,18 +16,6 @@ interface AuthState {
     isSuccess: boolean;
     message: string;
     user: User | null;
-}
-
-interface LoginRequest {
-    email: string;
-    password: string;
-}
-
-interface RegisterRequest {
-    email: string;
-    password: string;
-    confirmPassword: string;
-    birthYear: number;
 }
 
 interface User {
@@ -119,13 +109,14 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
     const register = async (data: RegisterRequest) => {
         try {
-            const response = await registerEP(data);
+            const response = await registerEP(data); 
+
             if (response != null) {
                 setAuthState((prevState) => ({
                     ...prevState,
-                    isSuccess: response.data.data.isSuccess,
-                    statusCode: response.data.data.statusCode,
-                    message: response.data.data.message,
+                    isSuccess: response.data.isSuccess,
+                    statusCode: response.data.statusCode,
+                    message: response.data.message,
                     user: null,
                     isAuthenticated: false,
                     isTokenValid: false,
@@ -150,7 +141,7 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         setAuthState((prevState) => ({ ...prevState, isLoading: true }));
         try {
             const response = await loginEP(data);
-            const token = response?.data.data.token;
+            const token = response?.data.;
             if (token) {
                 localStorage.setItem('jwtToken', token);
                 verifyTokenEP(token).then((res) => {
@@ -159,10 +150,10 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
                         isTokenValid: res,
                         token,
                         isLoading: false,
-                        statusCode: response.data.data.statusCode,
-                        isSuccess: response.data.data.isSuccess,
-                        message: response.data.data.message,
-                        user: response.data.data.user,
+                        statusCode: response.data.statusCode,
+                        isSuccess: response.data.isSuccess,
+                        message: response.data.message,
+                        user: response.data.user,
                     });
                 });
             }

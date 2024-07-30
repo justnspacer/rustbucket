@@ -12,7 +12,7 @@ namespace RustyTech.Server.Models
             Data = data;
         }
 
-        public static ApiResponse<T> Success(string message, T data)
+        public static ApiResponse<T> Success(T data)
         {
             return new ApiResponse<T>(data);
         }
