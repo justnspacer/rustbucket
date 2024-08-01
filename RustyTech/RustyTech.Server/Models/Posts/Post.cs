@@ -22,7 +22,5 @@ namespace RustyTech.Server.Models.Posts
 
         [JsonIgnore]
         public User? User { get; set; } // Navigation property
-
-        public abstract void Display();
     }
 }

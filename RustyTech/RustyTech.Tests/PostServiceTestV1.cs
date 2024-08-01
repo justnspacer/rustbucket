@@ -23,6 +23,7 @@ namespace RustyTech.Tests
         private IPostService _postService;
         private IImageService _imageService;
         private IVideoService _videoService;
+        private IKeywordService _keywordService;
 
         [SetUp]
         public void Setup()
@@ -37,7 +38,7 @@ namespace RustyTech.Tests
             _context = new DataContext(options);
             _mapper = new MapperConfiguration(cfg => cfg.AddProfile(new MappingProfile())).CreateMapper();
             _userService = new UserService(_context, _mapper, new Logger<UserService>(new LoggerFactory()));
-            _postService = new PostService(_context, _mapper, _userService, loggerMock.Object, sanitizerMock.Object, _imageService, _videoService);
+            _postService = new PostService(_context, _mapper, _userService, loggerMock.Object, _imageService, _videoService, _keywordService);
         }
 
         [TearDown]
@@ -84,7 +85,7 @@ namespace RustyTech.Tests
         public async Task CreatePostAsync_WithNullPost_ReturnsBadRequestResponse()
         {
             // Arrange
-            BlogDto post = new BlogDto() { Content = "<p class='hey'>Wow!</p>" }; 
+            BlogDto post = new BlogDto() { Title = "new title", Content = "<p class='hey'>Wow!</p>" };
 
             // Act
             var response = await _postService.CreatePostAsync(post);
@@ -132,7 +133,8 @@ namespace RustyTech.Tests
                     Content = "This is a test image post 1",
                     CreatedAt = new DateTime(2022, 1, 3),
                     UpdatedAt = new DateTime(2022, 1, 3),
-                    IsPublished = true
+                    IsPublished = true,
+                    ImageFile = "test.jpg"
                 },
                 new ImagePost
                 {
@@ -142,7 +144,9 @@ namespace RustyTech.Tests
                     Content = "This is a test image post 2",
                     CreatedAt = new DateTime(2022, 1, 4),
                     UpdatedAt = new DateTime(2022, 1, 4),
-                    IsPublished = true
+                    IsPublished = true,
+                    ImageFile = "test.jpg"
+
                 }
             };
 
@@ -156,7 +160,8 @@ namespace RustyTech.Tests
                     Content = "This is a test video post 1",
                     CreatedAt = new DateTime(2022, 1, 5),
                     UpdatedAt = new DateTime(2022, 1, 5),
-                    IsPublished = true
+                    IsPublished = true,
+                    VideoFile = "test.mp4"
                 },
                 new VideoPost
                 {
@@ -166,7 +171,8 @@ namespace RustyTech.Tests
                     Content = "This is a test video post 2",
                     CreatedAt = new DateTime(2022, 1, 6),
                     UpdatedAt = new DateTime(2022, 1, 6),
-                    IsPublished = true
+                    IsPublished = true,
+                    VideoFile = "test.mp4"
                 }
             };
 

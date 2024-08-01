@@ -39,7 +39,13 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddControllers(); // Add services for controllers.
+// Add services for controllers
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
+    });
+
 builder.Services.AddAntiforgery(options =>
 {
     options.HeaderName = "X-CSRF-TOKEN"; // Set the header name for CSRF tokens in AJAX requests.
@@ -120,6 +126,7 @@ builder.Services.AddScoped<IEmailService, EmailService>(); // Add email service 
 builder.Services.AddScoped<IPostService, PostService>(); // Add post service with scoped lifetime.
 builder.Services.AddScoped<IImageService, ImageService>(); // Add image service with scoped lifetime.
 builder.Services.AddScoped<IVideoService, VideoService>(); // Add video service with scoped lifetime.
+builder.Services.AddScoped<IKeywordService, KeywordService>(); // Add keyword service with scoped lifetime.
 
 builder.Services.Configure<RequestLocalizationOptions>(options =>
 {

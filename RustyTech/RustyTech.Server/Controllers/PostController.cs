@@ -45,7 +45,7 @@ namespace RustyTech.Server.Controllers
 
         [HttpPost("create/image")]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> CreateImagePostAsync([FromForm] ImageDto request)
+        public async Task<IActionResult> CreateImagePostAsync([FromForm] ImageCreateDto request)
         {
             var post = await _postService.CreatePostAsync(request);
             return Ok(post);

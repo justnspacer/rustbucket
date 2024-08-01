@@ -2,6 +2,8 @@
 {
     public class VideoDto : PostDto
     {
-        public new IFormFile? VideoUrl { get; set; }
+        public required IFormFile VideoFile1 { get; set; }
+
+        public string? VideoFileString { get; set; }
     }
 }
