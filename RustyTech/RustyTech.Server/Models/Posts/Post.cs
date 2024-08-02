@@ -12,6 +12,8 @@ namespace RustyTech.Server.Models.Posts
 
         [MaxLength(20000, ErrorMessage = "Content cannot exceed 20000 characters.")]
         public string? Content { get; set; }
+
+        [MaxLength(20000)]
         public string? PlainTextContent { get; set; }
         public bool IsPublished { get; set; }
         public ICollection<PostKeyword> Keywords { get; set; } = new List<PostKeyword>();

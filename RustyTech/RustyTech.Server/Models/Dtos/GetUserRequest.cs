@@ -1,6 +1,6 @@
 ﻿namespace RustyTech.Server.Models.Dtos
 {
-    public class UserDto
+    public class GetUserRequest
     {
         public Guid Id { get; set; }
         public string? Email { get; set; }

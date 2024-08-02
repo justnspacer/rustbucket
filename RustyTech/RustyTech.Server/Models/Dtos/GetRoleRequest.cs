@@ -1,6 +1,6 @@
 ﻿namespace RustyTech.Server.Models.Dtos
 {
-    public class RoleDto
+    public class GetRoleRequest
     {
         public string? Id { get; set; }
         public string? RoleName { get; set; }

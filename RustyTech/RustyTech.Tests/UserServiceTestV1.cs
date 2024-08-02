@@ -23,8 +23,8 @@ namespace RustyTech.Tests
             var mapperMock = new Mock<IMapper>();
             var loggerMock = new Mock<ILogger<IUserService>>();
 
-            mapperMock.Setup(m => m.Map<UserDto>(It.IsAny<User>()))
-          .Returns((User source) => new UserDto
+            mapperMock.Setup(m => m.Map<GetUserRequest>(It.IsAny<User>()))
+          .Returns((User source) => new GetUserRequest
           {
               Id = source.Id,
               Email = source.Email,

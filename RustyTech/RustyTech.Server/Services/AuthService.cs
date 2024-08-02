@@ -110,7 +110,7 @@ namespace RustyTech.Server.Services
             {
                 token = GenerateJwtToken(user.Id, user.Email, userRoles);
             }
-            var userDto = new UserDto
+            var userDto = new GetUserRequest
             {
                 Id = user.Id,
                 Email = user.Email,
@@ -267,7 +267,7 @@ namespace RustyTech.Server.Services
             return new ResponseBase() { IsSuccess = true, Message = Constants.Messages.Info.UserPasswordReset };
         }
 
-        public async Task<ResponseBase> UpdateUserAsync(UserUpdateDto userDto)
+        public async Task<ResponseBase> UpdateUserAsync(UpdateUserRequest userDto)
         {
             if (userDto.UserId == Guid.Empty)
             {

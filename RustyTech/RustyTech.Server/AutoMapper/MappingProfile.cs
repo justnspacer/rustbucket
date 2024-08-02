@@ -8,17 +8,15 @@ namespace RustyTech.Server.AutoMapper
     {
         public MappingProfile()
         {
-            CreateMap<User, UserDto>();
+            CreateMap<User, GetUserRequest>();
 
-            CreateMap<Post, PostDto>().ForMember(destionation => destionation.User, option => option.MapFrom(source => source.User));
-            CreateMap<Post, PostDto>().ForMember(destionation => destionation.Keywords, option => option.MapFrom(source => source.Keywords));
+            CreateMap<BlogPost, CreateBlogRequest>().ForMember(destionation => destionation.User, option => option.MapFrom(source => source.User));
+            CreateMap<ImagePost, CreateImageRequest>().ForMember(destionation => destionation.User, option => option.MapFrom(source => source.User));
+            CreateMap<VideoPost, CreateVideoRequest>().ForMember(destionation => destionation.User, option => option.MapFrom(source => source.User));
 
-            CreateMap<Post, PostReadDto>().ForMember(destionation => destionation.User, option => option.MapFrom(source => source.User));
-            CreateMap<Post, PostReadDto>().ForMember(destionation => destionation.Keywords, option => option.MapFrom(source => source.Keywords));
-
-            CreateMap<BlogPost, PostReadDto>();
-            CreateMap<ImagePost, PostReadDto>();
-            CreateMap<VideoPost, PostReadDto>();
+            CreateMap<BlogPost, GetPostRequest>().ForMember(destionation => destionation.User, option => option.MapFrom(source => source.User));
+            CreateMap<ImagePost, GetPostRequest>().ForMember(destionation => destionation.User, option => option.MapFrom(source => source.User));
+            CreateMap<VideoPost, GetPostRequest>().ForMember(destionation => destionation.User, option => option.MapFrom(source => source.User));
 
         }
     }

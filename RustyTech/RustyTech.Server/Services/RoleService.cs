@@ -33,13 +33,13 @@ namespace RustyTech.Server.Services
             return Constants.Messages.Role.Created;
         }
 
-        public async Task<List<RoleDto>> GetAllRolesAsync()
+        public async Task<List<GetRoleRequest>> GetAllRolesAsync()
         {
-            var roles = await _context.Roles.Select(role => new RoleDto { Id = role.Id, RoleName = role.Name }).ToListAsync();
+            var roles = await _context.Roles.Select(role => new GetRoleRequest { Id = role.Id, RoleName = role.Name }).ToListAsync();
             return roles;
         }
 
-        public async Task<RoleDto?> GetRoleByIdAsync(string id)
+        public async Task<GetRoleRequest?> GetRoleByIdAsync(string id)
         {
             if (string.IsNullOrEmpty(id))
             {
@@ -50,11 +50,11 @@ namespace RustyTech.Server.Services
             {
                 return null;
             }
-            var roleDto = new RoleDto { Id = role.Id, RoleName = role.Name };
+            var roleDto = new GetRoleRequest { Id = role.Id, RoleName = role.Name };
             return roleDto;
         }
 
-        public async Task<RoleDto?> GetRoleByNameAsync(string roleName)
+        public async Task<GetRoleRequest?> GetRoleByNameAsync(string roleName)
         {
             if (string.IsNullOrEmpty(roleName))
             {
@@ -65,7 +65,7 @@ namespace RustyTech.Server.Services
             {
                 return null;
             }
-            var roleDto = new RoleDto { Id = role.Id, RoleName = role.Name };
+            var roleDto = new GetRoleRequest { Id = role.Id, RoleName = role.Name };
             return roleDto;
         }
 

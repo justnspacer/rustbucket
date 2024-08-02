@@ -15,7 +15,7 @@ namespace RustyTech.Server.Services.Interfaces
         void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt);
         Task<ResponseBase> ForgotPasswordAsync(string email);
         Task<ResponseBase> ResetPasswordAsync(ResetPasswordRequest request);
-        Task<ResponseBase> UpdateUserAsync(UserUpdateDto userDto);
+        Task<ResponseBase> UpdateUserAsync(UpdateUserRequest userDto);
         Task<ResponseBase> EnableTwoFactorAuthenticationAsync(Guid id);
         ResponseBase GetInfoAsync(Guid id);
         LoginResponse LogoutAsync();

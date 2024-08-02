@@ -18,7 +18,7 @@ namespace RustyTech.Server.Services
 
         public async Task<List<string>> GetPostKeywordsAsync(int? id) => await _context.PostKeywords.Where(pk => pk.PostId == id).Select(k => k.Keyword.Text).ToListAsync();
 
-        public async void AddKeywords(Post post, List<string>? keywords)
+        public async void AddPostKeywords(Post post, List<string>? keywords)
         {
             if (keywords != null)
             {
@@ -45,7 +45,7 @@ namespace RustyTech.Server.Services
             }
         }
 
-        public void RemoveKeywords(Post currentPost, PostDto newData)
+        public void RemovePostKeywords(Post currentPost, UpdatePostRequest newData)
         {
             if (newData.Keywords != null)
             {

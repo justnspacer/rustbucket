@@ -83,7 +83,7 @@ namespace RustyTech.Server.Controllers
 
         [Authorize]
         [HttpPut("update")]
-        public async Task<IActionResult> UpdateUserAsync([FromBody] UserUpdateDto user)
+        public async Task<IActionResult> UpdateUserAsync([FromBody] UpdateUserRequest user)
         {
             var result = await _authService.UpdateUserAsync(user);
             _logger.LogInformation($"User updated");

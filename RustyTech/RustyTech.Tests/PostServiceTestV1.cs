@@ -11,7 +11,6 @@ using RustyTech.Server.Models.Posts;
 using RustyTech.Server.Models;
 using RustyTech.Server.Models.Dtos;
 using Ganss.Xss;
-using Microsoft.AspNetCore.Http;
 
 namespace RustyTech.Tests
 {
@@ -52,7 +51,7 @@ namespace RustyTech.Tests
         public async Task CreatePostAsync_WithValidPost_ReturnsSuccessResponse()
         {
             // Arrange
-            var post = new BlogDto()
+            var post = new CreateBlogRequest()
             {
                 Id = 1,
                 UserId = Guid.NewGuid(),
@@ -74,25 +73,11 @@ namespace RustyTech.Tests
             _context.SaveChanges();
 
             // Act
-            var response = await _postService.CreatePostAsync(post);
+            var response = await _postService.CreateBlogPostAsync(post);
 
             // Assert
             Assert.IsTrue(response.IsSuccess);
             Assert.That(response.Message, Is.EqualTo(Messages.Info.PostCreated));
-        }
-
-        [Test]
-        public async Task CreatePostAsync_WithNullPost_ReturnsBadRequestResponse()
-        {
-            // Arrange
-            BlogDto post = new BlogDto() { Title = "new title", Content = "<p class='hey'>Wow!</p>" };
-
-            // Act
-            var response = await _postService.CreatePostAsync(post);
-
-            // Assert
-            Assert.IsFalse(response.IsSuccess);
-            Assert.That(response.Message, Is.EqualTo(Messages.Error.BadRequest));
         }
 
         [Test]

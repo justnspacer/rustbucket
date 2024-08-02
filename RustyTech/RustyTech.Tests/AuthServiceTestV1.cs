@@ -249,7 +249,7 @@ namespace RustyTech.Tests
         {
             // Arrange
             var userId = Guid.NewGuid();
-            var userDto = new UserUpdateDto
+            var userDto = new UpdateUserRequest
             {
                 UserId = userId,
                 UserName = "John",

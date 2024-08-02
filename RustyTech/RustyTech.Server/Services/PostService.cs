@@ -4,7 +4,6 @@ using RustyTech.Server.Models.Dtos;
 using RustyTech.Server.Models.Posts;
 using RustyTech.Server.Services.Interfaces;
 using RustyTech.Server.Utilities;
-using System.Linq.Expressions;
 
 namespace RustyTech.Server.Services
 {
@@ -32,50 +31,9 @@ namespace RustyTech.Server.Services
             _keywordService = keywordService;
         }
 
-        public async Task<ResponseBase> CreatePostAsync(PostDto post)
+        public async Task<List<GetPostRequest>> GetAllAsync(bool published = true)
         {
-            if (post == null)
-            {
-                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Error.BadRequest };
-            }
-
-            if (post.UserId == Guid.Empty)
-            {
-                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.IdRequired };
-            }
-
-            var user = await _userService.GetByIdAsync(post.UserId);
-            if (user == null)
-            {
-                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Info.UserNotFound };
-
-            }
-            else if (DateTime.Equals(user.VerifiedAt, null))
-            {
-                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Info.UserNotVerified };
-            }
-
-            switch (post)
-            {
-                case BlogDto blogDto:
-                    await CreateBlogPost(blogDto, user);
-                    break;
-                case ImageCreateDto imageDto:
-                    await CreateImagePost(imageDto, user);
-                    break;
-                case VideoDto videoDto:
-                    await CreateVideoPost(videoDto, user);
-                    break;
-                default:
-                    return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Error.InvalidRequest };
-            }
-            _logger.LogInformation($"Post {post.Id} created");
-            return new ResponseBase() { IsSuccess = true, Message = Constants.Messages.Info.PostCreated };
-        }
-
-        public async Task<List<PostReadDto>> GetAllAsync(bool published = true)
-        {
-            List<PostReadDto> allPosts = new List<PostReadDto>();
+            List<GetPostRequest> allPosts = new List<GetPostRequest>();
 
             if (published)
             {
@@ -102,38 +60,43 @@ namespace RustyTech.Server.Services
             return allPosts;
         }
 
-        public async Task<PostDto?> GetPostByIdAsync(int postId)
+        public async Task<GetPostRequest?> GetPostByIdAsync(int postId)
         {
             var blog = await GetPostById<BlogPost>(postId);
             if (blog != null)
             {
-                var blogDto = _mapper.Map<BlogPost, PostDto>(blog);
+                var blogDto = _mapper.Map<BlogPost, GetPostRequest>(blog);
                 blogDto.PostType = "BlogPost";
-                blogDto.Keywords = await GetPostKeywordsAsync(blogDto.Id);
+                blogDto.Keywords = await _keywordService.GetPostKeywordsAsync(blogDto.Id);
                 return blogDto;
             }
 
             var image = await GetPostById<ImagePost>(postId);
             if (image != null)
             {
-                var imageDto = _mapper.Map<ImagePost, PostDto>(image);
+                var imageDto = _mapper.Map<ImagePost, GetPostRequest>(image);
                 imageDto.PostType = "ImagePost";
-                imageDto.Keywords = await GetPostKeywordsAsync(imageDto.Id);
+                imageDto.Keywords = await _keywordService.GetPostKeywordsAsync(imageDto.Id);
                 return imageDto;
             }
 
             var video = await GetPostById<VideoPost>(postId);
             if (video != null)
             {
-                var videoDto = _mapper.Map<VideoPost, PostDto>(video);
+                var videoDto = _mapper.Map<VideoPost, GetPostRequest>(video);
                 videoDto.PostType = "VideoPost";
-                videoDto.Keywords = await GetPostKeywordsAsync(videoDto.Id);
+                videoDto.Keywords = await _keywordService.GetPostKeywordsAsync(videoDto.Id);
                 return videoDto;
             }
             return null;
         }
 
-        public async Task<ResponseBase> EditPostAsync<T>(PostDto newData) where T : Post
+        private async Task<T?> GetPostById<T>(int postId) where T : class
+        {
+            return await _context.Set<T>().FindAsync(postId);
+        }
+        
+        public async Task<ResponseBase> EditPostAsync<T>(UpdatePostRequest newData) where T : Post
         {
             var currentPost = await _context.Set<T>().Include(k => k.Keywords).ThenInclude(t => t.Keyword).FirstOrDefaultAsync(p => p.Id == newData.Id);
             if (currentPost == null)
@@ -151,10 +114,10 @@ namespace RustyTech.Server.Services
 
             if (currentPost.Keywords.Count > 0)
             {
-                _keywordService.RemoveKeywords(currentPost, newData);
+                _keywordService.RemovePostKeywords(currentPost, newData);
             }
 
-            _keywordService.AddKeywords(currentPost, newData.Keywords);
+            _keywordService.AddPostKeywords(currentPost, newData.Keywords);
 
             currentPost.UpdatedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
@@ -181,54 +144,37 @@ namespace RustyTech.Server.Services
             return new ResponseBase() { IsSuccess = true, Message = $"Post {post.Id} publish status: {post.IsPublished}" };
         }
 
-        private async Task<List<PostReadDto>> GetAllBlogPosts(bool isPublished = true)
+        //VideoPost Tasks
+        public async Task<ResponseBase> CreateVideoPostAsync(CreateVideoRequest post)
         {
-            var blogs = await _context.BlogPosts.Where(b => b.IsPublished == isPublished).ToListAsync();
-            var dtos = new List<PostReadDto>();
-            foreach (var blog in blogs)
+            if (post == null)
             {
-                var dto = _mapper.Map<BlogPost, PostReadDto>(blog);
-                dto.PostType = "BlogPost";
-                var keywords = await GetPostKeywordsAsync(dto.Id);
-                dto.Keywords = keywords;
-                dtos.Add(dto);
+                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Error.BadRequest };
             }
-            return dtos;
-        }
 
-        private async Task<List<PostReadDto>> GetAllVideoPosts(bool isPublished = true)
-        {
-            var videos = await _context.VideoPosts.Where(b => b.IsPublished == isPublished).ToListAsync();
-            var dtos = new List<PostReadDto>();
-            foreach (var video in videos)
+            if (post.UserId == Guid.Empty)
             {
-                var dto = _mapper.Map<VideoPost, PostReadDto>(video);
-                dto.PostType = "VideoPost";
-                var keywords = await GetPostKeywordsAsync(dto.Id);
-                dto.Keywords = keywords;
-                dtos.Add(dto);
+                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.IdRequired };
             }
-            return dtos;
-        }
 
-        private async Task<List<PostReadDto>> GetAllImagePosts(bool isPublished = true)
-        {
-            var images = await _context.ImagePosts.Where(b => b.IsPublished == isPublished).ToListAsync();
-            var dtos = new List<PostReadDto>();
-            foreach (var image in images)
+            var user = await _userService.GetByIdAsync(post.UserId);
+            if (user == null)
             {
-                var dto = _mapper.Map<ImagePost, PostReadDto>(image);
-                dto.PostType = "ImagePost";
-                var keywords = await GetPostKeywordsAsync(dto.Id);
-                dto.Keywords = keywords;
-                dtos.Add(dto);
-            }
-            return dtos;
-        }
+                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Info.UserNotFound };
 
-        private async Task CreateVideoPost(VideoDto videoDto, UserDto user)
+            }
+            else if (DateTime.Equals(user.VerifiedAt, null))
+            {
+                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Info.UserNotVerified };
+            }
+
+            var response = await CreateVideoPost(post, user);
+            return response;
+        }
+        
+        private async Task<ResponseBase> CreateVideoPost(CreateVideoRequest videoDto, GetUserRequest user)
         {
-            if (videoDto.VideoFile1 != null)
+            if (videoDto.VideoFile != null)
             {
                 var content = StringHelper.SanitizeString(videoDto.Content);
                 var date = DateTime.UtcNow;
@@ -237,22 +183,68 @@ namespace RustyTech.Server.Services
                     Title = StringHelper.SanitizeString(videoDto.Title),
                     Content = content,
                     PlainTextContent = StringHelper.ConvertHtmlToPlainText(content),
-                    VideoFile = await _videoService.UploadVideoAsync(videoDto.VideoFile1),
+                    VideoFile = await _videoService.UploadVideoAsync(videoDto.VideoFile),
                     CreatedAt = date,
                     UpdatedAt = date,
                     UserId = user.Id,
                     IsPublished = true //maybe change this to false, need publish automation
                 };
 
-                _keywordService.AddKeywords(video, videoDto.Keywords);
+                _keywordService.AddPostKeywords(video, videoDto.Keywords);
                 await _context.VideoPosts.AddAsync(video);
                 await _context.SaveChangesAsync();
+                _logger.LogInformation($"Video post {video.Id} created");
+                return new ResponseBase() { IsSuccess = true, Message = Constants.Messages.Info.PostCreated };
             }
+            return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Error.InvalidRequest };
         }
 
-        private async Task CreateImagePost(ImageCreateDto imageDto, UserDto user)
+        private async Task<List<GetPostRequest>> GetAllVideoPosts(bool isPublished = true)
         {
-            if (imageDto.ImageFile1 != null)
+            var videos = await _context.VideoPosts.Where(b => b.IsPublished == isPublished).ToListAsync();
+            var dtos = new List<GetPostRequest>();
+            foreach (var video in videos)
+            {
+                var dto = _mapper.Map<VideoPost, GetPostRequest>(video);
+                dto.PostType = "VideoPost";
+                var keywords = await _keywordService.GetPostKeywordsAsync(dto.Id);
+                dto.Keywords = keywords;
+                dtos.Add(dto);
+            }
+            return dtos;
+        }
+
+        //ImagePost Tasks
+        public async Task<ResponseBase> CreateImagePostAsync(CreateImageRequest post)
+        {
+            if (post == null)
+            {
+                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Error.BadRequest };
+            }
+
+            if (post.UserId == Guid.Empty)
+            {
+                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.IdRequired };
+            }
+
+            var user = await _userService.GetByIdAsync(post.UserId);
+            if (user == null)
+            {
+                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Info.UserNotFound };
+
+            }
+            else if (DateTime.Equals(user.VerifiedAt, null))
+            {
+                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Info.UserNotVerified };
+            }
+
+            var response = await CreateImagePost(post, user);
+            return response;
+        }
+
+        private async Task<ResponseBase> CreateImagePost(CreateImageRequest imageDto, GetUserRequest user)
+        {
+            if (imageDto.ImageFile != null)
             {
                 var content = StringHelper.SanitizeString(imageDto.Content);
                 var date = DateTime.UtcNow;
@@ -262,25 +254,71 @@ namespace RustyTech.Server.Services
                     Title = StringHelper.SanitizeString(imageDto.Title),
                     Content = content,
                     PlainTextContent = StringHelper.ConvertHtmlToPlainText(content),
-                    ImageFile = await _imageService.UploadImageAsync(imageDto.ImageFile1),
+                    ImageFile = await _imageService.UploadImageAsync(imageDto.ImageFile),
                     CreatedAt = date,
                     UpdatedAt = date,
                     UserId = user.Id,
                     IsPublished = true
                 };
 
-                _keywordService.AddKeywords(image, imageDto.Keywords);
+                _keywordService.AddPostKeywords(image, imageDto.Keywords);
                 await _context.ImagePosts.AddAsync(image);
                 await _context.SaveChangesAsync();
+                _logger.LogInformation($"Image post {image.Id} created");
+                return new ResponseBase() { IsSuccess = true, Message = Constants.Messages.Info.PostCreated };
             }
+            return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Error.InvalidRequest };
         }
 
-        private async Task CreateBlogPost(BlogDto blogDto, UserDto user)
+        private async Task<List<GetPostRequest>> GetAllImagePosts(bool isPublished = true)
+        {
+            var images = await _context.ImagePosts.Where(b => b.IsPublished == isPublished).ToListAsync();
+            var dtos = new List<GetPostRequest>();
+            foreach (var image in images)
+            {
+                var dto = _mapper.Map<ImagePost, GetPostRequest>(image);
+                dto.PostType = "ImagePost";
+                var keywords = await _keywordService.GetPostKeywordsAsync(dto.Id);
+                dto.Keywords = keywords;
+                dtos.Add(dto);
+            }
+            return dtos;
+        }
+
+        //BlogPost Tasks
+        public async Task<ResponseBase> CreateBlogPostAsync(CreateBlogRequest post)
+        {
+            if (post == null)
+            {
+                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Error.BadRequest };
+            }
+
+            if (post.UserId == Guid.Empty)
+            {
+                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.IdRequired };
+            }
+
+            var user = await _userService.GetByIdAsync(post.UserId);
+            if (user == null)
+            {
+                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Info.UserNotFound };
+
+            }
+            else if (DateTime.Equals(user.VerifiedAt, null))
+            {
+                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Info.UserNotVerified };
+            }
+
+            var response = await CreateBlogPost(post, user);
+            return response;
+        }
+
+        private async Task<ResponseBase> CreateBlogPost(CreateBlogRequest blogDto, GetUserRequest user)
         {
             var imageUrls = new List<string>();
-            if (blogDto.ImageFiles1 != null)
+            if (blogDto.ImageFiles != null)
             {
-                foreach (var file in blogDto.ImageFiles1)
+                foreach (var file in blogDto.ImageFiles)
                 {
                     imageUrls.Add(await _imageService.UploadImageAsync(file));
                 }
@@ -301,41 +339,28 @@ namespace RustyTech.Server.Services
                     IsPublished = true
                 };
 
-                _keywordService.AddKeywords(blog, blogDto.Keywords);
+                _keywordService.AddPostKeywords(blog, blogDto.Keywords);
                 await _context.BlogPosts.AddAsync(blog);
                 await _context.SaveChangesAsync();
+                _logger.LogInformation($"Blog post {blog.Id} created");
+                return new ResponseBase() { IsSuccess = true, Message = Constants.Messages.Info.PostCreated };
             }
+            return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Error.InvalidRequest };
         }
 
-        private async Task AddPostsByType<T>(DbSet<T> dbSet, List<PostDto> allPosts, Expression<Func<T, bool>> predicate) where T : class
+        private async Task<List<GetPostRequest>> GetAllBlogPosts(bool isPublished = true)
         {
-            var posts = await dbSet.Where(predicate).ToListAsync();
-            var postDtos = _mapper.Map<List<T>, List<PostDto>>(posts);
-
-            //add type and keywords to each post
-            foreach (var postDto in postDtos)
+            var blogs = await _context.BlogPosts.Where(b => b.IsPublished == isPublished).ToListAsync();
+            var dtos = new List<GetPostRequest>();
+            foreach (var blog in blogs)
             {
-                postDto.PostType = typeof(T).Name;
-
-                var keywords = await GetPostKeywordsAsync(postDto.Id);
-                postDto.Keywords = keywords;
+                var dto = _mapper.Map<BlogPost, GetPostRequest>(blog);
+                dto.PostType = "BlogPost";
+                var keywords = await _keywordService.GetPostKeywordsAsync(dto.Id);
+                dto.Keywords = keywords;
+                dtos.Add(dto);
             }
-
-            allPosts.AddRange(postDtos);
+            return dtos;
         }
-
-        private async Task<T?> GetPostById<T>(int postId) where T : class
-        {
-            return await _context.Set<T>().FindAsync(postId);
-        }
-
-        //keyword functions
-        public async Task<List<string>> GetAllKeywordsAsync() => await _context.Keywords.Select(k => k.Text).ToListAsync();
-
-        public async Task<List<string>> GetPostKeywordsAsync(int? id) => await _context.PostKeywords.Where(pk => pk.PostId == id).Select(k => k.Keyword.Text).ToListAsync();
-        //keyword functions end
-
-        //keyword helpers
-
     }
 }

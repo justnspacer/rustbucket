@@ -18,21 +18,21 @@ namespace RustyTech.Server.Services
             _logger = logger;
         }
 
-        public async Task<List<UserDto>> GetAllAsync(bool active = true)
+        public async Task<List<GetUserRequest>> GetAllAsync(bool active = true)
         {
-            var users = new List<UserDto>();
+            var users = new List<GetUserRequest>();
             if (active)
             {
-                users = await _context.Users.Where(confirmed => confirmed.EmailConfirmed).Select(user => _mapper.Map<UserDto>(user)).ToListAsync();
+                users = await _context.Users.Where(confirmed => confirmed.EmailConfirmed).Select(user => _mapper.Map<GetUserRequest>(user)).ToListAsync();
             }
             else
             {
-                users = await _context.Users.Select(user => _mapper.Map<UserDto>(user)).ToListAsync();
+                users = await _context.Users.Select(user => _mapper.Map<GetUserRequest>(user)).ToListAsync();
             }
             return users;
         }
 
-        public async Task<UserDto?> GetByIdAsync(Guid id)
+        public async Task<GetUserRequest?> GetByIdAsync(Guid id)
         {
             if (id == Guid.Empty)
             {
@@ -43,7 +43,7 @@ namespace RustyTech.Server.Services
             {
                 return null;
             }
-            var userDto = _mapper.Map<UserDto>(user);
+            var userDto = _mapper.Map<GetUserRequest>(user);
             return userDto;
         }
 

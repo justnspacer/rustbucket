@@ -14,11 +14,13 @@ namespace RustyTech.Server.Controllers
     {
         private readonly IPostService _postService;
         private readonly IRoleService _roleService;
+        private readonly IKeywordService _keywordService;
 
-        public PostController(IPostService postService, IRoleService roleService)
+        public PostController(IPostService postService, IRoleService roleService, IKeywordService keywordService)
         {
             _postService = postService;
             _roleService = roleService;
+            _keywordService = keywordService;
         }
 
         [HttpGet("all")]
@@ -37,25 +39,25 @@ namespace RustyTech.Server.Controllers
 
         [HttpPost("create/blog")]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> CreateBlogPostAsync([FromForm] BlogDto request)
+        public async Task<IActionResult> CreateBlogPostAsync([FromForm] CreateBlogRequest request)
         {
-            var post = await _postService.CreatePostAsync(request);
+            var post = await _postService.CreateBlogPostAsync(request);
             return Ok(post);
         }
 
         [HttpPost("create/image")]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> CreateImagePostAsync([FromForm] ImageCreateDto request)
+        public async Task<IActionResult> CreateImagePostAsync([FromForm] CreateImageRequest request)
         {
-            var post = await _postService.CreatePostAsync(request);
+            var post = await _postService.CreateImagePostAsync(request);
             return Ok(post);
         }
 
         [HttpPost("create/video")]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> CreateVideoPostAsync([FromForm] VideoDto request)
+        public async Task<IActionResult> CreateVideoPostAsync([FromForm] CreateVideoRequest request)
         {
-            var post = await _postService.CreatePostAsync(request);
+            var post = await _postService.CreateVideoPostAsync(request);
             return Ok(post);
         }
 
@@ -68,7 +70,7 @@ namespace RustyTech.Server.Controllers
         }
 
         [HttpPut("edit")]
-        public async Task<IActionResult> EditPostAsync([FromBody] PostDto request)
+        public async Task<IActionResult> EditPostAsync([FromBody] UpdatePostRequest request)
         {
             var result = await _postService.EditPostAsync<Post>(request);
             return Ok(result);
@@ -77,14 +79,14 @@ namespace RustyTech.Server.Controllers
         [HttpGet("keywords")]
         public async Task<IActionResult> GetKeywordsAsync()
         {
-            var result = await _postService.GetAllKeywordsAsync();
+            var result = await _keywordService.GetAllKeywordsAsync();
             return Ok(result);
         }
 
         [HttpGet("keywords/{id}")]
         public async Task<IActionResult> GetPostKeywordsAsync(int id)
         {
-            var result = await _postService.GetPostKeywordsAsync(id);
+            var result = await _keywordService.GetPostKeywordsAsync(id);
             return Ok(result);
         }
     }

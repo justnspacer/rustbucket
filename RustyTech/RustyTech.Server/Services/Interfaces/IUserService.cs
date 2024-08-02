@@ -5,8 +5,8 @@ namespace RustyTech.Server.Services.Interfaces
 {
     public interface IUserService
     {
-        Task<List<UserDto>> GetAllAsync(bool active);
-        Task<UserDto?> GetByIdAsync(Guid id);
+        Task<List<GetUserRequest>> GetAllAsync(bool active);
+        Task<GetUserRequest?> GetByIdAsync(Guid id);
         Task<ResponseBase> DeleteAsync(Guid id);
     }
 }
