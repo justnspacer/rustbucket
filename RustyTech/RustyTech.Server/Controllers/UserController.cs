@@ -29,7 +29,7 @@ namespace RustyTech.Server.Controllers
             return Ok(user);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Administrator")]
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeleteAsync(Guid id)
         {

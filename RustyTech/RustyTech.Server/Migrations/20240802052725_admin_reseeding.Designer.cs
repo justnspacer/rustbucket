@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RustyTech.Server.Data;
 
@@ -11,9 +12,11 @@ using RustyTech.Server.Data;
 namespace RustyTech.Server.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20240802052725_admin_reseeding")]
+    partial class admin_reseeding
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -43,7 +46,7 @@ namespace RustyTech.Server.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "c5b55af6-b884-4599-910c-3ab3904f833d",
+                            Id = "94d6a21c-d2d3-4eb7-8efc-3d59dd7748cd",
                             ConcurrencyStamp = "1",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
@@ -185,8 +188,8 @@ namespace RustyTech.Server.Migrations
                         {
                             Id = 1,
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            RoleId = "c5b55af6-b884-4599-910c-3ab3904f833d",
-                            UserId = new Guid("d3e78363-2520-487a-952f-fb92c26c7399")
+                            RoleId = "94d6a21c-d2d3-4eb7-8efc-3d59dd7748cd",
+                            UserId = new Guid("6555ff46-9ef0-4e59-8d23-548e1305e0c3")
                         });
                 });
 
@@ -265,22 +268,22 @@ namespace RustyTech.Server.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("d3e78363-2520-487a-952f-fb92c26c7399"),
+                            Id = new Guid("6555ff46-9ef0-4e59-8d23-548e1305e0c3"),
                             AccessFailedCount = 0,
                             BirthYear = 0,
-                            ConcurrencyStamp = "8d0bff08-6677-47d7-8732-c44d1bb56643",
+                            ConcurrencyStamp = "65f2b67c-6a15-4da7-a4cd-83640cbe4c8d",
                             Email = "admin@rustbucket.io",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@RUSTBUCKET.IO",
                             NormalizedUserName = "ADMIN@RUSTBUCKET.IO",
-                            PasswordHash = new byte[] { 65, 81, 65, 65, 65, 65, 73, 65, 65, 89, 97, 103, 65, 65, 65, 65, 69, 73, 109, 109, 72, 121, 116, 54, 106, 122, 74, 116, 84, 104, 114, 76, 52, 112, 106, 81, 52, 78, 100, 70, 122, 75, 107, 51, 83, 113, 101, 57, 79, 115, 55, 107, 99, 112, 112, 102, 119, 112, 81, 102, 116, 100, 48, 50, 106, 71, 99, 90, 117, 103, 72, 116, 84, 54, 85, 69, 76, 55, 116, 120, 52, 65, 61, 61 },
+                            PasswordHash = new byte[] { 65, 81, 65, 65, 65, 65, 73, 65, 65, 89, 97, 103, 65, 65, 65, 65, 69, 77, 119, 107, 84, 120, 74, 114, 114, 109, 106, 97, 100, 81, 106, 54, 87, 68, 54, 72, 67, 99, 121, 72, 107, 79, 108, 119, 103, 51, 66, 72, 99, 80, 50, 65, 114, 97, 84, 89, 84, 48, 100, 49, 74, 121, 107, 84, 86, 117, 111, 109, 57, 108, 99, 102, 113, 103, 101, 57, 55, 68, 106, 104, 104, 119, 61, 61 },
                             PasswordSalt = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "55366581-c3a1-48e0-9c31-71d0be02b25c",
+                            SecurityStamp = "84bc1382-e780-48b1-8b90-2bc9f2f0fbd9",
                             TwoFactorEnabled = false,
                             UserName = "admin@rustbucket.io",
-                            VerifiedAt = new DateTime(2024, 8, 2, 0, 36, 37, 617, DateTimeKind.Local).AddTicks(441)
+                            VerifiedAt = new DateTime(2024, 8, 2, 0, 27, 24, 687, DateTimeKind.Local).AddTicks(8902)
                         });
                 });
 

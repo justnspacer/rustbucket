@@ -31,6 +31,7 @@ namespace RustyTech.Server.Services
             _keywordService = keywordService;
         }
 
+        //Shared Post Tasks
         public async Task<List<GetPostRequest>> GetAllAsync(bool published = true)
         {
             List<GetPostRequest> allPosts = new List<GetPostRequest>();
@@ -144,6 +145,7 @@ namespace RustyTech.Server.Services
             return new ResponseBase() { IsSuccess = true, Message = $"Post {post.Id} publish status: {post.IsPublished}" };
         }
 
+        
         //VideoPost Tasks
         public async Task<ResponseBase> CreateVideoPostAsync(CreateVideoRequest post)
         {
@@ -176,6 +178,11 @@ namespace RustyTech.Server.Services
         {
             if (videoDto.VideoFile != null)
             {
+                var userfromDb = await _context.Users.FirstOrDefaultAsync(u => u.Id == user.Id);
+                if (userfromDb == null)
+                {
+                    return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Info.UserNotFound };
+                }
                 var content = StringHelper.SanitizeString(videoDto.Content);
                 var date = DateTime.UtcNow;
                 var video = new VideoPost()
@@ -187,6 +194,7 @@ namespace RustyTech.Server.Services
                     CreatedAt = date,
                     UpdatedAt = date,
                     UserId = user.Id,
+                    User = userfromDb,
                     IsPublished = true //maybe change this to false, need publish automation
                 };
 
@@ -201,7 +209,7 @@ namespace RustyTech.Server.Services
 
         private async Task<List<GetPostRequest>> GetAllVideoPosts(bool isPublished = true)
         {
-            var videos = await _context.VideoPosts.Where(b => b.IsPublished == isPublished).ToListAsync();
+            var videos = await _context.VideoPosts.Where(b => b.IsPublished == isPublished).Include(user => user.User).ToListAsync();
             var dtos = new List<GetPostRequest>();
             foreach (var video in videos)
             {
@@ -214,6 +222,7 @@ namespace RustyTech.Server.Services
             return dtos;
         }
 
+        
         //ImagePost Tasks
         public async Task<ResponseBase> CreateImagePostAsync(CreateImageRequest post)
         {
@@ -246,9 +255,13 @@ namespace RustyTech.Server.Services
         {
             if (imageDto.ImageFile != null)
             {
+                var userfromDb = await _context.Users.FirstOrDefaultAsync(u => u.Id == user.Id);
+                if (userfromDb == null)
+                {
+                    return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Info.UserNotFound };
+                }
                 var content = StringHelper.SanitizeString(imageDto.Content);
                 var date = DateTime.UtcNow;
-
                 var image = new ImagePost()
                 {
                     Title = StringHelper.SanitizeString(imageDto.Title),
@@ -258,6 +271,7 @@ namespace RustyTech.Server.Services
                     CreatedAt = date,
                     UpdatedAt = date,
                     UserId = user.Id,
+                    User = userfromDb,
                     IsPublished = true
                 };
 
@@ -272,7 +286,7 @@ namespace RustyTech.Server.Services
 
         private async Task<List<GetPostRequest>> GetAllImagePosts(bool isPublished = true)
         {
-            var images = await _context.ImagePosts.Where(b => b.IsPublished == isPublished).ToListAsync();
+            var images = await _context.ImagePosts.Where(b => b.IsPublished == isPublished).Include(user => user.User).ToListAsync();
             var dtos = new List<GetPostRequest>();
             foreach (var image in images)
             {
@@ -285,6 +299,7 @@ namespace RustyTech.Server.Services
             return dtos;
         }
 
+        
         //BlogPost Tasks
         public async Task<ResponseBase> CreateBlogPostAsync(CreateBlogRequest post)
         {
@@ -325,6 +340,11 @@ namespace RustyTech.Server.Services
             }
             if (blogDto.Content != null)
             {
+                var userfromDb = await _context.Users.FirstOrDefaultAsync(u => u.Id == user.Id);
+                if (userfromDb == null)
+                {
+                    return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Info.UserNotFound };
+                }
                 var content = StringHelper.SanitizeString(blogDto.Content);
                 var date = DateTime.UtcNow;
                 var blog = new BlogPost()
@@ -336,6 +356,7 @@ namespace RustyTech.Server.Services
                     CreatedAt = date,
                     UpdatedAt = date,
                     UserId = user.Id,
+                    User = userfromDb,
                     IsPublished = true
                 };
 
@@ -350,7 +371,7 @@ namespace RustyTech.Server.Services
 
         private async Task<List<GetPostRequest>> GetAllBlogPosts(bool isPublished = true)
         {
-            var blogs = await _context.BlogPosts.Where(b => b.IsPublished == isPublished).ToListAsync();
+            var blogs = await _context.BlogPosts.Where(b => b.IsPublished == isPublished).Include(user => user.User).ToListAsync();
             var dtos = new List<GetPostRequest>();
             foreach (var blog in blogs)
             {

@@ -84,12 +84,19 @@ namespace RustyTech.Tests
         public async Task GetAllAsync_ReturnsAllPosts()
         {
             // Arrange
+            var user = new User
+            {
+                Id = Guid.NewGuid(),
+                UserName = "testuser",
+                VerifiedAt = new DateTime(7775, 3, 09)
+            };
             var blogPosts = new List<BlogPost>
             {
                 new BlogPost
                 {
                     Id = 1,
-                    UserId = Guid.NewGuid(),
+                    UserId = user.Id,
+                    User = user,
                     Title = "Test Blog Post 1",
                     Content = "This is a test blog post 1",
                     CreatedAt = new DateTime(2022, 1, 1),
@@ -99,7 +106,8 @@ namespace RustyTech.Tests
                 new BlogPost
                 {
                     Id = 2,
-                    UserId = Guid.NewGuid(),
+                    UserId = user.Id,
+                    User = user,
                     Title = "Test Blog Post 2",
                     Content = "This is a test blog post 2",
                     CreatedAt = new DateTime(2022, 1, 2),
@@ -113,7 +121,8 @@ namespace RustyTech.Tests
                 new ImagePost
                 {
                     Id = 3,
-                    UserId = Guid.NewGuid(),
+                    UserId = user.Id,
+                    User = user,
                     Title = "Test Image Post 1",
                     Content = "This is a test image post 1",
                     CreatedAt = new DateTime(2022, 1, 3),
@@ -124,7 +133,8 @@ namespace RustyTech.Tests
                 new ImagePost
                 {
                     Id = 4,
-                    UserId = Guid.NewGuid(),
+                    UserId = user.Id,
+                    User = user,
                     Title = "Test Image Post 2",
                     Content = "This is a test image post 2",
                     CreatedAt = new DateTime(2022, 1, 4),
@@ -140,7 +150,8 @@ namespace RustyTech.Tests
                 new VideoPost
                 {
                     Id = 5,
-                    UserId = Guid.NewGuid(),
+                    UserId = user.Id,
+                    User = user,
                     Title = "Test Video Post 1",
                     Content = "This is a test video post 1",
                     CreatedAt = new DateTime(2022, 1, 5),
@@ -151,7 +162,8 @@ namespace RustyTech.Tests
                 new VideoPost
                 {
                     Id = 6,
-                    UserId = Guid.NewGuid(),
+                    UserId = user.Id,
+                    User = user,
                     Title = "Test Video Post 2",
                     Content = "This is a test video post 2",
                     CreatedAt = new DateTime(2022, 1, 6),
@@ -183,11 +195,18 @@ namespace RustyTech.Tests
         public async Task GetPostByIdAsync_WithExistingPost_ReturnsPostDto()
         {
             // Arrange
+            var user = new User
+            {
+                Id = Guid.NewGuid(),
+                UserName = "testuser",
+                VerifiedAt = new DateTime(7775, 3, 09)
+            };
             var postId = 1;
             var blogPost = new BlogPost
             {
                 Id = postId,
-                UserId = Guid.NewGuid(),
+                UserId = user.Id,
+                User = user,
                 Title = "Test Blog Post",
                 Content = "This is a test blog post",
                 CreatedAt = new DateTime(2022, 1, 1),
@@ -213,11 +232,18 @@ namespace RustyTech.Tests
         public async Task TogglePostPublishedStatusAsync_WithExistingPost_ReturnsSuccessResponse()
         {
             // Arrange
+            var user = new User
+            {
+                Id = Guid.NewGuid(),
+                UserName = "testuser",
+                VerifiedAt = new DateTime(7775, 3, 09)
+            };
             var postId = 1;
             var blogPost = new BlogPost
             {
                 Id = postId,
-                UserId = Guid.NewGuid(),
+                UserId = user.Id,
+                User = user,
                 Title = "Test Blog Post",
                 Content = "This is a test blog post",
                 CreatedAt = new DateTime(2022, 1, 1),

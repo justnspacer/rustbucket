@@ -8,11 +8,11 @@ namespace RustyTech.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Administrator")]
     public class RoleController : ControllerBase
     {
         private readonly IRoleService _roleService;
         private readonly ILogger<RoleController> _logger;
-
 
         public RoleController(RoleService roleService, ILogger<RoleController> logger)
         {
@@ -20,7 +20,6 @@ namespace RustyTech.Server.Controllers
             _logger = logger;
         }
 
-        [Authorize(Roles = "Admin")]
         [HttpPost("create")]
         public async Task<IActionResult> CreateRoleAsync(string roleName)
         {
@@ -29,7 +28,6 @@ namespace RustyTech.Server.Controllers
             return Ok(result);
         }
 
-        [Authorize(Roles = "Admin")]
         [HttpGet("get/all")]
         public async Task<IActionResult> GetAllAsync()
         {
@@ -38,7 +36,6 @@ namespace RustyTech.Server.Controllers
             return Ok(result);
         }
 
-        [Authorize(Roles = "Admin")]
         [HttpGet("get/{roleId}")]
         public async Task<IActionResult> GetRoleByIdAsync(string roleId)
         {
@@ -47,7 +44,6 @@ namespace RustyTech.Server.Controllers
             return Ok(result);
         }
 
-        [Authorize(Roles = "Admin")]
         [HttpGet("get/name/{roleName}")]
         public async Task<IActionResult> GetRoleByNameAsync(string roleName)
         {
@@ -56,7 +52,6 @@ namespace RustyTech.Server.Controllers
             return Ok(result);
         }
 
-        [Authorize(Roles = "Admin")]
         [HttpGet("get/user/{userId}")]
         public async Task<IActionResult> GetUserRolesAsync(Guid userId)
         {
@@ -65,7 +60,6 @@ namespace RustyTech.Server.Controllers
             return Ok(result);
         }
 
-        [Authorize(Roles = "Admin")]
         [HttpPost("add/user")]
         public async Task<IActionResult> AddRoleToUserAsync([FromBody] RoleRequest request)
         {
@@ -74,7 +68,6 @@ namespace RustyTech.Server.Controllers
             return Ok(result);
         }
 
-        [Authorize(Roles = "Admin")]
         [HttpDelete("remove/user")]
         public async Task<IActionResult> RemoveRoleFromUserAsync([FromBody] RoleRequest request)
         {

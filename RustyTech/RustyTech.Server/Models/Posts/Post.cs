@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 
 namespace RustyTech.Server.Models.Posts
 {
@@ -19,10 +18,7 @@ namespace RustyTech.Server.Models.Posts
         public ICollection<PostKeyword> Keywords { get; set; } = new List<PostKeyword>();
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
-
         public Guid UserId { get; set; } // Foreign key
-
-        [JsonIgnore]
-        public User? User { get; set; } // Navigation property
+        public required User User { get; set; } // Navigation property
     }
 }

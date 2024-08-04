@@ -2,6 +2,7 @@
 using RustyTech.Server.Models.Auth;
 using RustyTech.Server.Models.Posts;
 using RustyTech.Server.Models.Role;
+using System.Text;
 
 namespace RustyTech.Server.Data
 {
@@ -20,6 +21,27 @@ namespace RustyTech.Server.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            IdentityRole<string> admin = new IdentityRole<string>
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = "Administrator",
+                ConcurrencyStamp = "1",
+                NormalizedName = "ADMINISTRATOR"
+            };
+            modelBuilder.Entity<IdentityRole>().HasData(admin);
+
+            User user = CreateUser("admin@rustbucket.io");
+            modelBuilder.Entity<User>().HasData(user);
+
+            modelBuilder.Entity<UserRole>().HasData(
+                new UserRole()
+                {
+                    Id = 1,
+                    UserId = user.Id,
+                    RoleId = admin.Id
+                }
+                );
+
             // Configure the relationships and inheritance
             modelBuilder.Entity<Post>()
                 .HasDiscriminator<string>("PostType")
@@ -34,6 +56,9 @@ namespace RustyTech.Server.Data
                     .HasAnnotation("MinLength", 5);
 
                 entity.Property(p => p.Content)
+                .HasMaxLength(20000);
+
+                entity.Property(p => p.PlainTextContent)
                 .HasMaxLength(20000);
 
                 entity.HasOne(p => p.User)
@@ -67,5 +92,23 @@ namespace RustyTech.Server.Data
         public DbSet<VideoPost> VideoPosts { get; set; }
         public DbSet<Keyword> Keywords { get; set; }
         public DbSet<PostKeyword> PostKeywords { get; set; }
+
+        private User CreateUser(string email)
+        {
+            User user = new User()
+            {
+                Id = Guid.NewGuid(),
+                UserName = email,
+                Email = email,
+                NormalizedEmail = email.ToUpper(),
+                NormalizedUserName = email.ToUpper(),
+                EmailConfirmed = true,
+                VerifiedAt = DateTime.Now
+            };
+
+            PasswordHasher<User> hasher = new PasswordHasher<User>();
+            user.PasswordHash = Encoding.ASCII.GetBytes(hasher.HashPassword(user, email));
+            return user;
+        }
     }
 }

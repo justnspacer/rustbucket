@@ -43,7 +43,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
-        options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
+        options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull; // Ignore null values when serializing.
     });
 
 builder.Services.AddAntiforgery(options =>
@@ -190,16 +190,5 @@ app.Use(next => context =>
 app.MapControllers(); // Map controller routes.
 
 app.MapFallbackToFile("/index.html"); // Map fallback route to serve index.html for SPA.
-
-// Role management
-using (var scope = app.Services.CreateScope())
-{
-    var roleService = scope.ServiceProvider.GetRequiredService<IRoleService>(); // Get role service from DI.
-    var roles = new[] { "Admin", "Manager", "Developer", "User", "Guest" }; // Define roles.
-    foreach (var role in roles)
-    {
-        await roleService.CreateRoleAsync(role); // Create roles if they don't exist.
-    }
-}
 
 app.Run(); // Run the application.
