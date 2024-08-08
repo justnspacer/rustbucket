@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getAllPosts } from '../services/postService';
 import { PostDto } from '../types/apiResponse';
+import { MEDIA_URL } from '../types/urls';
 import Spinner from './spinner';
 
 const formatDate = (datetime: Date) => {
@@ -45,22 +46,37 @@ const PostsList: React.FC = () => {
                 {posts?.map((post: PostDto) => (
                     <a className='postlink' href={`/posts/get/${post.id}`} key={post.id}>
                         <li className='post' >
+                           
+                            {post.imageFile && (
+                                <img src={`${MEDIA_URL}${post.imageFile}`} alt={post.title} />
+                            )}
+                            {post.videoFile && (
+                                <video controls>
+                                    <source src={`${MEDIA_URL}${post.videoFile}`} type="video/mp4" />
+                                    Your browser does not support the video tag.
+                                </video>
+                            )}
+                            {post?.imageFiles && (
+                                <>
+                                    {post.imageFiles.map((imageFile, index) => (
+                                        <img key={index} src={`${MEDIA_URL}${imageFile}`} alt={post?.title} />
+                                    ))}
+                                </>
+                            )}
                             <h2>{post.title}</h2>
-                            <p>{post.userId}</p>
+                            <p>{post.user.userName}</p>
                             <span className='date'>{formatDate(post.createdAt)}</span>
                             {post.createdAt != post.updatedAt && (
-                                <div>                                    
+                                <div>
                                     <span className='date'>{formatDate(post.updatedAt)} (updated)</span>
                                 </div>
                             )}
-                            {post.imageUrl && (
-                                <img src={post.imageUrl} alt={post.title} />
-                            )}
-                            {post.videoUrl && (
-                                <video src={post.videoUrl} controls />
-                            )}
-                            <p>{post.content}</p>
-                            <p>Images:</p>
+
+                            <ul className='post-keyword-list'>
+                                {post?.keywords && post.keywords.map((keyword, index) => (
+                                    <li className='keyword-text' key={index}>{keyword}</li>
+                                ))}
+                            </ul>
                         </li>
                     </a>
                 ))}

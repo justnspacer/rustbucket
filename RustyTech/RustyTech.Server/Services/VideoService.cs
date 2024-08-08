@@ -7,15 +7,22 @@ namespace RustyTech.Server.Services
     public class VideoService : IVideoService
     {
         private readonly string _videoPath;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public VideoService()
+        public VideoService(IWebHostEnvironment webHostEnvironment)
         {
-            _videoPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "videos");
-            if (!Directory.Exists(_videoPath))
+            _webHostEnvironment = webHostEnvironment;
+            _videoPath = Path.Combine(_webHostEnvironment.WebRootPath, "videos");
+            if (!Directory.Exists(GetAbsolutePath(_videoPath)))
             {
-                Directory.CreateDirectory(_videoPath);
+                Directory.CreateDirectory(GetAbsolutePath(_videoPath));
             }
             FFmpeg.SetExecutablesPath("C:\\ffmpeg-n5.1-latest-win64-lgpl-shared-5.1\\bin"); //address when ffmpeg is installed
+        }
+
+        private string GetAbsolutePath(string relativePath)
+        {
+            return Path.Combine(_webHostEnvironment.WebRootPath, relativePath);
         }
 
         public async Task<string> UploadVideoAsync(IFormFile file)
@@ -32,18 +39,20 @@ namespace RustyTech.Server.Services
             {
                 await file.CopyToAsync(stream);
             }
-
+            /*
             // Optionally convert the video to reduce size
             var convertedFilePath = Path.Combine(_videoPath, Path.GetFileNameWithoutExtension(fileName) + "_converted.mp4");
-            await ConvertVideoAsync(originalFilePath, convertedFilePath, 1280, 720, 1000);
+            var newPath = await ConvertVideoAsync(originalFilePath, convertedFilePath, 1280, 720, 1000);
 
-            // Delete the original uploaded file
+             Delete the original uploaded file
             if (File.Exists(originalFilePath))
             {
-                File.Delete(originalFilePath);
+               File.Delete(originalFilePath);
             }
-
-            return convertedFilePath;
+            var relativeFilePath = Path.Combine("/videos", Path.GetFileName(newPath)).Replace("\\", "/");
+            */
+            var relativeFilePath = Path.Combine("/videos", Path.GetFileName(originalFilePath)).Replace("\\", "/");
+            return relativeFilePath;
         }
 
         public async Task<VideoMetadata> GetVideoMetadataAsync(string filePath)

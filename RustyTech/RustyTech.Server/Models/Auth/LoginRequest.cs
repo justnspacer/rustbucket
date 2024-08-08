@@ -2,7 +2,7 @@
 
 namespace RustyTech.Server.Models.Auth
 {
-    public class UserLogin
+    public class LoginRequest
     {
         [Required, EmailAddress]
         public required string Email { get; set; }

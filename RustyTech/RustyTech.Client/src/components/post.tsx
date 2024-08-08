@@ -3,6 +3,8 @@ import Spinner from './spinner';
 import { getPostById } from '../services/postService';
 import { PostDto } from '../types/apiResponse';
 import { useParams } from 'react-router-dom';
+import { MEDIA_URL } from '../types/urls';
+
 
 const formatDate = (datetime: Date) => {
     const date = new Date(datetime);
@@ -42,8 +44,24 @@ const Post: React.FC = () => {
 
     return (
         <div className='post' key={post?.id}>
+            {post?.videoFile && (
+                <video controls>
+                    <source src={`${MEDIA_URL}${post?.videoFile}`} type="video/mp4" />
+                    Your browser does not support the video tag.
+                </video>
+            )}
+            {post?.imageFile && (
+                <img src={`${MEDIA_URL}${post?.imageFile}`} alt={post?.title} />
+            )}
+            {post?.imageFiles && (
+                <>
+                    {post.imageFiles.map((imageFile, index) => (
+                        <img key={index} src={`${MEDIA_URL}${imageFile}`} alt={post?.title} />
+                    ))}
+                </>
+            )}
             <h2>{post?.title}</h2>
-            <p>{post?.userId}</p>
+            <p>{post?.user.userName}</p>
             <span className='date'>{post && formatDate(post.createdAt)}</span>
 
 
@@ -52,15 +70,14 @@ const Post: React.FC = () => {
                     <span className='date'>{post && formatDate(post.updatedAt)} (updated)</span>
                 </div>
             )}
+            <div dangerouslySetInnerHTML={{ __html: post?.content }}></div>
 
-            {post?.imageUrl && (
-                <img src={post?.imageUrl} alt={post?.title} />
-            )}
-            {post?.videoUrl && (
-                <video src={post?.videoUrl} controls />
-            )}
-            <p>{post?.content}</p>
-            <p>Images:</p>
+            <ul className='post-keyword-list'>
+                {post?.keywords && post.keywords.map((keyword, index) => (
+                    <li className='keyword-text' key={index}>{keyword}</li>
+                ))}
+            </ul>
+
         </div>
     );
 };

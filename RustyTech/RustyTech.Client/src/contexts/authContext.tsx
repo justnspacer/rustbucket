@@ -1,11 +1,10 @@
 /* eslint-disable react-refresh/only-export-components */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { registerEP, loginEP, verifyTokenEP } from '../services/authService';
+import { registerUser, loginUser, verifyToken } from '../services/authService';
 import { getJwtClaims } from '../utils/getJwtClaims';
 import Spinner from '../components/spinner';
-import { RegisterRequest, LoginRequest, ApiResponse } from '../types/apiResponse';
-
+import { RegisterRequest, LoginRequest } from '../types/apiResponse';
 
 interface AuthState {
     isAuthenticated: boolean;
@@ -60,7 +59,7 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
             message: 'loading...',
         }));
 
-        verifyTokenEP(token).then((response) => {
+        verifyToken(token).then((response) => {
             if (response) {
                 const claims = getJwtClaims(token);
                 if (claims) {
@@ -109,14 +108,11 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
     const register = async (data: RegisterRequest) => {
         try {
-            const response = await registerEP(data); 
+            const response = await registerUser(data); 
 
-            if (response != null) {
+            if (response != null) {               
                 setAuthState((prevState) => ({
                     ...prevState,
-                    isSuccess: response.data.isSuccess,
-                    statusCode: response.data.statusCode,
-                    message: response.data.message,
                     user: null,
                     isAuthenticated: false,
                     isTokenValid: false,
@@ -140,22 +136,10 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const login = async (data: LoginRequest) => {
         setAuthState((prevState) => ({ ...prevState, isLoading: true }));
         try {
-            const response = await loginEP(data);
-            const token = response?.data.;
+            const response = await loginUser(data);
+            const token = response.data;
             if (token) {
-                localStorage.setItem('jwtToken', token);
-                verifyTokenEP(token).then((res) => {
-                    setAuthState({
-                        isAuthenticated: res,
-                        isTokenValid: res,
-                        token,
-                        isLoading: false,
-                        statusCode: response.data.statusCode,
-                        isSuccess: response.data.isSuccess,
-                        message: response.data.message,
-                        user: response.data.user,
-                    });
-                });
+                localStorage.setItem('jwtToken', "token");
             }
             else {
                 console.error('missing token for login');

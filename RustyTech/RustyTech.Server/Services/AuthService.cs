@@ -32,7 +32,7 @@ namespace RustyTech.Server.Services
             _roleService = roleService;
         }
 
-        public async Task<ResponseBase> RegisterAsync(UserRegister request)
+        public async Task<ResponseBase> RegisterAsync(Models.Auth.RegisterRequest request)
         {
             if (_context.Users.Any(user => user.Email == request.Email))
             {
@@ -72,7 +72,7 @@ namespace RustyTech.Server.Services
             return new ResponseBase() { IsSuccess = true, Message = Constants.Messages.Info.UserRegistered };
         }
 
-        public async Task<LoginResponse> LoginAsync(UserLogin request)
+        public async Task<LoginResponse> LoginAsync(Models.Auth.LoginRequest request)
         {
             var expires = _configuration["Jwt:ExpiresInMinutes"];
             var user = await _context.Users.FirstOrDefaultAsync(user => user.Email == request.Email);

@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using RustyTech.Server.Models.Auth;
 using RustyTech.Server.Models.Dtos;
 using RustyTech.Server.Models.Posts;
 using RustyTech.Server.Services.Interfaces;
@@ -68,6 +67,7 @@ namespace RustyTech.Server.Services
             {
                 var blogDto = _mapper.Map<BlogPost, GetPostRequest>(blog);
                 blogDto.PostType = "BlogPost";
+                blogDto.User = await _userService.GetByIdAsync(blogDto.UserId);
                 blogDto.Keywords = await _keywordService.GetPostKeywordsAsync(blogDto.Id);
                 return blogDto;
             }
@@ -77,6 +77,7 @@ namespace RustyTech.Server.Services
             {
                 var imageDto = _mapper.Map<ImagePost, GetPostRequest>(image);
                 imageDto.PostType = "ImagePost";
+                imageDto.User = await _userService.GetByIdAsync(imageDto.UserId);
                 imageDto.Keywords = await _keywordService.GetPostKeywordsAsync(imageDto.Id);
                 return imageDto;
             }
@@ -86,6 +87,7 @@ namespace RustyTech.Server.Services
             {
                 var videoDto = _mapper.Map<VideoPost, GetPostRequest>(video);
                 videoDto.PostType = "VideoPost";
+                videoDto.User = await _userService.GetByIdAsync(videoDto.UserId);
                 videoDto.Keywords = await _keywordService.GetPostKeywordsAsync(videoDto.Id);
                 return videoDto;
             }

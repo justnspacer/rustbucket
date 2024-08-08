@@ -21,7 +21,7 @@ namespace RustyTech.Server.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> RegisterAsync([FromBody] UserRegister request)
+        public async Task<IActionResult> RegisterAsync([FromBody] Models.Auth.RegisterRequest request)
         {
             var result = await _authService.RegisterAsync(request);
             _logger.LogInformation($"User {request.Email} registered successfully");
@@ -29,7 +29,7 @@ namespace RustyTech.Server.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> LoginAsync([FromBody] UserLogin request)
+        public async Task<IActionResult> LoginAsync([FromBody] Models.Auth.LoginRequest request)
         {
             var result = await _authService.LoginAsync(request);
 

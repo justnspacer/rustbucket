@@ -3,7 +3,7 @@ import { getCSRFToken } from '../utils/getCSRFToken';
 import { ApiResponse, PostDto } from '../types/apiResponse';
 import { BASE_URL } from '../types/urls';
 
-export async function createPost(post: PostDto): Promise<ApiResponse | null> {
+export const createPost = async (post: PostDto) => {
     try {
         const response = await axios.post<ApiResponse>(`${BASE_URL}/posts`, post);
         return response.data;
@@ -13,22 +13,21 @@ export async function createPost(post: PostDto): Promise<ApiResponse | null> {
     }
 }
 
-export const getAllPosts = async (): Promise<ApiResponse[] | null> => {
+export const getAllPosts = async () => {
     try {
         const csrfToken = getCSRFToken();
-        const response = await axios.get<ApiResponse[]>(`${BASE_URL}/post/all`, {
+        const response = await axios.get<ApiResponse>(`${BASE_URL}/post/all`, {
             headers: {
                 'X-CSRF-TOKEN': csrfToken || '',
             }
         });
-        return response.data;
+        return response.data.data;
     } catch (e) {
         console.error('Error fetching posts:', e);
-        return null;
     }
 }
 
-export const getPostById = async (postId: number): Promise<ApiResponse | null> => {
+export const getPostById = async (postId: number) => {
     try {
         const csrfToken = getCSRFToken();
         const response = await axios.get<ApiResponse>(`${BASE_URL}/post/${postId}`, {
@@ -36,29 +35,26 @@ export const getPostById = async (postId: number): Promise<ApiResponse | null> =
                 'X-CSRF-TOKEN': csrfToken || '',
             }
         });
-        return response.data;
+        return response.data.data;
     } catch (e) {
         console.error('Error fetching post:', e);
-        return null;
     }
 }
 
-export async function editPost<T extends PostDto>(newData: T): Promise<ApiResponse | null> {
+export const editPost = async <T extends PostDto>(newData: T) => {
     try {
         const response = await axios.put<ApiResponse>(`${BASE_URL}/posts/${newData.id}`, newData);
         return response.data;
-    } catch (error) {
-        console.error('Error editing post:', error);
-        return null;
+    } catch (e) {
+        console.error('Error editing post:', e);
     }
 }
 
-export async function togglePostPublishedStatus(postId: number): Promise<ApiResponse | null> {
+export const togglePostPublishedStatus = async (postId: number) => {
     try {
         const response = await axios.put<ApiResponse>(`${BASE_URL}/posts/publish/${postId}`);
         return response.data;
-    } catch (error) {
-        console.error('Error toggling post published status:', error);
-        return null;
+    } catch (e) {
+        console.error('Error toggling post published status:', e);
     }
 }

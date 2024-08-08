@@ -1,4 +1,5 @@
 export interface RegisterRequest {
+    type: "RegisterRequest";
     email: string;
     password: string;
     confirmPassword: string;
@@ -6,28 +7,27 @@ export interface RegisterRequest {
 }
 
 export interface LoginRequest {
+    type: "LoginRequest";
     email: string;
     password: string;
 }
 
-export interface User {
-    id: string;
-    email: string;
-}
-
 export interface ResponseBase
 {
+    type: "ResponseBase";
     statusCode: number;
     isSuccess: boolean;
     message: string;
 }
 
 export interface RoleDto {
+    type: "RoleRequest";
     id: string;
     roleName: string;
 }
 
 export interface UserUpdateDto {
+    type: "UserUpdateRequest";
     userId: string;
     email?: string;
     userName?: string;
@@ -35,6 +35,7 @@ export interface UserUpdateDto {
 }
 
 export interface UserDto {
+    type: "GetUserRequest";
     id: string;
     email: string;
     userName: string;
@@ -42,6 +43,7 @@ export interface UserDto {
 }
 
 export interface PostDto {
+    type: "GetPostRequest";
     id: number;
     title: string;
     content: string;
@@ -53,22 +55,10 @@ export interface PostDto {
     createdAt: Date;
     updatedAt: Date;
     isPublished: boolean;
-    imageUrl?: string;
-    videoUrl?: string;
-    imageUrls?: string[];
+    imageFile?: string;
+    videoFile?: string;
+    imageFiles?: string[];
 }
-
-//export interface BlogDto extends PostDto {
-//    imageUrls?: File[];
-//}
-
-//export interface VideoDto extends PostDto {
-//    videoUrl: File;
-//}
-
-//export interface ImageDto extends PostDto {
-//    imageUrl: File;
-//}
 
 export interface ApiData<T> {
     data: T;

@@ -5,14 +5,21 @@ namespace RustyTech.Server.Services
     public class ImageService : IImageService
     {
         private readonly string _imagePath;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public ImageService()
+        public ImageService(IWebHostEnvironment webHostEnvironment)
         {
-            _imagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images");
-            if (!Directory.Exists(_imagePath))
+            _webHostEnvironment = webHostEnvironment;
+            _imagePath = Path.Combine(_webHostEnvironment.WebRootPath, "images");
+            if (!Directory.Exists(GetAbsolutePath(_imagePath)))
             {
-                Directory.CreateDirectory(_imagePath);
+                Directory.CreateDirectory(GetAbsolutePath(_imagePath));
             }
+        }
+
+        private string GetAbsolutePath(string relativePath)
+        {
+            return Path.Combine(_webHostEnvironment.WebRootPath, relativePath);
         }
 
         public async Task<string> UploadImageAsync(IFormFile file)
@@ -37,7 +44,8 @@ namespace RustyTech.Server.Services
                 await file.CopyToAsync(stream);
             }
 
-            return filePath;
+            var relativeFilePath = Path.Combine("/images", Path.GetFileName(filePath)).Replace("\\", "/");
+            return relativeFilePath;
         }
 
         public async Task<ImageMetadata> GetImageMetadataAsync(string filePath)

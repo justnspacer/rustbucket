@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace RustyTech.Server.Models.Auth
 {
-    public class UserRegister
+    public class RegisterRequest
     {
         [Required, EmailAddress]
         public required string Email { get; set; }

@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using RustyTech.Server.Models.Auth;
 using RustyTech.Server.Models.Dtos;
 using RustyTech.Server.Services.Interfaces;
 

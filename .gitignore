@@ -16,3 +16,4 @@ node_modules/
 /build/
 /dist/
 /RustyTech/RustyTech.Server/efbundle.exe
+/RustyTech/RustyTech.Server/wwwroot

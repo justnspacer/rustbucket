@@ -1,5 +1,4 @@
-﻿using RustyTech.Server.Models.Auth;
-using RustyTech.Server.Models.Dtos;
+﻿using RustyTech.Server.Models.Dtos;
 using RustyTech.Server.Models.Posts;
 
 namespace RustyTech.Server.Services.Interfaces

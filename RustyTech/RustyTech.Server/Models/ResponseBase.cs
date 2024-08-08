@@ -1,4 +1,4 @@
-﻿namespace RustyTech.Server.Models.Auth
+﻿namespace RustyTech.Server.Models
 {
     public class ResponseBase
     {

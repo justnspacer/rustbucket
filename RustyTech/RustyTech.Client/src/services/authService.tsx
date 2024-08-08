@@ -3,7 +3,7 @@ import { getCSRFToken } from '../utils/getCSRFToken';
 import { RegisterRequest, LoginRequest, ApiResponse } from '../types/apiResponse';
 import { BASE_URL } from '../types/urls';
 
-export const registerEP = async (data: RegisterRequest) => {
+export async function registerUser(data: RegisterRequest): Promise<ApiResponse> {
     try {
         const csrfToken = getCSRFToken();
         const response = await axios.post<ApiResponse>(`${BASE_URL}/auth/register`, data, {
@@ -14,10 +14,11 @@ export const registerEP = async (data: RegisterRequest) => {
         return response.data;
     } catch (e) {
         console.error('error with user registration: ', e);
+        return { data: { isSuccess: false, message: 'Error registering user', statusCode: 500 } };
     }
-};
+}
 
-export const loginEP = async (data: LoginRequest) => {
+export async function loginUser(data: LoginRequest): Promise<ApiResponse> {
     try {
         const csrfToken = getCSRFToken();
         const response = await axios.post<ApiResponse>(`${BASE_URL}/auth/login`, data, {
@@ -28,10 +29,11 @@ export const loginEP = async (data: LoginRequest) => {
         return response.data;
     } catch (e) {
         console.error('error with user login: ', e);
+        return { data: { isSuccess: false, message: 'Error registering user', statusCode: 500 } };
     }
-};
+}
 
-export const verifyTokenEP = async (token: string) => {
+export const verifyToken = async (token: string) => {
     try {
         const csrfToken = getCSRFToken();
         const response = await axios.get<ApiResponse>(`${BASE_URL}/auth/verify/token`, {
