@@ -6,23 +6,21 @@ namespace RustyTech.Server.Services
 {
     public class VideoService : IVideoService
     {
+        private string _dir;
         private readonly string _videoPath;
-        private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly string _ffmpegPath;
+        private readonly IWebHostEnvironment? _webHostEnvironment;
 
         public VideoService(IWebHostEnvironment webHostEnvironment)
         {
-            _webHostEnvironment = webHostEnvironment;
-            _videoPath = Path.Combine(_webHostEnvironment.WebRootPath, "videos");
-            if (!Directory.Exists(GetAbsolutePath(_videoPath)))
+            _dir = webHostEnvironment.WebRootPath;
+            _videoPath = Path.Combine(_dir, "videos");
+            _ffmpegPath = Path.Combine(_dir, "ffmpeg");
+            if (!Directory.Exists(_videoPath))
             {
-                Directory.CreateDirectory(GetAbsolutePath(_videoPath));
+                Directory.CreateDirectory(_videoPath);
             }
-            FFmpeg.SetExecutablesPath("C:\\ffmpeg-n5.1-latest-win64-lgpl-shared-5.1\\bin"); //address when ffmpeg is installed
-        }
-
-        private string GetAbsolutePath(string relativePath)
-        {
-            return Path.Combine(_webHostEnvironment.WebRootPath, relativePath);
+            FFmpeg.SetExecutablesPath(_ffmpegPath, "ffmpeg");
         }
 
         public async Task<string> UploadVideoAsync(IFormFile file)
@@ -35,29 +33,29 @@ namespace RustyTech.Server.Services
             var fileName = Path.GetFileNameWithoutExtension(cleanFileName) + "_" + Guid.NewGuid() + Path.GetExtension(cleanFileName);
             var originalFilePath = Path.Combine(_videoPath, fileName);
 
-            using (var stream = new FileStream(originalFilePath, FileMode.Create))
+            using (var stream = new FileStream(originalFilePath, FileMode.Create, FileAccess.Write))
             {
                 await file.CopyToAsync(stream);
             }
-            /*
+            
             // Optionally convert the video to reduce size
             var convertedFilePath = Path.Combine(_videoPath, Path.GetFileNameWithoutExtension(fileName) + "_converted.mp4");
-            var newPath = await ConvertVideoAsync(originalFilePath, convertedFilePath, 1280, 720, 1000);
-
-             Delete the original uploaded file
+            var newPath = await ConvertVideoAsync(originalFilePath, convertedFilePath);
+            // Delete the original uploaded file
             if (File.Exists(originalFilePath))
             {
                File.Delete(originalFilePath);
             }
-            var relativeFilePath = Path.Combine("/videos", Path.GetFileName(newPath)).Replace("\\", "/");
-            */
-            var relativeFilePath = Path.Combine("/videos", Path.GetFileName(originalFilePath)).Replace("\\", "/");
+            if (newPath == null)
+            {
+                return "Video conversion error.";
+            }
+            var relativeFilePath = Path.Combine("/videos", Path.GetFileName(newPath)).Replace("\\", "/");            
             return relativeFilePath;
         }
 
         public async Task<VideoMetadata> GetVideoMetadataAsync(string filePath)
         {
-
             var mediaInfo = await FFmpeg.GetMediaInfo(filePath);
             return new VideoMetadata
             {
@@ -67,23 +65,13 @@ namespace RustyTech.Server.Services
             };
         }
 
-        private async Task<string> ConvertVideoAsync(string inputFilePath, string outputFilePath, int maxWidth, int maxHeight, int maxBitrate)
+        private async Task<string> ConvertVideoAsync(string inputFilePath, string outputFilePath)
         {
-            var conversion = FFmpeg.Conversions.New()
-                .AddParameter($"-i {inputFilePath}")
-                .AddParameter($"-vf scale='min({maxWidth},iw)':'min({maxHeight},ih)':force_original_aspect_ratio=decrease")
-                .AddParameter($"-b:v {maxBitrate}k")
-                .SetOutput(outputFilePath);
-
+            var info = await FFmpeg.GetMediaInfo(inputFilePath);
+            var videoStream = info.VideoStreams.First().SetCodec(VideoCodec.h264).SetSize(VideoSize.Hd480);
+            var conversion = FFmpeg.Conversions.New().AddStream(videoStream).SetOutput(outputFilePath);
             await conversion.Start();
             return outputFilePath;
-        }
-
-        private async Task ConvertToMp4(string filePath)
-        {
-            var outputFilePath = Path.ChangeExtension(filePath, ".mp4");
-            var conversion = await FFmpeg.Conversions.FromSnippet.Convert(filePath, outputFilePath);
-            await conversion.Start();
         }
     }
 }
