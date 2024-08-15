@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -22,6 +23,8 @@ namespace RustyTech.Tests
         {
             var mapperMock = new Mock<IMapper>();
             var loggerMock = new Mock<ILogger<IUserService>>();
+            var userManagerMock = new Mock<UserManager<User>>();
+            var signInManagerMock = new Mock<SignInManager<User>>();
 
             mapperMock.Setup(m => m.Map<GetUserRequest>(It.IsAny<User>()))
           .Returns((User source) => new GetUserRequest
@@ -36,7 +39,7 @@ namespace RustyTech.Tests
                 .UseInMemoryDatabase(databaseName: "TestDatabase")
                 .Options;
             _context = new DataContext(options);
-            _userService = new UserService(_context, mapperMock.Object, loggerMock.Object);
+            _userService = new UserService(_context, userManagerMock.Object, signInManagerMock.Object, mapperMock.Object, loggerMock.Object);
         }
 
         [TearDown]

@@ -6,8 +6,8 @@ namespace RustyTech.Server.Services.Interfaces
 {
     public interface IAuthService
     {
-        Task<ResponseBase> RegisterAsync(Models.Auth.RegisterRequest request);
-        Task<LoginResponse> LoginAsync(Models.Auth.LoginRequest request);
+        Task<ResponseBase> RegisterAsync(Models.Auth.RegisterRequest_old request);
+        Task<LoginResponse> LoginAsync(Models.Auth.LoginRequest_old request);
         Task<ResponseBase> VerifyEmailAsync(ConfirmEmailRequest request);
         ResponseBase VerifyJwtToken(string token);
         ResponseBase ResendEmailAsync(string email);

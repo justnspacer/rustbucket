@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using RustyTech.Server.Models.Dtos;
 using RustyTech.Server.Services.Interfaces;
 
@@ -7,12 +8,16 @@ namespace RustyTech.Server.Services
     public class UserService : IUserService
     {
         private readonly DataContext _context;
+        private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
         private readonly IMapper _mapper;
         private readonly ILogger<IUserService> _logger;
 
-        public UserService(DataContext context, IMapper mapper, ILogger<IUserService> logger)
+        public UserService(DataContext context, UserManager<User> userManager, SignInManager<User> signInManager, IMapper mapper, ILogger<IUserService> logger)
         {
             _context = context;
+            _userManager = userManager;
+            _signInManager = signInManager;
             _mapper = mapper;
             _logger = logger;
         }

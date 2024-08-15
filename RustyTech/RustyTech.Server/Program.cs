@@ -9,13 +9,12 @@ using RustyTech.Server.Services;
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
 using RustyTech.Server.Middleware;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using Microsoft.OpenApi.Models;
 using RustyTech.Server.Services.Interfaces;
 using RustyTech.Server.Interfaces;
 using Microsoft.AspNetCore.Antiforgery;
 using RustyTech.Server.Utilities;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 var builder = WebApplication.CreateBuilder(args); // Create a WebApplication builder instance.
 
@@ -54,75 +53,80 @@ builder.Services.AddAntiforgery(options =>
 });
 
 // Add authentication
+
+/*
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultAuthenticateScheme = "Bearer"; // Set the default authentication scheme to "Bearer".
-    options.DefaultChallengeScheme = "Bearer"; // Set the default challenge scheme to "Bearer".
-})
-.AddJwtBearer("Bearer", options =>
+    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+
+}).AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, option =>
 {
-    options.Authority = "https://some-authentication-authority.com"; // Set the authority for token validation.
-    options.Audience = "some-audience"; // Set the expected audience for the token.
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateAudience = true, // Validate the audience in the token.
-        ValidateIssuer = true, // Validate the issuer in the token.
-        ValidateLifetime = true, // Validate the token's lifetime.
-        ValidateIssuerSigningKey = true, // Validate the token's signing key.
-        ValidIssuer = builder.Configuration.GetSection("Jwt:Issuer").Value, // Set the valid issuer from configuration.
-        ValidAudience = builder.Configuration.GetSection("Jwt:Audience").Value, // Set the valid audience from configuration.
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("Jwt:Key").Value)) // Set the signing key from configuration.
-    };
+    option.LoginPath = "/auth/login";
+    option.LogoutPath = "/auth/logout";
+    option.AccessDeniedPath = "/auth/access-denied";
+    option.SlidingExpiration = true;
+    option.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+    option.Cookie.HttpOnly = true;
+    option.Cookie.SecurePolicy = CookieSecurePolicy.Always;
 });
+*/
 
 builder.Services.AddAuthorization(); // Add authorization services.
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer(); // Add endpoint API explorer for Swagger.
 builder.Services.AddRouting(options => options.LowercaseUrls = true); // Configure routing to use lowercase URLs.
+
 builder.Services.AddSwaggerGen(config =>
 {
     config.SwaggerDoc("v1", new() { Title = "RustyTech.Server", Version = "v1" }); // Configure Swagger document.
     config.OperationFilter<AddFileUploadParams>(); // Add file upload parameters to Swagger UI.
-
-    config.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        In = ParameterLocation.Header, // Define the location of the security scheme (header).
-        Description = "Please enter JWT with Bearer into field", // Description for the security scheme.
-        Name = "Authorization", // Name of the security scheme.
-        Type = SecuritySchemeType.ApiKey, // Type of the security scheme (API key).
-        Scheme = "Bearer" // The scheme name (Bearer).
-    });
-
-    config.AddSecurityRequirement(new OpenApiSecurityRequirement {
-            {
-                new OpenApiSecurityScheme
-                {
-                    Reference = new OpenApiReference
-                    {
-                        Type = ReferenceType.SecurityScheme, // Reference type is a security scheme.
-                        Id = "Bearer" // The ID of the security scheme.
-                    }
-                },
-                new string[] { } // Required scopes for the security scheme.
-            }
-        });
 });
 
 builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))); // Add Entity Framework Core services with SQL Server configuration.
 
+builder.Services.AddIdentity<User, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<DataContext>(); // Add ASP.NET Core Identity services with roles and EF Core store.
+builder.Services.Configure<IdentityOptions>(options =>
+{
+    //password settings
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireNonAlphanumeric = true;
+    options.Password.RequireUppercase = true;
+    options.Password.RequiredLength = 8;
+    options.Password.RequiredUniqueChars = 1;
 
-builder.Services.AddIdentityCore<User>().AddRoles<IdentityRole>().AddEntityFrameworkStores<DataContext>(); // Add ASP.NET Core Identity services with roles and EF Core store.
+    //lockout settings
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+    options.Lockout.MaxFailedAccessAttempts = 5;
+    options.Lockout.AllowedForNewUsers = true;
 
+    //user settings
+    options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+    options.User.RequireUniqueEmail = true;
+});
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    //cookie settings
+    options.Cookie.HttpOnly = true;
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(5); //double check this!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    options.LoginPath = "/auth/login";
+    options.AccessDeniedPath = "/auth/access-denied";
+    options.SlidingExpiration = true;
+});
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>(); // Add rate limit configuration as a singleton.
 builder.Services.AddSingleton<Ganss.Xss.HtmlSanitizer>();
-builder.Services.AddScoped<ISmtpClientService, SmtpClientService>(); // Add smtp client service with scoped lifetime.
+builder.Services.AddTransient<ISmtpClientService, SmtpClientService>(); // Add smtp client service with transient lifetime.
 builder.Services.AddScoped<IAuthService, AuthService>(); // Add authentication service with scoped lifetime.
 builder.Services.AddScoped<IRoleService, RoleService>(); // Add role service with scoped lifetime.
 builder.Services.AddScoped<IUserService, UserService>(); // Add user service with scoped lifetime.
-builder.Services.AddScoped<IEmailService, EmailService>(); // Add email service with scoped lifetime.
+builder.Services.AddTransient<IEmailService, EmailService>(); // Add email service with transient lifetime.
+builder.Services.AddTransient<IEmailSender, EmailSender>(); // Add email sender with transient lifetime.
 builder.Services.AddScoped<IPostService, PostService>(); // Add post service with scoped lifetime.
 builder.Services.AddScoped<IImageService, ImageService>(); // Add image service with scoped lifetime.
 builder.Services.AddScoped<IVideoService, VideoService>(); // Add video service with scoped lifetime.
@@ -150,8 +154,12 @@ var app = builder.Build(); // Build the WebApplication.
 // Middleware to use CORS policy.
 app.UseCors("MyCorsPolicy");
 
-app.UseDefaultFiles(); // Enable default file mapping for the app.
-app.UseStaticFiles(); // Enable static file serving.
+app.UseCookiePolicy(new CookiePolicyOptions
+{
+    MinimumSameSitePolicy = SameSiteMode.Strict, // Set the minimum same site policy to strict.
+});
+
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -170,14 +178,16 @@ app.UseMiddleware<ExceptionMiddleware>(); // Use custom exception middleware.
 app.UseIpRateLimiting(); // Enable IP rate limiting.
 
 app.UseHttpsRedirection(); // Redirect HTTP requests to HTTPS.
-
-app.UseAuthentication(); // Enable authentication middleware.
+app.UseDefaultFiles(); // Enable default file mapping for the app.
+app.UseStaticFiles(); // Enable static file serving.
 
 app.UseRouting(); // Enable routing middleware.
 
+app.UseAuthentication(); // Enable authentication middleware.
 app.UseAuthorization(); // Enable authorization middleware.
 
 //CSRF token is generated and stored in a cookie named XSRF-TOKEN
+/*
 app.Use(next => context =>
 {
     var antiforgery = context.RequestServices.GetRequiredService<IAntiforgery>();
@@ -186,9 +196,9 @@ app.Use(next => context =>
 
     return next(context);
 });
+*/
 
 app.MapControllers(); // Map controller routes.
-
 app.MapFallbackToFile("/index.html"); // Map fallback route to serve index.html for SPA.
 
 app.Run(); // Run the application.

@@ -52,7 +52,7 @@ namespace RustyTech.Tests
         public async Task RegisterAsync_SuccessfulRequest_ReturnsResponseBaseWithSuccessMessage()
         {
             // Arrange
-            var request = new Server.Models.Auth.RegisterRequest
+            var request = new Server.Models.Auth.RegisterRequest_old
             {
                 Email = "test@example.com",
                 Password = "Test123!",
@@ -72,7 +72,7 @@ namespace RustyTech.Tests
         public async Task RegisterAsync_PasswordMismatch_ReturnsResponseBaseWithErrorMessage()
         {
             // Arrange
-            var request = new Server.Models.Auth.RegisterRequest
+            var request = new Server.Models.Auth.RegisterRequest_old
             {
                 Email = "request@example.com",
                 Password = "Password123",
@@ -91,7 +91,7 @@ namespace RustyTech.Tests
         public async Task RegisterAsync_BadEmail_ReturnsResponseBaseWithErrorMessage()
         {
             // Arrange
-            var request = new Server.Models.Auth.RegisterRequest
+            var request = new Server.Models.Auth.RegisterRequest_old
             {
                 Email = "request@example.",
                 Password = "Password123",
@@ -110,7 +110,7 @@ namespace RustyTech.Tests
         public async Task LoginAsync_SuccessfulRequest_ReturnsLoginResponseWithAuthenticatedUser()
         {
             // Arrange
-            var request = new Server.Models.Auth.LoginRequest
+            var request = new Server.Models.Auth.LoginRequest_old
             {
                 Email = "test@example.com",
                 Password = "Test123!"

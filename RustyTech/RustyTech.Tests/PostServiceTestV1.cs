@@ -11,6 +11,7 @@ using RustyTech.Server.Models.Posts;
 using RustyTech.Server.Models;
 using RustyTech.Server.Models.Dtos;
 using Ganss.Xss;
+using Microsoft.AspNetCore.Identity;
 
 namespace RustyTech.Tests
 {
@@ -29,6 +30,8 @@ namespace RustyTech.Tests
         {
             var loggerMock = new Mock<ILogger<PostService>>();
             var sanitizerMock = new Mock<HtmlSanitizer>();
+            var userManagerMock = new Mock<UserManager<User>>();
+            var signInManagerMock = new Mock<SignInManager<User>>();
 
             var options = new DbContextOptionsBuilder<DataContext>()
                 .UseInMemoryDatabase(databaseName: "TestDatabase")
@@ -36,7 +39,7 @@ namespace RustyTech.Tests
 
             _context = new DataContext(options);
             _mapper = new MapperConfiguration(cfg => cfg.AddProfile(new MappingProfile())).CreateMapper();
-            _userService = new UserService(_context, _mapper, new Logger<UserService>(new LoggerFactory()));
+            _userService = new UserService(_context, userManagerMock.Object, signInManagerMock.Object,  _mapper, new Logger<UserService>(new LoggerFactory()));
             _postService = new PostService(_context, _mapper, _userService, loggerMock.Object, _imageService, _videoService, _keywordService);
         }
 

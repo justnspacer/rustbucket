@@ -24,9 +24,9 @@ namespace RustyTech.Server.Data
             IdentityRole<string> admin = new IdentityRole<string>
             {
                 Id = Guid.NewGuid().ToString(),
-                Name = "Administrator",
+                Name = "SuperAdministrator",
                 ConcurrencyStamp = "1",
-                NormalizedName = "ADMINISTRATOR"
+                NormalizedName = "SUPERADMINISTRATOR"
             };
             modelBuilder.Entity<IdentityRole>().HasData(admin);
 

@@ -11,6 +11,7 @@ using RustyTech.Server.Services.Interfaces;
 using RustyTech.Server.Interfaces;
 using RustyTech.Server.Utilities;
 using RustyTech.Server.Models.Dtos;
+using Microsoft.AspNetCore.Identity;
 
 namespace RustyTech.Server.Services
 {
@@ -32,7 +33,7 @@ namespace RustyTech.Server.Services
             _roleService = roleService;
         }
 
-        public async Task<ResponseBase> RegisterAsync(Models.Auth.RegisterRequest request)
+        public async Task<ResponseBase> RegisterAsync(Models.Auth.RegisterRequest_old request)
         {
             if (_context.Users.Any(user => user.Email == request.Email))
             {
@@ -72,7 +73,7 @@ namespace RustyTech.Server.Services
             return new ResponseBase() { IsSuccess = true, Message = Constants.Messages.Info.UserRegistered };
         }
 
-        public async Task<LoginResponse> LoginAsync(Models.Auth.LoginRequest request)
+        public async Task<LoginResponse> LoginAsync(Models.Auth.LoginRequest_old request)
         {
             var expires = _configuration["Jwt:ExpiresInMinutes"];
             var user = await _context.Users.FirstOrDefaultAsync(user => user.Email == request.Email);

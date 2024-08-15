@@ -1,10 +1,11 @@
 /* eslint-disable react-refresh/only-export-components */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo } from 'react';
 import { registerUser, loginUser, verifyToken } from '../services/authService';
 import { getJwtClaims } from '../utils/getJwtClaims';
 import Spinner from '../components/spinner';
 import { RegisterRequest, LoginRequest } from '../types/apiResponse';
+import { useHistory, useLocation } from 'react-router-dom';
 
 interface AuthState {
     isAuthenticated: boolean;
@@ -20,15 +21,44 @@ interface AuthState {
 interface User {
     id: string;
     email: string;
+    userName: string;
 }
 
-interface AuthContextType extends AuthState {
+interface AuthContextType {
+    user?: User;
+    loading: boolean;
+    error?: any;
     login: (data: LoginRequest) => Promise<void>;
     register: (data: RegisterRequest) => Promise<void>;
     logout: () => void;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType>({} as AuthContextType);
+
+export function AuthProvider({
+    children,
+}: {
+    children: ReactNode;
+    }): JSX.Element {
+    const [user, setUser] = useState<User>();
+    const [error, setError] = useState<any>();
+    const [loading, setLoading] = useState<boolean>(false);
+    const [loadingInitial, setLoadingInitial] = useState<boolean>(true);
+
+    const history = useHistory();
+    const location = useLocation();
+
+    // Reset the error state if we change page
+    useEffect(() => {
+        if (error) setError(undefined);
+    }, [location.pathname]);
+
+    useEffect(() => {
+
+    })
+
+}
+
 
 const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [authState, setAuthState] = useState<AuthState>({

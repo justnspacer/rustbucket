@@ -43,10 +43,10 @@ namespace RustyTech.Server.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "c5b55af6-b884-4599-910c-3ab3904f833d",
+                            Id = "b6cc6fc9-5053-4e31-a474-e22b89c87f15",
                             ConcurrencyStamp = "1",
-                            Name = "Administrator",
-                            NormalizedName = "ADMINISTRATOR"
+                            Name = "SuperAdministrator",
+                            NormalizedName = "SUPERADMINISTRATOR"
                         });
                 });
 
@@ -185,8 +185,8 @@ namespace RustyTech.Server.Migrations
                         {
                             Id = 1,
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            RoleId = "c5b55af6-b884-4599-910c-3ab3904f833d",
-                            UserId = new Guid("d3e78363-2520-487a-952f-fb92c26c7399")
+                            RoleId = "b6cc6fc9-5053-4e31-a474-e22b89c87f15",
+                            UserId = new Guid("219423ec-efd9-4100-a3f6-2bf8323e131f")
                         });
                 });
 
@@ -265,22 +265,22 @@ namespace RustyTech.Server.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("d3e78363-2520-487a-952f-fb92c26c7399"),
+                            Id = new Guid("219423ec-efd9-4100-a3f6-2bf8323e131f"),
                             AccessFailedCount = 0,
                             BirthYear = 0,
-                            ConcurrencyStamp = "8d0bff08-6677-47d7-8732-c44d1bb56643",
+                            ConcurrencyStamp = "14d3a863-78e0-4e22-b331-9148128f5150",
                             Email = "admin@rustbucket.io",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@RUSTBUCKET.IO",
                             NormalizedUserName = "ADMIN@RUSTBUCKET.IO",
-                            PasswordHash = new byte[] { 65, 81, 65, 65, 65, 65, 73, 65, 65, 89, 97, 103, 65, 65, 65, 65, 69, 73, 109, 109, 72, 121, 116, 54, 106, 122, 74, 116, 84, 104, 114, 76, 52, 112, 106, 81, 52, 78, 100, 70, 122, 75, 107, 51, 83, 113, 101, 57, 79, 115, 55, 107, 99, 112, 112, 102, 119, 112, 81, 102, 116, 100, 48, 50, 106, 71, 99, 90, 117, 103, 72, 116, 84, 54, 85, 69, 76, 55, 116, 120, 52, 65, 61, 61 },
+                            PasswordHash = new byte[] { 65, 81, 65, 65, 65, 65, 73, 65, 65, 89, 97, 103, 65, 65, 65, 65, 69, 80, 110, 107, 48, 55, 56, 112, 119, 51, 70, 78, 122, 105, 117, 51, 119, 112, 108, 89, 54, 69, 54, 75, 100, 69, 80, 84, 77, 52, 77, 79, 75, 53, 53, 82, 120, 118, 81, 120, 56, 81, 83, 86, 79, 66, 120, 70, 48, 84, 97, 121, 106, 71, 73, 47, 105, 71, 76, 106, 48, 98, 69, 72, 65, 81, 61, 61 },
                             PasswordSalt = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "55366581-c3a1-48e0-9c31-71d0be02b25c",
+                            SecurityStamp = "56b829d4-e158-40d4-b8e5-0a0f86e595da",
                             TwoFactorEnabled = false,
                             UserName = "admin@rustbucket.io",
-                            VerifiedAt = new DateTime(2024, 8, 2, 0, 36, 37, 617, DateTimeKind.Local).AddTicks(441)
+                            VerifiedAt = new DateTime(2024, 8, 14, 0, 1, 29, 313, DateTimeKind.Local).AddTicks(5086)
                         });
                 });
 
