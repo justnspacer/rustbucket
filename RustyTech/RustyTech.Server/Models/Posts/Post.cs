@@ -18,7 +18,7 @@ namespace RustyTech.Server.Models.Posts
         public ICollection<PostKeyword> Keywords { get; set; } = new List<PostKeyword>();
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
-        public Guid UserId { get; set; } // Foreign key
+        public required string UserId { get; set; } // Foreign key
         public required User User { get; set; } // Navigation property
     }
 }

@@ -107,7 +107,7 @@ namespace RustyTech.Server.Services
                 return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Info.PostNotFound };
             }
 
-            if (currentPost.UserId != newData.UserId)
+            if (currentPost.UserId != newData.UserId.ToString())
             {
                 return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Error.Unauthorized };
             }
@@ -195,7 +195,7 @@ namespace RustyTech.Server.Services
                     VideoFile = await _videoService.UploadVideoAsync(videoDto.VideoFile),
                     CreatedAt = date,
                     UpdatedAt = date,
-                    UserId = user.Id,
+                    UserId = user.Id.ToString(),
                     User = userfromDb,
                     IsPublished = true //maybe change this to false, need publish automation
                 };
@@ -272,7 +272,7 @@ namespace RustyTech.Server.Services
                     ImageFile = await _imageService.UploadImageAsync(imageDto.ImageFile),
                     CreatedAt = date,
                     UpdatedAt = date,
-                    UserId = user.Id,
+                    UserId = user.Id.ToString(),
                     User = userfromDb,
                     IsPublished = true
                 };
@@ -357,7 +357,7 @@ namespace RustyTech.Server.Services
                     ImageFiles = imageUrls,
                     CreatedAt = date,
                     UpdatedAt = date,
-                    UserId = user.Id,
+                    UserId = user.Id.ToString(),
                     User = userfromDb,
                     IsPublished = true
                 };

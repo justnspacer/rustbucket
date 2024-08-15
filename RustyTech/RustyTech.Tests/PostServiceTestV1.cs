@@ -98,7 +98,7 @@ namespace RustyTech.Tests
                 new BlogPost
                 {
                     Id = 1,
-                    UserId = user.Id,
+                    UserId = user.Id.ToString(),
                     User = user,
                     Title = "Test Blog Post 1",
                     Content = "This is a test blog post 1",
@@ -109,7 +109,7 @@ namespace RustyTech.Tests
                 new BlogPost
                 {
                     Id = 2,
-                    UserId = user.Id,
+                    UserId = user.Id.ToString(),
                     User = user,
                     Title = "Test Blog Post 2",
                     Content = "This is a test blog post 2",
@@ -124,7 +124,7 @@ namespace RustyTech.Tests
                 new ImagePost
                 {
                     Id = 3,
-                    UserId = user.Id,
+                    UserId = user.Id.ToString(),
                     User = user,
                     Title = "Test Image Post 1",
                     Content = "This is a test image post 1",
@@ -136,7 +136,7 @@ namespace RustyTech.Tests
                 new ImagePost
                 {
                     Id = 4,
-                    UserId = user.Id,
+                    UserId = user.Id.ToString(),
                     User = user,
                     Title = "Test Image Post 2",
                     Content = "This is a test image post 2",
@@ -153,7 +153,7 @@ namespace RustyTech.Tests
                 new VideoPost
                 {
                     Id = 5,
-                    UserId = user.Id,
+                    UserId = user.Id.ToString(),
                     User = user,
                     Title = "Test Video Post 1",
                     Content = "This is a test video post 1",
@@ -165,7 +165,7 @@ namespace RustyTech.Tests
                 new VideoPost
                 {
                     Id = 6,
-                    UserId = user.Id,
+                    UserId = user.Id.ToString(),
                     User = user,
                     Title = "Test Video Post 2",
                     Content = "This is a test video post 2",
@@ -208,7 +208,7 @@ namespace RustyTech.Tests
             var blogPost = new BlogPost
             {
                 Id = postId,
-                UserId = user.Id,
+                UserId = user.Id.ToString(),
                 User = user,
                 Title = "Test Blog Post",
                 Content = "This is a test blog post",
@@ -245,7 +245,7 @@ namespace RustyTech.Tests
             var blogPost = new BlogPost
             {
                 Id = postId,
-                UserId = user.Id,
+                UserId = user.Id.ToString(),
                 User = user,
                 Title = "Test Blog Post",
                 Content = "This is a test blog post",

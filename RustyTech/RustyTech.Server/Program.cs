@@ -87,7 +87,8 @@ builder.Services.AddSwaggerGen(config =>
 
 builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))); // Add Entity Framework Core services with SQL Server configuration.
 
-builder.Services.AddIdentity<User, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<DataContext>(); // Add ASP.NET Core Identity services with roles and EF Core store.
+builder.Services.AddIdentity<User, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddEntityFrameworkStores<DataContext>().AddDefaultTokenProviders(); // Add ASP.NET Core Identity services with roles and EF Core store.
 builder.Services.Configure<IdentityOptions>(options =>
 {
     //password settings

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using RustyTech.Server.Models.Auth;
 using RustyTech.Server.Models.Posts;
 using RustyTech.Server.Models.Role;
@@ -6,7 +7,7 @@ using System.Text;
 
 namespace RustyTech.Server.Data
 {
-    public class DataContext : DbContext
+    public class DataContext : IdentityDbContext<User>
     {
         public DataContext() { }
 
