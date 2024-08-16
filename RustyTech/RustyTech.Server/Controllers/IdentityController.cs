@@ -12,12 +12,12 @@ namespace RustyTech.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthController : ControllerBase
+    public class IdentityController : ControllerBase
     {
-        private readonly IAuthService _authService;
-        private readonly ILogger<AuthController> _logger;
+        private readonly IIdentityService _authService;
+        private readonly ILogger<IdentityController> _logger;
 
-        public AuthController(IAuthService authService, ILogger<AuthController> logger)
+        public IdentityController(IIdentityService authService, ILogger<IdentityController> logger)
         {
             _authService = authService;
             _logger = logger;

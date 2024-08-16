@@ -1,5 +1,4 @@
 ﻿using MailKit.Security;
-using MailKit.Net.Smtp;
 using MimeKit.Text;
 using MimeKit;
 using RustyTech.Server.Models.Auth;

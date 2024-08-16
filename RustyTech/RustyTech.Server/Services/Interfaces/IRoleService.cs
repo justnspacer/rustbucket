@@ -12,7 +12,7 @@ namespace RustyTech.Server.Interfaces
         Task<List<GetRoleRequest>> GetAllRolesAsync();
         Task<GetRoleRequest?> GetRoleByIdAsync(string id);
         Task<GetRoleRequest?> GetRoleByNameAsync(string roleName);
-        Task<List<UserRole>?> GetUserRolesAsync(Guid id);
+        Task<IList<string>?> GetUserRolesAsync(Guid id);
         Task<string> AddRoleToUserAsync(RoleRequest request);
         Task<string> RemoveRoleFromUserAsync(RoleRequest request);
     }

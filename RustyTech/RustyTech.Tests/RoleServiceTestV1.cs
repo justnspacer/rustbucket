@@ -13,27 +13,14 @@ namespace RustyTech.Tests
 {
     public class RoleServiceTestV1
     {
-        private DataContext _context;
         private IRoleService _roleService;
+        private readonly Mock<RoleManager<IdentityRole>> _roleManager;
+        private readonly Mock<UserManager<User>> _userManager;
 
         [SetUp]
         public void Setup()
         {
-            var loggerMock = new Mock<ILogger<RoleService>>();
-
-            // Create in-memory database
-            var options = new DbContextOptionsBuilder<DataContext>()
-                .UseInMemoryDatabase(databaseName: "TestDatabase")
-                .Options;
-            _context = new DataContext(options);
-            _roleService = new RoleService(_context);
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            _context.Database.EnsureDeleted();
-            _context.Dispose();
+            _roleService = new RoleService(_roleManager.Object, _userManager.Object);
         }
 
         [Test]
@@ -68,8 +55,8 @@ namespace RustyTech.Tests
             // Arrange
             var roleName = "TestRole";
             var role = new IdentityRole { Name = roleName, NormalizedName = roleName.ToUpper(), ConcurrencyStamp = Guid.NewGuid().ToString() };
-            await _context.Roles.AddAsync(role);
-            await _context.SaveChangesAsync();
+            var roleManger = _roleManager.Object;
+            await roleManger.CreateAsync(role);
 
             // Act
             var result = await _roleService.CreateRoleAsync(roleName);
@@ -84,8 +71,9 @@ namespace RustyTech.Tests
             // Arrange
             var role1 = new IdentityRole { Name = "Role1", NormalizedName = "ROLE1", ConcurrencyStamp = Guid.NewGuid().ToString() };
             var role2 = new IdentityRole { Name = "Role2", NormalizedName = "ROLE2", ConcurrencyStamp = Guid.NewGuid().ToString() };
-            await _context.Roles.AddRangeAsync(role1, role2);
-            await _context.SaveChangesAsync();
+            var roleManger = _roleManager.Object;
+            await roleManger.CreateAsync(role1);
+            await roleManger.CreateAsync(role2);
 
             // Act
             var result = await _roleService.GetAllRolesAsync();
@@ -101,8 +89,8 @@ namespace RustyTech.Tests
         {
             // Arrange
             var role = new IdentityRole { Name = "TestRole", NormalizedName = "TESTROLE", ConcurrencyStamp = Guid.NewGuid().ToString() };
-            await _context.Roles.AddAsync(role);
-            await _context.SaveChangesAsync();
+            var roleManger = _roleManager.Object;
+            await roleManger.CreateAsync(role);
 
             // Act
             var result = await _roleService.GetRoleByIdAsync(role.Id);
@@ -131,8 +119,8 @@ namespace RustyTech.Tests
         {
             // Arrange
             var role = new IdentityRole { Name = "TestRole", NormalizedName = "TESTROLE", ConcurrencyStamp = Guid.NewGuid().ToString() };
-            await _context.Roles.AddAsync(role);
-            await _context.SaveChangesAsync();
+            var roleManger = _roleManager.Object;
+            await roleManger.CreateAsync(role);
 
             // Act
             var result = await _roleService.GetRoleByNameAsync(role.Name);
@@ -163,13 +151,12 @@ namespace RustyTech.Tests
             var user = new User { Id = Guid.NewGuid() };
             var role1 = new IdentityRole { Name = "Role1", NormalizedName = "ROLE1", ConcurrencyStamp = Guid.NewGuid().ToString() };
             var role2 = new IdentityRole { Name = "Role2", NormalizedName = "ROLE2", ConcurrencyStamp = Guid.NewGuid().ToString() };
-            await _context.Roles.AddRangeAsync(role1, role2);
-            await _context.SaveChangesAsync();
-
-            var userRole1 = new UserRole { RoleId = role1.Id, UserId = user.Id, CreatedAt = DateTime.UtcNow };
-            var userRole2 = new UserRole { RoleId = role2.Id, UserId = user.Id, CreatedAt = DateTime.UtcNow };
-            await _context.UserRoles.AddRangeAsync(userRole1, userRole2);
-            await _context.SaveChangesAsync();
+            var roleManger = _roleManager.Object;
+            var userManager = _userManager.Object;
+            await roleManger.CreateAsync(role1);
+            await roleManger.CreateAsync(role2);
+            await userManager.AddToRoleAsync(user, role1.Name);
+            await userManager.AddToRoleAsync(user, role2.Name);
 
             // Act
             var result = await _roleService.GetUserRolesAsync(user.Id);
@@ -177,8 +164,8 @@ namespace RustyTech.Tests
             // Assert
             Assert.IsNotNull(result);
             Assert.That(result.Count, Is.EqualTo(2));
-            Assert.IsTrue(result.Any(ur => ur.RoleId == role1.Id));
-            Assert.IsTrue(result.Any(ur => ur.RoleId == role2.Id));
+            Assert.IsTrue(result.Any(name => name == role1.Name));
+            Assert.IsTrue(result.Any(name => name == role2.Name));
         }
 
         [Test]
@@ -200,11 +187,12 @@ namespace RustyTech.Tests
             // Arrange
             var user = new User { Id = Guid.NewGuid() };
             var role = new IdentityRole { Name = "TestRole", NormalizedName = "TESTROLE", ConcurrencyStamp = Guid.NewGuid().ToString() };
-            await _context.Roles.AddAsync(role);
-            await _context.Users.AddAsync(user);
-            await _context.SaveChangesAsync();
+            var roleManger = _roleManager.Object;
+            var userManager = _userManager.Object;
+            await roleManger.CreateAsync(role);
+            await userManager.CreateAsync(user);
 
-            var request = new RoleRequest { RoleName = role.Name, UserId = user.Id };
+            var request = new RoleRequest { RoleId = "1", RoleName = role.Name, UserId = user.Id };
 
             // Act
             var result = await _roleService.AddRoleToUserAsync(request);
@@ -218,7 +206,7 @@ namespace RustyTech.Tests
         {
             // Arrange
             var user = new User { Id = Guid.NewGuid() };
-            var request = new RoleRequest { RoleName = "", UserId = user.Id };
+            var request = new RoleRequest { RoleId = "1",  RoleName = "", UserId = user.Id };
 
             // Act
             var result = await _roleService.AddRoleToUserAsync(request);
@@ -231,7 +219,7 @@ namespace RustyTech.Tests
         public async Task AddRoleToUserAsync_WhenUserIdIsEmpty_ShouldReturnBadRequest()
         {
             // Arrange
-            var request = new RoleRequest { RoleName = "TestRole", UserId = Guid.Empty };
+            var request = new RoleRequest { RoleId = "1", RoleName = "TestRole", UserId = Guid.Empty };
 
             // Act
             var result = await _roleService.AddRoleToUserAsync(request);
@@ -244,7 +232,7 @@ namespace RustyTech.Tests
         public async Task AddRoleToUserAsync_WhenUserNotFound_ShouldReturnUserNotFound()
         {
             // Arrange
-            var request = new RoleRequest { RoleName = "TestRole", UserId = Guid.NewGuid() };
+            var request = new RoleRequest { RoleId = "1", RoleName = "TestRole", UserId = Guid.NewGuid() };
 
             // Act
             var result = await _roleService.AddRoleToUserAsync(request);
@@ -258,10 +246,10 @@ namespace RustyTech.Tests
         {
             // Arrange
             var user = new User { Id = Guid.NewGuid() };
-            await _context.Users.AddAsync(user);
-            await _context.SaveChangesAsync();
+            var userManager = _userManager.Object;
+            await userManager.CreateAsync(user);
 
-            var request = new RoleRequest { RoleName = "TestRole", UserId = user.Id };
+            var request = new RoleRequest { RoleId = "1", RoleName = "TestRole", UserId = user.Id };
 
             // Act
             var result = await _roleService.AddRoleToUserAsync(request);
@@ -276,15 +264,14 @@ namespace RustyTech.Tests
             // Arrange
             var user = new User { Id = Guid.NewGuid() };
             var role = new IdentityRole { Name = "TestRole", NormalizedName = "TESTROLE", ConcurrencyStamp = Guid.NewGuid().ToString() };
-            await _context.Roles.AddAsync(role);
-            await _context.Users.AddAsync(user);
-            await _context.SaveChangesAsync();
+            var roleManger = _roleManager.Object;
+            var userManager = _userManager.Object;
+            await roleManger.CreateAsync(role);
+            await userManager.CreateAsync(user);
 
             var userRole = new UserRole { RoleId = role.Id, UserId = user.Id, CreatedAt = DateTime.UtcNow };
-            await _context.UserRoles.AddAsync(userRole);
-            await _context.SaveChangesAsync();
-
-            var request = new RoleRequest { RoleId = role.Id, UserId = user.Id };
+            await userManager.AddToRoleAsync(user, role.Name);
+            var request = new RoleRequest { RoleName = "TestRole", RoleId = role.Id, UserId = user.Id };
 
             // Act
             var result = await _roleService.RemoveRoleFromUserAsync(request);
@@ -298,7 +285,7 @@ namespace RustyTech.Tests
         {
             // Arrange
             var user = new User { Id = Guid.NewGuid() };
-            var request = new RoleRequest { RoleId = "", UserId = user.Id };
+            var request = new RoleRequest { RoleName = string.Empty, RoleId = string.Empty, UserId = user.Id };
 
             // Act
             var result = await _roleService.RemoveRoleFromUserAsync(request);
@@ -311,7 +298,7 @@ namespace RustyTech.Tests
         public async Task RemoveRoleFromUserAsync_WhenUserIdIsEmpty_ShouldReturnBadRequest()
         {
             // Arrange
-            var request = new RoleRequest { RoleId = "TestRoleId", UserId = Guid.Empty };
+            var request = new RoleRequest { RoleName = string.Empty, RoleId = "TestRoleId", UserId = Guid.Empty };
 
             // Act
             var result = await _roleService.RemoveRoleFromUserAsync(request);
@@ -324,7 +311,7 @@ namespace RustyTech.Tests
         public async Task RemoveRoleFromUserAsync_WhenUserNotFound_ShouldReturnUserNotFound()
         {
             // Arrange
-            var request = new RoleRequest { RoleId = "TestRoleId", UserId = Guid.NewGuid() };
+            var request = new RoleRequest { RoleName = string.Empty, RoleId = "TestRoleId", UserId = Guid.NewGuid() };
 
             // Act
             var result = await _roleService.RemoveRoleFromUserAsync(request);
@@ -338,10 +325,10 @@ namespace RustyTech.Tests
         {
             // Arrange
             var user = new User { Id = Guid.NewGuid() };
-            await _context.Users.AddAsync(user);
-            await _context.SaveChangesAsync();
+            var userManager = _userManager.Object;
+            await userManager.CreateAsync(user);
 
-            var request = new RoleRequest { RoleId = "TestRoleId", UserId = user.Id };
+            var request = new RoleRequest { RoleName = string.Empty, RoleId = "TestRoleId", UserId = user.Id };
 
             // Act
             var result = await _roleService.RemoveRoleFromUserAsync(request);

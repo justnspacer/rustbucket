@@ -11,14 +11,17 @@ using RustyTech.Server.Models.Auth;
 using Microsoft.AspNetCore.Identity.Data;
 using RustyTech.Server.Models;
 using RustyTech.Server.Models.Dtos;
+using Microsoft.AspNetCore.Identity;
 
 namespace RustyTech.Tests
 {
     [TestFixture]
-    public class AuthServiceTestV1
+    public class IdentityServiceTestV1
     {
         private DataContext _context;
-        private IAuthService _authService;
+        private IIdentityService _iIdentityService;
+        private readonly Mock<UserManager<User>> _userManager;
+
 
         [SetUp]
         public void Setup()
@@ -26,7 +29,7 @@ namespace RustyTech.Tests
             var emailServiceMock = new Mock<IEmailService>();
             var roleServiceMock = new Mock<IRoleService>();
             var configurationMock = new Mock<IConfiguration>();
-            var loggerMock = new Mock<ILogger<IAuthService>>();
+            var loggerMock = new Mock<ILogger<IIdentityService>>();
 
             configurationMock.SetupGet(x => x[It.Is<string>(s => s == "Jwt:Key")]).Returns("J277A871-CDF3-D6B8-4167-D6B8-D85F255901CE");
             configurationMock.SetupGet(x => x[It.Is<string>(s => s == "Jwt:Issuer")]).Returns("https://testhost:7111");
@@ -38,7 +41,7 @@ namespace RustyTech.Tests
                 .Options;
             _context = new DataContext(options);
 
-            _authService = new AuthService(emailServiceMock.Object, roleServiceMock.Object, configurationMock.Object, loggerMock.Object, _context);
+            _iIdentityService = new IdentityService(_userManager.Object, _context, emailServiceMock.Object, roleServiceMock.Object, configurationMock.Object, loggerMock.Object);
         }
 
         [TearDown]
@@ -61,7 +64,7 @@ namespace RustyTech.Tests
             };
 
             // Act
-            var response = await _authService.RegisterAsync(request);
+            var response = await _iIdentityService.RegisterAsync(request);
 
             // Assert
             Assert.IsTrue(response.IsSuccess);
@@ -80,7 +83,7 @@ namespace RustyTech.Tests
             };
 
             // Act
-            var response = await _authService.RegisterAsync(request);
+            var response = await _iIdentityService.RegisterAsync(request);
 
             // Assert
             Assert.IsFalse(response.IsSuccess);
@@ -99,7 +102,7 @@ namespace RustyTech.Tests
             };
 
             // Act
-            var response = await _authService.RegisterAsync(request);
+            var response = await _iIdentityService.RegisterAsync(request);
 
             // Assert
             Assert.IsFalse(response.IsSuccess);
@@ -115,7 +118,7 @@ namespace RustyTech.Tests
                 Email = "test@example.com",
                 Password = "Test123!"
             };
-            _authService.CreatePasswordHash(request.Password, out byte[] hash, out byte[] salt);
+            _iIdentityService.CreatePasswordHash(request.Password, out byte[] hash, out byte[] salt);
             var user = new User
             {
                 Email = request.Email,
@@ -128,7 +131,7 @@ namespace RustyTech.Tests
             _context.SaveChanges();
 
             // Act
-            var response = await _authService.LoginAsync(request);
+            var response = await _iIdentityService.LoginAsync(request);
 
             // Assert
             Assert.IsTrue(response.IsAuthenticated);
@@ -154,7 +157,7 @@ namespace RustyTech.Tests
             _context.SaveChanges();
 
             // Act
-            var response = await _authService.VerifyEmailAsync(request);
+            var response = await _iIdentityService.VerifyEmailAsync(request);
 
             // Assert
             Assert.IsTrue(response.IsSuccess);
@@ -164,10 +167,10 @@ namespace RustyTech.Tests
         public void VerifyJwtToken_ValidToken_ReturnsResponseBaseWithSuccessMessage()
         {
             // Arrange
-            var token = _authService.GenerateJwtToken(Guid.NewGuid(), "testemail@example.com", new List<string>() { "Test" });
+            var token = _iIdentityService.GenerateJwtToken(Guid.NewGuid(), "testemail@example.com", new List<string>() { "Test" });
 
             // Act
-            var response = _authService.VerifyJwtToken(token);
+            var response = _iIdentityService.VerifyJwtToken(token);
 
             // Assert
             Assert.IsTrue(response.IsSuccess);
@@ -188,7 +191,7 @@ namespace RustyTech.Tests
             _context.SaveChanges();
 
             // Act
-            var response = _authService.ResendEmailAsync(email);
+            var response = _iIdentityService.ResendEmailAsync(email);
 
             // Assert
             Assert.IsTrue(response.IsSuccess);
@@ -208,7 +211,7 @@ namespace RustyTech.Tests
             _context.SaveChanges();
 
             // Act
-            var response = await _authService.ForgotPasswordAsync(email);
+            var response = await _iIdentityService.ForgotPasswordAsync(email);
 
             // Assert
             Assert.IsTrue(response.IsSuccess);
@@ -237,7 +240,7 @@ namespace RustyTech.Tests
 
 
             // Act
-            var response = await _authService.ResetPasswordAsync(request);
+            var response = await _iIdentityService.ResetPasswordAsync(request);
 
             // Assert
             Assert.IsTrue(response.IsSuccess);
@@ -267,7 +270,7 @@ namespace RustyTech.Tests
             _context.SaveChanges();
 
             // Act
-            var response = await _authService.UpdateUserAsync(userDto);
+            var response = await _iIdentityService.UpdateUserAsync(userDto);
 
             // Assert
             Assert.IsTrue(response.IsSuccess);
@@ -290,7 +293,7 @@ namespace RustyTech.Tests
             _context.SaveChanges();
 
             // Act
-            var response = await _authService.EnableTwoFactorAuthenticationAsync(userId);
+            var response = await _iIdentityService.EnableTwoFactorAuthenticationAsync(userId);
 
             // Assert
             Assert.IsTrue(response.IsSuccess);
@@ -311,7 +314,7 @@ namespace RustyTech.Tests
             _context.SaveChanges();
 
             // Act
-            var response = _authService.GetInfoAsync(userId);
+            var response = _iIdentityService.GetInfoAsync(userId);
 
             // Assert
             Assert.IsTrue(response.IsSuccess);
@@ -328,7 +331,7 @@ namespace RustyTech.Tests
             _context.SaveChanges();
 
             // Act
-            var response = _authService.LogoutAsync();
+            var response = _iIdentityService.LogoutAsync();
 
             // Assert
             Assert.IsFalse(response.IsAuthenticated);

@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using AngleSharp.Css;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
 using RustyTech.Server.Interfaces;
 using RustyTech.Server.Models.Dtos;
 using RustyTech.Server.Models.Role;
@@ -7,13 +9,15 @@ namespace RustyTech.Server.Services
 {
     public class RoleService : IRoleService
     {
-        private readonly DataContext _context;
+        private readonly UserManager<User> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
         public RoleService() { }
 
-        public RoleService(DataContext context)
+        public RoleService(RoleManager<IdentityRole> roleManager, UserManager<User> userManager)
         {
-            _context = context;
+            _roleManager = roleManager;
+            _userManager = userManager;
         }
 
         public async Task<string> CreateRoleAsync(string roleName)
@@ -22,20 +26,19 @@ namespace RustyTech.Server.Services
             {
                 return Constants.Messages.Role.NameRequired;
             }
-            var roleExists = await _context.Roles.FirstOrDefaultAsync(role => role.Name == roleName);
-            if (roleExists != null)
+            var roleExists = await _roleManager.RoleExistsAsync(roleName);
+            if (roleExists)
             {
                 return Constants.Messages.Role.Exists;
             }
             var role = new IdentityRole { Name = roleName, NormalizedName = roleName.ToUpper(), ConcurrencyStamp = Guid.NewGuid().ToString() };
-            await _context.Roles.AddAsync(role);
-            await _context.SaveChangesAsync();
+            await _roleManager.CreateAsync(role);
             return Constants.Messages.Role.Created;
         }
 
         public async Task<List<GetRoleRequest>> GetAllRolesAsync()
         {
-            var roles = await _context.Roles.Select(role => new GetRoleRequest { Id = role.Id, RoleName = role.Name }).ToListAsync();
+            var roles = await _roleManager.Roles.Select(role => new GetRoleRequest { Id = role.Id, RoleName = role.Name }).ToListAsync();
             return roles;
         }
 
@@ -45,7 +48,7 @@ namespace RustyTech.Server.Services
             {
                 return null;
             }
-            var role = await _context.Roles.FirstOrDefaultAsync(role => role.Id == id);
+            var role = await _roleManager.Roles.FirstOrDefaultAsync(role => role.Id == id);
             if (role == null)
             {
                 return null;
@@ -60,7 +63,7 @@ namespace RustyTech.Server.Services
             {
                 return null;
             }
-            var role = await _context.Roles.FirstOrDefaultAsync(role => role.Name == roleName);
+            var role = await _roleManager.Roles.FirstOrDefaultAsync(role => role.Name == roleName);
             if (role == null)
             {
                 return null;
@@ -69,21 +72,23 @@ namespace RustyTech.Server.Services
             return roleDto;
         }
 
-        public async Task<List<UserRole>?> GetUserRolesAsync(Guid id)
+        public async Task<IList<string>?> GetUserRolesAsync(Guid id)
         {
             if (id == Guid.Empty)
             {
                 return null;
             }
-
-            var userRoles = await _context.UserRoles
-                .Where(role => role.UserId == id).ToListAsync();
+            var user = await _userManager.FindByIdAsync(id.ToString());
+            if (user == null)
+            {
+                return null;
+            }
+            var userRoles = await _userManager.GetRolesAsync(user);
 
             if (userRoles == null)
             {
                 return null;
             }
-
             return userRoles;
         }
 
@@ -94,23 +99,23 @@ namespace RustyTech.Server.Services
                 return Constants.Messages.Error.BadRequest;
             }
 
-            var user = await _context.Users.FirstOrDefaultAsync(user => user.Id == request.UserId);
+            var user = await _userManager.FindByIdAsync(request.UserId.ToString());
             if (user == null)
             {
                 return Constants.Messages.Info.UserNotFound;
             }
 
-            var role = await _context.Roles.FirstOrDefaultAsync(role => role.Name == request.RoleName);
+            var role = await _roleManager.Roles.FirstOrDefaultAsync(role => role.Name == request.RoleName);
 
             if (role == null)
             {
                 return Constants.Messages.Role.NotFound;
             }
-
-            var userRole = new UserRole { RoleId = role.Id, UserId = user.Id, CreatedAt = DateTime.UtcNow };
-            _context.UserRoles.Add(userRole);
-            await _context.SaveChangesAsync();
-
+            if (string.IsNullOrEmpty(role.Name))
+            {
+                return Constants.Messages.Role.NotFound;
+            }
+            await _userManager.AddToRoleAsync(user, role.Name);
             return Constants.Messages.Role.AddedToUser;
         }
 
@@ -121,15 +126,21 @@ namespace RustyTech.Server.Services
                 return Constants.Messages.Error.BadRequest;
             }
 
-            var userRole = _context.UserRoles.FirstOrDefault(ur => ur.UserId == request.UserId && ur.RoleId == request.RoleId);
-            if (userRole == null)
+            var user = await _userManager.FindByIdAsync(request.UserId.ToString());
+            if (user == null)
             {
                 return Constants.Messages.Info.UserNotFound;
             }
-
-            _context.UserRoles.Remove(userRole);
-            await _context.SaveChangesAsync();
-
+            var role = await _roleManager.FindByNameAsync(request.RoleName);
+            if (role == null)
+            {
+                return Constants.Messages.Role.NotFound;
+            }
+            if (string.IsNullOrEmpty(role.Name))
+            {
+                return Constants.Messages.Role.NotFound;
+            }
+            await _userManager.RemoveFromRoleAsync(user, role.Name);
             return Constants.Messages.Role.Removed;
         }
     }

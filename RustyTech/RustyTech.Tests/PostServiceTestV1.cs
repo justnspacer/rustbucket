@@ -39,7 +39,7 @@ namespace RustyTech.Tests
 
             _context = new DataContext(options);
             _mapper = new MapperConfiguration(cfg => cfg.AddProfile(new MappingProfile())).CreateMapper();
-            _userService = new UserService(_context, userManagerMock.Object, signInManagerMock.Object,  _mapper, new Logger<UserService>(new LoggerFactory()));
+            _userService = new UserService(userManagerMock.Object, _mapper, new Logger<UserService>(new LoggerFactory()));
             _postService = new PostService(_context, _mapper, _userService, loggerMock.Object, _imageService, _videoService, _keywordService);
         }
 

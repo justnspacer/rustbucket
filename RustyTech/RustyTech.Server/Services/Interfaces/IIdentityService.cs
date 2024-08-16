@@ -4,7 +4,7 @@ using RustyTech.Server.Models.Dtos;
 
 namespace RustyTech.Server.Services.Interfaces
 {
-    public interface IAuthService
+    public interface IIdentityService
     {
         Task<ResponseBase> RegisterAsync(Models.Auth.RegisterRequest_old request);
         Task<LoginResponse> LoginAsync(Models.Auth.LoginRequest_old request);
