@@ -70,35 +70,6 @@ namespace RustyTech.Server.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Logins",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    LoginTime = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Logins", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "UserRoles",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    RoleId = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserRoles", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -343,13 +314,7 @@ namespace RustyTech.Server.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Logins");
-
-            migrationBuilder.DropTable(
                 name: "PostKeywords");
-
-            migrationBuilder.DropTable(
-                name: "UserRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

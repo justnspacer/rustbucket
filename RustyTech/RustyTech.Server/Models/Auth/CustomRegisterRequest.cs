@@ -3,8 +3,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace RustyTech.Server.Models.Auth
 {
-    public class RegisterRequest_old
+    public class CustomRegisterRequest
     {
+        [Required, MinLength(4, ErrorMessage = "Please enter at least 4 characters"), MaxLength(20, ErrorMessage = "Please enter at most 20 characters")]
+        public required string UserName { get; set; }
+
         [Required, EmailAddress]
         public required string Email { get; set; }
 
@@ -13,9 +16,6 @@ namespace RustyTech.Server.Models.Auth
             ErrorMessage = "Please enter at least 6 characters and one lowercase letter, uppercase letter, digit, and special character")]
         [SwaggerSchema(Description = "string")]
         public required string Password { get; set; }
-
-        [Required, Compare("Password")]
-        public required string ConfirmPassword { get; set; }
 
         public int BirthYear { get; set; }
     }

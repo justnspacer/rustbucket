@@ -123,7 +123,7 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>(); // Add rate limit configuration as a singleton.
 builder.Services.AddSingleton<Ganss.Xss.HtmlSanitizer>();
 builder.Services.AddTransient<ISmtpClientService, SmtpClientService>(); // Add smtp client service with transient lifetime.
-builder.Services.AddScoped<IIdentityService, IdentityService>(); // Add authentication service with scoped lifetime.
+builder.Services.AddScoped<IAccountService, AccountService>(); // Add authentication service with scoped lifetime.
 builder.Services.AddScoped<IRoleService, RoleService>(); // Add role service with scoped lifetime.
 builder.Services.AddScoped<IUserService, UserService>(); // Add user service with scoped lifetime.
 builder.Services.AddTransient<IEmailService, EmailService>(); // Add email service with transient lifetime.
@@ -202,6 +202,6 @@ app.Use(next => context =>
 app.MapControllers(); // Map controller routes.
 app.MapFallbackToFile("/index.html"); // Map fallback route to serve index.html for SPA.
 
-app.MapIdentityApi<User>(); // Map identity API endpoints.
+//app.MapIdentityApi<User>(); // Map identity API endpoints.
 
 app.Run(); // Run the application.

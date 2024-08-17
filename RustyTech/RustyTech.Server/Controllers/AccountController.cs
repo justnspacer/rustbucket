@@ -12,26 +12,26 @@ namespace RustyTech.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class IdentityController : ControllerBase
+    public class AccountController : ControllerBase
     {
-        private readonly IIdentityService _authService;
-        private readonly ILogger<IdentityController> _logger;
+        private readonly IAccountService _authService;
+        private readonly ILogger<AccountController> _logger;
 
-        public IdentityController(IIdentityService authService, ILogger<IdentityController> logger)
+        public AccountController(IAccountService authService, ILogger<AccountController> logger)
         {
             _authService = authService;
             _logger = logger;
         }
 
-        [HttpPost("register_old")]
-        public async Task<IActionResult> RegisterAsync([FromBody] Models.Auth.RegisterRequest_old request)
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] CustomRegisterRequest request)
         {
-            var result = await _authService.RegisterAsync(request);
+            var result = await _authService.Register(request);
             _logger.LogInformation($"User {request.Email} registered successfully");
             return Ok(result);
         }
 
-        [HttpPost("login_old")]
+        [HttpPost("login")]
         public async Task<IActionResult> LoginAsync([FromBody] Models.Auth.LoginRequest_old request)
         {
             var claims = new List<Claim>
@@ -47,16 +47,16 @@ namespace RustyTech.Server.Controllers
             return BadRequest();
         }
 
-        [HttpPost("verify/email_old")]
-        public async Task<IActionResult> VerifyEmail([FromBody] ConfirmEmailRequest request)
+        [HttpPost("verify/email")]
+        public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailRequest request)
         {
-            var result = await _authService.VerifyEmailAsync(request);
+            var result = await _authService.VerifyEmail(request);
             _logger.LogInformation($"Email verified");
             return Ok(result);
         }
 
         [Authorize]
-        [HttpGet("verify/token_old")]
+        [HttpGet("verify/token")]
         public IActionResult VerifyJwtToken()
         {
             var authHeader = HttpContext.Request.Headers["Authorization"].ToString();
@@ -69,7 +69,7 @@ namespace RustyTech.Server.Controllers
             return Ok(result);
         }
 
-        [HttpPost("resend_old")]
+        [HttpPost("resend")]
         public IActionResult ResendEmailAsync(string email)
         {
             var result = _authService.ResendEmailAsync(email);
@@ -77,7 +77,7 @@ namespace RustyTech.Server.Controllers
             return Ok(result);
         }
 
-        [HttpPost("forgot/password_old")]
+        [HttpPost("forgot/password")]
         public async Task<IActionResult> ForgotPasswordAsync(string email)
         {
             var result = await _authService.ForgotPasswordAsync(email);
@@ -86,7 +86,7 @@ namespace RustyTech.Server.Controllers
         }
 
         [Authorize]
-        [HttpPut("update_old")]
+        [HttpPut("update")]
         public async Task<IActionResult> UpdateUserAsync([FromBody] UpdateUserRequest user)
         {
             var result = await _authService.UpdateUserAsync(user);
@@ -95,7 +95,7 @@ namespace RustyTech.Server.Controllers
         }
 
         [Authorize]
-        [HttpPost("reset/password_old")]
+        [HttpPost("reset/password")]
         public async Task<IActionResult> ResetPasswordAsync([FromBody] ResetPasswordRequest model)
         {
             var result = await _authService.ResetPasswordAsync(model);
@@ -103,7 +103,7 @@ namespace RustyTech.Server.Controllers
         }
 
         [Authorize]
-        [HttpPost("manage/2fa_old")]
+        [HttpPost("manage/2fa")]
         public async Task<IActionResult> Enable2faAsync(Guid userId)
         {
             var result = await _authService.EnableTwoFactorAuthenticationAsync(userId);
@@ -111,7 +111,7 @@ namespace RustyTech.Server.Controllers
         }
 
         [Authorize]
-        [HttpGet("manage/info_old")]
+        [HttpGet("manage/info")]
         public IActionResult GetInfoAsync(Guid userId)
         {
             var result = _authService.GetInfoAsync(userId);
@@ -120,7 +120,7 @@ namespace RustyTech.Server.Controllers
         }
 
         [Authorize]
-        [HttpPost("logout_old")]
+        [HttpPost("logout")]
         public async Task<IActionResult> LogoutAsync()
         {
             //var result = _authService.LogoutAsync();

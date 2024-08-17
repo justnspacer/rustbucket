@@ -44,6 +44,14 @@ namespace RustyTech.Server.Data
                 );
 
             // Configure the relationships and inheritance
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.UserName)
+                .IsUnique();
+
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.Email)
+                .IsUnique();
+
             modelBuilder.Entity<Post>()
                 .HasDiscriminator<string>("PostType")
                 .HasValue<ImagePost>("ImagePost")
