@@ -100,7 +100,7 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.Password.RequiredUniqueChars = 1;
 
     //lockout settings
-    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromSeconds(10); // ADDRESS THIS!!!!!!!!!
     options.Lockout.MaxFailedAccessAttempts = 5;
     options.Lockout.AllowedForNewUsers = true;
 
@@ -113,9 +113,9 @@ builder.Services.ConfigureApplicationCookie(options =>
 {
     //cookie settings
     options.Cookie.HttpOnly = true;
-    options.ExpireTimeSpan = TimeSpan.FromMinutes(5); //double check this!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    options.LoginPath = "/auth/login";
-    options.AccessDeniedPath = "/auth/access-denied";
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(30); //double check this!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    options.LoginPath = "/account/login";
+    options.AccessDeniedPath = "/account/access-denied";
     options.SlidingExpiration = true;
 });
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());

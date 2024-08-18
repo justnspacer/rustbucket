@@ -1,4 +1,4 @@
-﻿namespace RustyTech.Server.Models.Auth
+﻿namespace RustyTech.Server.Models.Account
 {
     public class VerifyEmailRequest
     {

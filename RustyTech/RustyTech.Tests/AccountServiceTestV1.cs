@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
 using RustyTech.Server.Interfaces;
-using RustyTech.Server.Models.Auth;
+using RustyTech.Server.Models.Account;
 using Microsoft.AspNetCore.Identity.Data;
 using RustyTech.Server.Models;
 using RustyTech.Server.Models.Dtos;
@@ -30,6 +30,8 @@ namespace RustyTech.Tests
             var roleServiceMock = new Mock<IRoleService>();
             var configurationMock = new Mock<IConfiguration>();
             var loggerMock = new Mock<ILogger<IAccountService>>();
+            var userManagerMock = new Mock<UserManager<User>>();
+            var signInManagerMock = new Mock<SignInManager<User>>();
 
             configurationMock.SetupGet(x => x[It.Is<string>(s => s == "Jwt:Key")]).Returns("J277A871-CDF3-D6B8-4167-D6B8-D85F255901CE");
             configurationMock.SetupGet(x => x[It.Is<string>(s => s == "Jwt:Issuer")]).Returns("https://testhost:7111");
@@ -41,7 +43,7 @@ namespace RustyTech.Tests
                 .Options;
             _context = new DataContext(options);
 
-            _accountService = new AccountService(_userManager.Object, _context, emailServiceMock.Object, roleServiceMock.Object, configurationMock.Object, loggerMock.Object);
+            _accountService = new AccountService(userManagerMock.Object, signInManagerMock.Object, _context, emailServiceMock.Object, roleServiceMock.Object, configurationMock.Object, loggerMock.Object);
         }
 
         [TearDown]
@@ -55,7 +57,7 @@ namespace RustyTech.Tests
         public async Task RegisterAsync_SuccessfulRequest_ReturnsResponseBaseWithSuccessMessage()
         {
             // Arrange
-            var request = new Server.Models.Auth.CustomRegisterRequest
+            var request = new CustomRegisterRequest()
             {
                 UserName = "Test",
                 Email = "test@example.com",
@@ -75,7 +77,7 @@ namespace RustyTech.Tests
         public async Task RegisterAsync_PasswordMismatch_ReturnsResponseBaseWithErrorMessage()
         {
             // Arrange
-            var request = new Server.Models.Auth.CustomRegisterRequest
+            var request = new CustomRegisterRequest()
             {
                 UserName = "Test",
                 Email = "request@example.com",
@@ -94,7 +96,7 @@ namespace RustyTech.Tests
         public async Task RegisterAsync_BadEmail_ReturnsResponseBaseWithErrorMessage()
         {
             // Arrange
-            var request = new Server.Models.Auth.CustomRegisterRequest
+            var request = new CustomRegisterRequest()
             {
                 UserName = "Test",
                 Email = "request@example.",
@@ -105,7 +107,7 @@ namespace RustyTech.Tests
             var response = await _accountService.Register(request);
 
             // Assert
-            Assert.IsFalse(response.IsSuccess);
+            Assert.That(response.IsSuccess, Is.False);
             Assert.That(response.Message, Is.EqualTo(Messages.Error.InvalidEmail));
         }
 
@@ -113,11 +115,12 @@ namespace RustyTech.Tests
         public async Task LoginAsync_SuccessfulRequest_ReturnsLoginResponseWithAuthenticatedUser()
         {
             // Arrange
-            var request = new Server.Models.Auth.LoginRequest_old
+            var request = new CustomLoginRequest()
             {
                 Email = "test@example.com",
                 Password = "Test123!"
             };
+
             _accountService.CreatePasswordHash(request.Password, out byte[] hash, out byte[] salt);
             var user = new User
             {
@@ -131,14 +134,13 @@ namespace RustyTech.Tests
             _context.SaveChanges();
 
             // Act
-            var response = await _accountService.LoginAsync(request);
+            var response = await _accountService.Login(request);
 
             // Assert
             Assert.IsTrue(response.IsAuthenticated);
-            Assert.IsTrue(response.IsSuccess);
+            Assert.That(response.IsSuccess, Is.True);
             Assert.IsNotNull(response.User);
             Assert.That(response.User.Email, Is.EqualTo(request.Email));
-            Assert.IsNotNull(response.Token);
         }
 
         [Test]
@@ -160,22 +162,7 @@ namespace RustyTech.Tests
             var response = await _accountService.VerifyEmail(request);
 
             // Assert
-            Assert.IsTrue(response.IsSuccess);
-        }
-
-
-        [Test]
-        public void VerifyJwtToken_ValidToken_ReturnsResponseBaseWithSuccessMessage()
-        {
-            // Arrange
-            var token = _accountService.GenerateJwtToken(Guid.NewGuid(), "testemail@example.com", new List<string>() { "Test" });
-
-            // Act
-            var response = _accountService.VerifyJwtToken(token);
-
-            // Assert
-            Assert.IsTrue(response.IsSuccess);
-            Assert.That(response.Message, Is.EqualTo(Messages.Token.Valid));
+            Assert.That(response.IsSuccess, Is.True);
         }
 
         [Test]
@@ -192,11 +179,14 @@ namespace RustyTech.Tests
             _context.SaveChanges();
 
             // Act
-            var response = await _accountService.ResendEmailAsync(email);
+            var response = await _accountService.ResendEmail(email);
 
             // Assert
-            Assert.IsTrue(response.IsSuccess);
-            Assert.That(response.Message, Is.EqualTo(Messages.Info.ResendEmail));
+            Assert.Multiple(() =>
+            {
+                Assert.That(response.IsSuccess, Is.True);
+                Assert.That(response.Message, Is.EqualTo(Messages.Info.ResendEmail));
+            });
         }
 
         [Test]
@@ -212,11 +202,14 @@ namespace RustyTech.Tests
             _context.SaveChanges();
 
             // Act
-            var response = await _accountService.ForgotPasswordAsync(email);
+            var response = await _accountService.ForgotPassword(email);
 
             // Assert
-            Assert.IsTrue(response.IsSuccess);
-            Assert.That(response.Message, Is.EqualTo(Messages.Info.UserPasswordReset));
+            Assert.Multiple(() =>
+            {
+                Assert.That(response.IsSuccess, Is.True);
+                Assert.That(response.Message, Is.EqualTo(Messages.Info.UserPasswordReset));
+            });
         }
 
         [Test]
@@ -241,11 +234,14 @@ namespace RustyTech.Tests
 
 
             // Act
-            var response = await _accountService.ResetPasswordAsync(request);
+            var response = await _accountService.ResetPassword(request);
 
             // Assert
-            Assert.IsTrue(response.IsSuccess);
-            Assert.That(response.Message, Is.EqualTo(Messages.Info.UserPasswordReset));
+            Assert.Multiple(() =>
+            {
+                Assert.That(response.IsSuccess, Is.True);
+                Assert.That(response.Message, Is.EqualTo(Messages.Info.UserPasswordReset));
+            });
         }
 
         [Test]
@@ -271,17 +267,24 @@ namespace RustyTech.Tests
             _context.SaveChanges();
 
             // Act
-            var response = await _accountService.UpdateUserAsync(userDto);
+            var response = await _accountService.UpdateUser(userDto);
 
             // Assert
-            Assert.IsTrue(response.IsSuccess);
-            Assert.That(response.Message, Is.EqualTo("User updated, email reverifcation required"));
+            Assert.Multiple(() =>
+            {
+                
+                Assert.That(response.IsSuccess, Is.True);
+                Assert.That(response.Message, Is.EqualTo("User updated, email reverifcation required"));
+            });
 
             var updatedUser = _context.Users.FirstOrDefault(u => u.Id == userId);
-            Assert.IsNotNull(updatedUser);
-            Assert.That(updatedUser.UserName, Is.EqualTo(userDto.UserName));
-            Assert.That(updatedUser.Email, Is.EqualTo(userDto.Email));
-            Assert.That(updatedUser.BirthYear, Is.EqualTo(userDto.BirthYear));
+            Assert.That(updatedUser, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(updatedUser.UserName, Is.EqualTo(userDto.UserName));
+                Assert.That(updatedUser.Email, Is.EqualTo(userDto.Email));
+                Assert.That(updatedUser.BirthYear, Is.EqualTo(userDto.BirthYear));
+            });
         }
 
         [Test]
@@ -294,15 +297,15 @@ namespace RustyTech.Tests
             _context.SaveChanges();
 
             // Act
-            var response = await _accountService.EnableTwoFactorAuthenticationAsync(userId);
+            var response = await _accountService.ToggleTwoFactorAuth(userId);
 
             // Assert
             Assert.IsTrue(response.IsSuccess);
             Assert.That(response.Message, Is.EqualTo("Two factor enabled"));
 
             var updatedUser = _context.Users.FirstOrDefault(u => u.Id == userId);
-            Assert.IsNotNull(updatedUser);
-            Assert.IsTrue(updatedUser.TwoFactorEnabled);
+            Assert.That(updatedUser, Is.Not.Null);
+            Assert.That(updatedUser.TwoFactorEnabled);
         }
 
         [Test]
@@ -315,15 +318,15 @@ namespace RustyTech.Tests
             _context.SaveChanges();
 
             // Act
-            var response = await _accountService.GetInfoAsync(userId);
+            var response = await _accountService.GetInfo(userId);
 
             // Assert
-            Assert.IsTrue(response.IsSuccess);
+            Assert.That(response.IsSuccess);
             Assert.That(response.Message, Is.EqualTo("Two factor enabled? True"));
         }
 
         [Test]
-        public void LogoutAsync_SuccessfulRequest_ReturnsLoginResponseWithLoggedOutUser()
+        public async Task LogoutAsync_SuccessfulRequest_ReturnsLoginResponseWithLoggedOutUser()
         {
             // Arrange
             var userId = Guid.NewGuid();
@@ -332,13 +335,10 @@ namespace RustyTech.Tests
             _context.SaveChanges();
 
             // Act
-            var response = _accountService.LogoutAsync();
+            var response = await _accountService.Logout();
 
             // Assert
-            Assert.IsFalse(response.IsAuthenticated);
-            Assert.IsTrue(response.IsSuccess);
-            Assert.IsNull(response.User);
-            Assert.IsNull(response.Token);
+            Assert.That(response.IsSuccess);
         }
     }
 }

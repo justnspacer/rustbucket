@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using RustyTech.Server.Models.Auth;
+using RustyTech.Server.Models.Account;
 using RustyTech.Server.Models.Posts;
 using RustyTech.Server.Models.Role;
 using System.Text;
@@ -22,26 +22,24 @@ namespace RustyTech.Server.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            IdentityRole<string> admin = new IdentityRole<string>
+            User user = CreateUser("admin@rustbucket.io");
+            modelBuilder.Entity<User>().HasData(user);
+
+            IdentityRole<string> adminRole = new IdentityRole<string>
             {
-                Id = Guid.NewGuid().ToString(),
+                Id = "1",
                 Name = "SuperAdmin",
                 ConcurrencyStamp = "1",
                 NormalizedName = "SUPERADMINISTRATOR"
             };
-            modelBuilder.Entity<IdentityRole>().HasData(admin);
+            modelBuilder.Entity<IdentityRole>().HasData(adminRole);
 
-            User user = CreateUser("admin@rustbucket.io");
-            modelBuilder.Entity<User>().HasData(user);
-
-            modelBuilder.Entity<UserRole>().HasData(
-                new UserRole()
-                {
-                    Id = 1,
-                    UserId = user.Id,
-                    RoleId = admin.Id
-                }
-                );
+            IdentityUserRole<string> userRole = new IdentityUserRole<string>
+            {
+                UserId = user.Id.ToString(),
+                RoleId = adminRole.Id
+            };
+            modelBuilder.Entity<IdentityUserRole<string>>().HasData(userRole);
 
             // Configure the relationships and inheritance
             modelBuilder.Entity<User>()
@@ -91,8 +89,6 @@ namespace RustyTech.Server.Data
                 .HasMaxLength(30);
         }
 
-        public DbSet<LoginInfo> Logins { get; set; }
-
         public DbSet<BlogPost> BlogPosts { get; set; }
         public DbSet<ImagePost> ImagePosts { get; set; }
         public DbSet<VideoPost> VideoPosts { get; set; }
@@ -101,19 +97,18 @@ namespace RustyTech.Server.Data
 
         private User CreateUser(string email)
         {
+            var hasher = new PasswordHasher<User>();
             User user = new User()
             {
                 Id = Guid.NewGuid(),
                 UserName = email,
                 Email = email,
+                PasswordHash = "JackNJill1!",
                 NormalizedEmail = email.ToUpper(),
                 NormalizedUserName = email.ToUpper(),
                 EmailConfirmed = true,
                 VerifiedAt = DateTime.Now
-            };
-
-            PasswordHasher<User> hasher = new PasswordHasher<User>();
-            user.PasswordHash = Encoding.ASCII.GetBytes(hasher.HashPassword(user, email));
+            };            
             return user;
         }
     }

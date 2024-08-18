@@ -4,7 +4,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Security.Claims;
 using System.Text;
-using RustyTech.Server.Models.Auth;
+using RustyTech.Server.Models.Account;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using RustyTech.Server.Services.Interfaces;
@@ -12,22 +12,25 @@ using RustyTech.Server.Interfaces;
 using RustyTech.Server.Utilities;
 using RustyTech.Server.Models.Dtos;
 using Microsoft.AspNetCore.Identity;
+using RustyTech.Server.Models.Role;
 
 namespace RustyTech.Server.Services
 {
     public class AccountService : IAccountService
     {
         private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
         private readonly DataContext _context;
         private readonly IEmailService _emailService;
         private readonly IRoleService _roleService;
         private readonly IConfiguration _configuration;
         private readonly ILogger<IAccountService> _logger;
 
-        public AccountService(UserManager<User> userManager,  DataContext context, IEmailService emailService, IRoleService roleService, IConfiguration configuration,
+        public AccountService(UserManager<User> userManager, SignInManager<User> signInManager, DataContext context, IEmailService emailService, IRoleService roleService, IConfiguration configuration,
             ILogger<IAccountService> logger)
         {
             _userManager = userManager;
+            _signInManager = signInManager;
             _context = context;
             _emailService = emailService;
             _configuration = configuration;
@@ -37,24 +40,26 @@ namespace RustyTech.Server.Services
 
         public async Task<ResponseBase> Register(CustomRegisterRequest request)
         {
-            var existingUserName = await _userManager.FindByNameAsync(request.UserName);
+            var existingUserName = await _userManager
+                .FindByNameAsync(request.UserName);
+
             if (existingUserName != null)
             {
-                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Error.BadRequest };
+                return BadRequestResponse();
             }
 
             if (!EmailValidator.IsValidEmail(request.Email))
             {
-                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Error.InvalidEmail };
+                return InvalidEmailResponse();
             }
 
-            var existingEmail = await _userManager.FindByEmailAsync(request.Email);
+            var existingEmail = await _userManager
+                .FindByEmailAsync(request.Email);
+
             if (existingEmail != null)
             {
-                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Error.BadRequest };
+                return BadRequestResponse();
             }
-
-            CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
 
             var user = new User
             {
@@ -62,66 +67,63 @@ namespace RustyTech.Server.Services
                 Email = request.Email,
                 NormalizedEmail = request.Email.ToUpper(),
                 NormalizedUserName = request.UserName.ToUpper(),
-                PasswordHash = passwordHash,
-                PasswordSalt = passwordSalt,
                 BirthYear = request.BirthYear,
             };
 
-            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            var encodedToken = EncodeToken(token);
-            user.VerificationToken = token;
-            await _userManager.CreateAsync(user);
+            user.VerificationToken = await _userManager
+                .GenerateEmailConfirmationTokenAsync(user);
 
-            SendConfirmationEmail(user.Email, user.Id, token);
+            await _userManager.CreateAsync(user, request.Password);
+
+            SendConfirmationEmail(user.Email, user.Id, user.VerificationToken);
             _logger.LogInformation($"register email sent");
 
-            return new ResponseBase() { IsSuccess = true, Message = Constants.Messages.Info.UserRegistered };
+            return new ResponseBase()
+            {
+                IsSuccess = true,
+                Message = Constants.Messages.Info.UserRegistered
+            };
         }
 
-        public async Task<LoginResponse> LoginAsync(Models.Auth.LoginRequest_old request)
+        public async Task<LoginResponse> Login(CustomLoginRequest request)
         {
-            var expires = _configuration["Jwt:ExpiresInMinutes"];
-            var user = await _userManager.Users.FirstOrDefaultAsync(user => user.Email == request.Email);
+            var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
             {
-                return new LoginResponse() { IsAuthenticated = false, Message = Constants.Messages.Info.UserNotFound };
+                return UserNotFoundResponse();
+            }
+            if (user.VerifiedAt == null || user.VerifiedAt == DateTime.MinValue)
+            {
+                return UserNotVerifiedResponse();
             }
 
-            if (user.VerifiedAt == null)
+            if (user != null)
             {
-                return new LoginResponse() { IsAuthenticated = false, Message = Constants.Messages.Info.UserNotVerified };
-            }
-
-            if (!VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt))
-            {
-                return new LoginResponse() { IsAuthenticated = false, Message = Constants.Messages.Error.InvalidCredentials };
-            }
-            await AddLoginRecordAsync(user.Id);
-            var roles = await _userManager.GetRolesAsync(user);
-            List<string> userRoles = new List<string>();
-            foreach (var role in roles)
-            {
-                if (!string.IsNullOrEmpty(role))
+                var result = await _signInManager.PasswordSignInAsync(user, request.Password, isPersistent: request.RememberMe, lockoutOnFailure: true);
+                if (result.Succeeded)
                 {
-                    var addRole = await _roleService.GetRoleByIdAsync(role);
-                    if (addRole != null && addRole.RoleName != null)
+                    var userDto = new GetUserRequest
                     {
-                        userRoles.Add(addRole.RoleName);
-                    }
+                        Id = user.Id,
+                        Email = user.Email,
+                    };
+                    await AddLoginRecord(user);
+                    return new LoginResponse() { IsAuthenticated = true, IsSuccess = true, User = userDto };
+                }
+                else if (result.IsLockedOut)
+                {
+                    return new LoginResponse() { IsAuthenticated = false, IsSuccess = false, Message = "User is locked out, please try again later" };
+                }
+                else if (result.RequiresTwoFactor)
+                {
+                    return new LoginResponse() { IsAuthenticated = false, IsSuccess = false, Message = "User requires two factor auth" };
+                }
+                else
+                {
+                    return new LoginResponse() { IsAuthenticated = false, IsSuccess = false, Message = "User login error" };
                 }
             }
-            var token = string.Empty;
-            if (user.Email != null)
-            {
-                token = GenerateJwtToken(user.Id, user.Email, userRoles);
-            }
-            var userDto = new GetUserRequest
-            {
-                Id = user.Id,
-                Email = user.Email,
-            };
-
-            return new LoginResponse() { IsAuthenticated = true, IsSuccess = true, User = userDto, Token = token };
+            return InvalidCredentialsResponse();
         }
 
         public async Task<ResponseBase> VerifyEmail(VerifyEmailRequest request)
@@ -136,65 +138,34 @@ namespace RustyTech.Server.Services
 
             if (string.IsNullOrEmpty(request.Token))
             {
-                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Token.Invalid };
+                return InvalidTokenResponse();
             }
 
-            var user = _userManager.Users.FirstOrDefault(user => user.VerificationToken == request.Token);
+            var user = _userManager.Users
+                .FirstOrDefault(user => user.VerificationToken == request.Token);
+
             if (user == null)
             {
-                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Token.Invalid };
+                return UserNotFoundResponse();
             }
 
             user.VerifiedAt = DateTime.UtcNow;
             user.EmailConfirmed = true;
             await _userManager.UpdateAsync(user);
-            return new ResponseBase() { IsSuccess = true };
+            return new ResponseBase() { IsSuccess = true, Message = "User email verified" };
         }
 
-        public ResponseBase VerifyJwtToken(string token)
-        {
-            var key = _configuration["Jwt:Key"];
-
-            try
-            {
-                var jwtHandler = new JwtSecurityTokenHandler();
-                var jwtToken = jwtHandler.ReadJwtToken(token);
-
-                var expirationDate = jwtToken.ValidTo;
-                var tokenKey = jwtToken.SecurityKey;
-
-                var currentDate = DateTime.UtcNow;
-
-                if (key == null)
-                {
-                    return new ResponseBase() { IsSuccess = false, Message = "No jwt key" };
-                }
-
-                SymmetricSecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
-
-                if (currentDate > expirationDate && securityKey != tokenKey)
-                {
-                    return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Token.Invalid };
-                }
-                return new ResponseBase() { IsSuccess = true, Message = Constants.Messages.Token.Valid };
-            }
-            catch (Exception ex)
-            {
-                return new ResponseBase() { IsSuccess = false, Message = ex.Message };
-            }
-        }
-        
-        public async Task<ResponseBase> ResendEmailAsync(string email)
+        public async Task<ResponseBase> ResendEmail(string email)
         {
             if (string.IsNullOrEmpty(email))
             {
-                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.EmailRequired };
+                return EmailRequiredResponse();
             }
 
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
             {
-                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Info.UserNotFound };
+                return UserNotFoundResponse();
             }
 
             if (user.Email != null)
@@ -205,95 +176,112 @@ namespace RustyTech.Server.Services
                     _logger.LogInformation($"resent confirmation email");
                 }
             }
-            return new ResponseBase() { IsSuccess = true, Message = Constants.Messages.Info.ResendEmail };
+            return new ResponseBase()
+            {
+                IsSuccess = true,
+                Message = Constants.Messages.Info.ResendEmail
+            };
         }
 
-        public async Task<ResponseBase> ForgotPasswordAsync(string email)
+        public async Task<ResponseBase> ForgotPassword(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
             {
-                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Info.UserNotFound };
+                return UserNotFoundResponse();
             }
 
-            user.PasswordResetToken = CreateRandomToken();
-            user.ResetTokenExpires = DateTime.UtcNow.AddDays(1);
+            user.PasswordResetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+            user.ResetTokenExpires =
+                DateTime.UtcNow.AddDays(int.Parse(_configuration["ResetTokenExpiresInDays"]));
             await _userManager.UpdateAsync(user);
-
             var emailRequest = new EmailRequest
             {
                 To = user.Email,
                 Subject = "Reset Password",
-                Body = CreateResetPasswordBody(user.Id, EncodeToken(user.PasswordResetToken))
+                Body = CreateResetPasswordBody(user.Id, user.PasswordResetToken)
             };
 
             await _emailService.SendEmailAsync(emailRequest);
             _logger.LogInformation($"forgot password email sent");
-            return new ResponseBase() { IsSuccess = true, Message = Constants.Messages.Info.UserPasswordReset };
+            return new ResponseBase()
+            {
+                IsSuccess = true,
+                Message = Constants.Messages.Info.UserPasswordReset
+            };
         }
 
-        public async Task<ResponseBase> ResetPasswordAsync(ResetPasswordRequest request)
-        {
-            if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.NewPassword) ||
-                string.IsNullOrEmpty(request.ResetCode))
-            {
-                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Error.DataRecheck };
-            }
-
+        public async Task<ResponseBase> ResetPassword(CustomResetPasswordRequest request)
+        {            
             if (!IsPasswordValid(request.NewPassword))
             {
-                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Error.PasswordError };
-            }
+                return PasswordErrorResponse();
+            }           
 
             var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
             {
-                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Info.UserNotFound };
+                return UserNotFoundResponse();
             }
 
             var decodedCode = DecodeToken(request.ResetCode);
             if (user.PasswordResetToken != decodedCode)
             {
-                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Token.Invalid };
+                return InvalidTokenResponse();
             }
-            if (DateTime.UtcNow >= user.ResetTokenExpires)
+            if (DateTime.UtcNow >= user.ResetTokenExpires || user.ResetTokenExpires == DateTime.MinValue )
             {
-                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Token.Expired };
+                return TokenExpiredResponse();
             }
-            CreatePasswordHash(request.NewPassword, out byte[] passwordHash, out byte[] passwordSalt);
-            user.PasswordHash = passwordHash;
-            user.PasswordSalt = passwordSalt;
-            user.PasswordResetToken = null;
-            user.ResetTokenExpires = null;
-            user.VerificationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-
-            await _userManager.UpdateAsync(user);
-
-            //send another verification notification after password reset to notify user of the change
-            if (user.Email != null)
+            var isPassword = await _userManager.CheckPasswordAsync(user, request.CurrentPassword);
+            if (!isPassword)
             {
-                SendConfirmationEmail(user.Email, user.Id, user.VerificationToken);
-                _logger.LogInformation($"Email after password reset sent");
+                return PasswordErrorResponse();
             }
-            return new ResponseBase() { IsSuccess = true, Message = Constants.Messages.Info.UserPasswordReset };
+            var result = await _userManager.ChangePasswordAsync(user, request.CurrentPassword,  request.NewPassword);
+            if (result.Succeeded)
+            {
+                user.PasswordResetToken = null;
+                user.ResetTokenExpires = null;
+                user.VerificationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+
+                await _userManager.UpdateAsync(user);
+
+                //send another verification notification after password reset to notify user of the change
+                if (user.Email != null)
+                {
+                    SendConfirmationEmail(user.Email, user.Id, user.VerificationToken);
+                    _logger.LogInformation($"Email after password reset sent");
+                }
+                return new ResponseBase()
+                {
+                    IsSuccess = true,
+                    Message = Constants.Messages.Info.UserPasswordReset
+                };
+            }            
+            return new ResponseBase()
+            {
+                IsSuccess = false,
+                Message = result.Errors.ToString()
+            };
         }
 
-        public async Task<ResponseBase> UpdateUserAsync(UpdateUserRequest userDto)
+        public async Task<ResponseBase> UpdateUser(UpdateUserRequest userDto)
         {
             if (userDto.UserId == Guid.Empty)
             {
-                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.IdRequired };
+                return IdRequiredResponse();
             }
             var user = await _userManager.FindByIdAsync(userDto.UserId.ToString());
             if (user == null)
             {
-                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Info.UserNotFound };
+                return UserNotFoundResponse();
             }
 
             if (userDto.UserName != null)
             {
                 user.UserName = userDto.UserName;
-                user.NormalizedUserName = userDto.UserName.ToUpper();
+                await _userManager.UpdateNormalizedUserNameAsync(user);
             }
 
             if (userDto.BirthYear != 0)
@@ -304,58 +292,81 @@ namespace RustyTech.Server.Services
             if (userDto.Email != null)
             {
                 user.Email = userDto.Email;
-                user.NormalizedEmail = userDto.Email.ToUpper();
+                await _userManager.UpdateNormalizedEmailAsync(user);
                 user.VerifiedAt = null;
                 user.EmailConfirmed = false;
 
                 if (user.Email != null)
                 {
                     user.VerificationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    await _userManager.UpdateAsync(user);
                     SendConfirmationEmail(user.Email, user.Id, user.VerificationToken);
+                    await _userManager.UpdateSecurityStampAsync(user);
                     _logger.LogInformation($"reconfirm new email sent");
                 }
             }
             await _userManager.UpdateAsync(user);
-            return new ResponseBase() { IsSuccess = true, Message = "User updated, email reverifcation required" };
+            return new ResponseBase()
+            {
+                IsSuccess = true,
+                Message = "User updated, email reverifcation required"
+            };
         }
 
-        public async Task<ResponseBase> EnableTwoFactorAuthenticationAsync(Guid id)
+        public async Task<ResponseBase> ToggleTwoFactorAuth(Guid id)
         {
             var user = await _userManager.FindByIdAsync(id.ToString());
 
             if (user == null)
             {
-                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Info.UserNotFound };
+                return UserNotFoundResponse();
             }
-
-            user.TwoFactorEnabled = true;
-            await _userManager.UpdateAsync(user);
-            return new ResponseBase() { IsSuccess = true, Message = "Two factor enabled" };
+            if (user.TwoFactorEnabled)
+            {
+                await _userManager.SetTwoFactorEnabledAsync(user, false);
+            }
+            else
+            {
+                await _userManager.SetTwoFactorEnabledAsync(user, true);
+            }
+            await _userManager.UpdateSecurityStampAsync(user);
+            return new ResponseBase()
+            {
+                IsSuccess = true,
+                Message = $"Two factor updated for user {user.Id}"
+            };
         }
 
-        public async Task<ResponseBase> GetInfoAsync(Guid id)
+        public async Task<ResponseBase> GetInfo(Guid id)
         {
             if (id == Guid.Empty)
             {
-                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.IdRequired };
+                return IdRequiredResponse();
             }
 
             var user = await _userManager.FindByIdAsync(id.ToString());
             if (user == null)
             {
-                return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Info.UserNotFound };
+                return UserNotFoundResponse();
             }
-            return new ResponseBase() { IsSuccess = true, Message = $"Two factor enabled? {user.TwoFactorEnabled}" };
+            return new ResponseBase()
+            {
+                IsSuccess = true,
+                Message = $"Two factor enabled? {user.TwoFactorEnabled}"
+            };
         }
 
-        public LoginResponse LogoutAsync()
+        public async Task<ResponseBase> Logout()
         {
-            return new LoginResponse() { IsAuthenticated = false, IsSuccess = true, User = null, Message = Constants.Messages.Info.UserLoggedOut };
+            await _signInManager.SignOutAsync();
+            return new ResponseBase()
+            {
+                IsSuccess = true,
+                Message = Constants.Messages.Info.UserLoggedOut
+            };
         }
 
         //helper methods
-        public string GenerateJwtToken(Guid id, string email, List<string> userRoles)
+        private string GenerateJwtToken(Guid id, string email, List<string> userRoles)
         {
             var key = _configuration["Jwt:Key"];
             var issuer = _configuration["Jwt:Issuer"];
@@ -388,7 +399,8 @@ namespace RustyTech.Server.Services
             return "Error generating token";
         }
 
-        public void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
+        public void CreatePasswordHash(string password,
+            out byte[] passwordHash, out byte[] passwordSalt)
         {
             using (var hmac = new HMACSHA512())
             {
@@ -406,16 +418,19 @@ namespace RustyTech.Server.Services
             }
         }
 
+        /*
         private string CreateRandomToken()
         {
             return Convert.ToHexString(RandomNumberGenerator.GetBytes(64));
         }
+        
 
         private string EncodeToken(string token)
         {
             var encodedToken = WebUtility.UrlEncode(token);
             return encodedToken;
         }
+        */
 
         private string DecodeToken(string? token)
         {
@@ -448,16 +463,13 @@ namespace RustyTech.Server.Services
             _emailService.SendEmailAsync(emailRequest);
         }
 
-        private async Task AddLoginRecordAsync(Guid userId)
+        private async Task AddLoginRecord(User user)
         {
-            var loginInfo = new LoginInfo
-            {
-                UserId = userId,
-                LoginTime = DateTime.UtcNow,
-            };
-
-            _context.Logins.Add(loginInfo);
-            await _context.SaveChangesAsync();
+            var userLogin = new UserLoginInfo(
+                _configuration["LoginInfo:DefaultProvider:ProviderName"],
+                _configuration["LoginInfo:DefaultProvider:ProviderKey"],
+                _configuration["LoginInfo:DefaultProvider:ProviderName"]);
+            await _userManager.AddLoginAsync(user, userLogin);
         }
 
         private bool IsPasswordValid(string password)
@@ -465,6 +477,95 @@ namespace RustyTech.Server.Services
             string pattern = Constants.PasswordRegex.Pattern;
             Regex regex = new Regex(pattern);
             return regex.IsMatch(password);
+        }
+
+        private ResponseBase BadRequestResponse()
+        {
+            return new ResponseBase()
+            {
+                IsSuccess = false,
+                Message = Constants.Messages.Error.BadRequest
+            };
+        }
+
+        private ResponseBase InvalidEmailResponse()
+        {
+            return new ResponseBase()
+            {
+                IsSuccess = false,
+                Message = Constants.Messages.Error.InvalidEmail
+            };
+        }
+
+        private LoginResponse UserNotFoundResponse()
+        {
+            return new LoginResponse()
+            {
+                IsAuthenticated = false,
+                Message = Constants.Messages.Info.UserNotFound
+            };
+        }
+
+        private LoginResponse UserNotVerifiedResponse()
+        {
+            return new LoginResponse()
+            {
+                IsAuthenticated = false,
+                Message = Constants.Messages.Info.UserNotVerified
+            };
+        }
+
+        private LoginResponse InvalidCredentialsResponse()
+        {
+            return new LoginResponse()
+            {
+                IsAuthenticated = false,
+                Message = Constants.Messages.Error.InvalidCredentials
+            };
+        }
+        private ResponseBase InvalidTokenResponse()
+        {
+            return new ResponseBase()
+            {
+                IsSuccess = false,
+                Message = Constants.Messages.Token.Invalid
+            };
+        }
+
+        private ResponseBase IdRequiredResponse()
+        {
+            return new ResponseBase()
+            {
+                IsSuccess = false,
+                Message = Constants.Messages.IdRequired
+            };
+        }
+
+        private ResponseBase PasswordErrorResponse()
+        {
+            return new ResponseBase()
+            {
+                IsSuccess = false,
+                Message = Constants.Messages.Error.PasswordError
+            };
+        }
+
+        private ResponseBase TokenExpiredResponse()
+        {
+            return new ResponseBase()
+            {
+                IsSuccess = false,
+                Message = Constants.Messages.Token.Expired
+            };
+        }
+
+        private ResponseBase EmailRequiredResponse()
+        {
+            return new ResponseBase()
+            {
+                IsSuccess = false,
+                Message = Constants.Messages.EmailRequired
+            };
         }
     }
 }

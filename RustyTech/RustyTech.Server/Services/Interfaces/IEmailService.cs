@@ -1,4 +1,4 @@
-﻿using RustyTech.Server.Models.Auth;
+﻿using RustyTech.Server.Models.Account;
 
 namespace RustyTech.Server.Services.Interfaces
 {

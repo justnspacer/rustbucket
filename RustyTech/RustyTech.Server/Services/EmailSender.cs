@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using RustyTech.Server.Models.Auth;
+using RustyTech.Server.Models.Account;
 using RustyTech.Server.Services.Interfaces;
 
 namespace RustyTech.Server.Services

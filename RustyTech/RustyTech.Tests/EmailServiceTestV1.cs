@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using MimeKit;
 using Moq;
-using RustyTech.Server.Models.Auth;
+using RustyTech.Server.Models.Account;
 using RustyTech.Server.Services;
 using RustyTech.Server.Services.Interfaces;
 

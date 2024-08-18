@@ -1,7 +1,7 @@
 ﻿using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
 
-namespace RustyTech.Server.Models.Auth
+namespace RustyTech.Server.Models.Account
 {
     public class CustomRegisterRequest
     {

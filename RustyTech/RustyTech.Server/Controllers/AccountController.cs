@@ -1,12 +1,8 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity.Data;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using RustyTech.Server.Models.Auth;
+using RustyTech.Server.Models.Account;
 using RustyTech.Server.Models.Dtos;
 using RustyTech.Server.Services.Interfaces;
-using System.Security.Claims;
 
 namespace RustyTech.Server.Controllers
 {
@@ -32,19 +28,10 @@ namespace RustyTech.Server.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> LoginAsync([FromBody] Models.Auth.LoginRequest_old request)
+        public async Task<IActionResult> Login([FromBody] CustomLoginRequest request)
         {
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, request.Email)
-            };
-            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
-            if (User.Identity.IsAuthenticated)
-            {
-                return Ok(claimsIdentity);
-            }
-            return BadRequest();
+            var result = await _authService.Login(request);
+            return Ok(result);
         }
 
         [HttpPost("verify/email")]
@@ -55,78 +42,62 @@ namespace RustyTech.Server.Controllers
             return Ok(result);
         }
 
-        [Authorize]
-        [HttpGet("verify/token")]
-        public IActionResult VerifyJwtToken()
-        {
-            var authHeader = HttpContext.Request.Headers["Authorization"].ToString();
-            if (string.IsNullOrEmpty(authHeader) || !authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
-            {
-                return BadRequest("Missing or invalid Authorization header");
-            }
-            var token = authHeader.Substring("Bearer ".Length).Trim();
-            var result = _authService.VerifyJwtToken(token);
-            return Ok(result);
-        }
-
         [HttpPost("resend")]
-        public IActionResult ResendEmailAsync(string email)
+        public IActionResult ResendEmail(string email)
         {
-            var result = _authService.ResendEmailAsync(email);
+            var result = _authService.ResendEmail(email);
             _logger.LogInformation($"Email resent to {email}");
             return Ok(result);
         }
 
         [HttpPost("forgot/password")]
-        public async Task<IActionResult> ForgotPasswordAsync(string email)
+        public async Task<IActionResult> ForgotPassword(string email)
         {
-            var result = await _authService.ForgotPasswordAsync(email);
+            var result = await _authService.ForgotPassword(email);
             _logger.LogInformation($"Forgot password: {email}");
             return Ok(result);
         }
 
         [Authorize]
         [HttpPut("update")]
-        public async Task<IActionResult> UpdateUserAsync([FromBody] UpdateUserRequest user)
+        public async Task<IActionResult> UpdateUser([FromBody] UpdateUserRequest user)
         {
-            var result = await _authService.UpdateUserAsync(user);
+            var result = await _authService.UpdateUser(user);
             _logger.LogInformation($"User updated");
             return Ok(result);
         }
 
         [Authorize]
         [HttpPost("reset/password")]
-        public async Task<IActionResult> ResetPasswordAsync([FromBody] ResetPasswordRequest model)
+        public async Task<IActionResult> ResetPassword([FromBody] CustomResetPasswordRequest model)
         {
-            var result = await _authService.ResetPasswordAsync(model);
+            var result = await _authService.ResetPassword(model);
             return Ok(result);
         }
 
         [Authorize]
         [HttpPost("manage/2fa")]
-        public async Task<IActionResult> Enable2faAsync(Guid userId)
+        public async Task<IActionResult> ToggleTwoFactorAuth(Guid userId)
         {
-            var result = await _authService.EnableTwoFactorAuthenticationAsync(userId);
+            var result = await _authService.ToggleTwoFactorAuth(userId);
             return Ok(result);
         }
 
         [Authorize]
         [HttpGet("manage/info")]
-        public IActionResult GetInfoAsync(Guid userId)
+        public IActionResult GetInfo(Guid userId)
         {
-            var result = _authService.GetInfoAsync(userId);
+            var result = _authService.GetInfo(userId);
             _logger.LogInformation($"2fa status for: {userId}");
             return Ok(result);
         }
 
         [Authorize]
         [HttpPost("logout")]
-        public async Task<IActionResult> LogoutAsync()
+        public async Task<IActionResult> Logout()
         {
-            //var result = _authService.LogoutAsync();
-            //Response.Cookies.Delete("AuthToken");
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return Redirect("/auth/login");
+            await _authService.Logout();
+            return Ok("User logged out.");
         }
     }
 }

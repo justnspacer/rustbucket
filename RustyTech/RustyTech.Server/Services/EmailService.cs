@@ -1,7 +1,7 @@
 ﻿using MailKit.Security;
 using MimeKit.Text;
 using MimeKit;
-using RustyTech.Server.Models.Auth;
+using RustyTech.Server.Models.Account;
 using RustyTech.Server.Services.Interfaces;
 
 namespace RustyTech.Server.Services
