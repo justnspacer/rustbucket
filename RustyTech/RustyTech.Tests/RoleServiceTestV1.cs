@@ -14,13 +14,14 @@ namespace RustyTech.Tests
     public class RoleServiceTestV1
     {
         private IRoleService _roleService;
-        private readonly Mock<RoleManager<IdentityRole>> _roleManager;
-        private readonly Mock<UserManager<User>> _userManager;
 
         [SetUp]
         public void Setup()
         {
-            _roleService = new RoleService(_roleManager.Object, _userManager.Object);
+            var logger = new Mock<ILogger<RoleService>>();
+            var userManager = new Mock<UserManager<User>>();
+            var roleManager = new Mock<RoleManager<IdentityRole>>();
+            _roleService = new RoleService(roleManager.Object, userManager.Object, logger.Object);
         }
 
         [Test]
@@ -30,7 +31,7 @@ namespace RustyTech.Tests
             var roleName = "TestRole";
 
             // Act
-            var result = await _roleService.CreateRoleAsync(roleName);
+            var result = await _roleService.CreateRole(roleName);
 
             // Assert
             Assert.That(result, Is.EqualTo(Messages.Role.Created));
@@ -43,7 +44,7 @@ namespace RustyTech.Tests
             var roleName = "";
 
             // Act
-            var result = await _roleService.CreateRoleAsync(roleName);
+            var result = await _roleService.CreateRole(roleName);
 
             // Assert
             Assert.That(result, Is.EqualTo(Messages.Role.NameRequired));
@@ -59,7 +60,7 @@ namespace RustyTech.Tests
             await roleManger.CreateAsync(role);
 
             // Act
-            var result = await _roleService.CreateRoleAsync(roleName);
+            var result = await _roleService.CreateRole(roleName);
 
             // Assert
             Assert.That(result, Is.EqualTo(Messages.Role.Exists));
@@ -76,7 +77,7 @@ namespace RustyTech.Tests
             await roleManger.CreateAsync(role2);
 
             // Act
-            var result = await _roleService.GetAllRolesAsync();
+            var result = await _roleService.GetAllRoles();
 
             // Assert
             Assert.That(result.Count, Is.EqualTo(2));
@@ -93,7 +94,7 @@ namespace RustyTech.Tests
             await roleManger.CreateAsync(role);
 
             // Act
-            var result = await _roleService.GetRoleByIdAsync(role.Id);
+            var result = await _roleService.GetRoleById(role.Id);
 
             // Assert
             Assert.IsNotNull(result);
@@ -108,7 +109,7 @@ namespace RustyTech.Tests
             string id = string.Empty;
 
             // Act
-            var result = await _roleService.GetRoleByIdAsync(id);
+            var result = await _roleService.GetRoleById(id);
 
             // Assert
             Assert.IsNull(result);
@@ -123,7 +124,7 @@ namespace RustyTech.Tests
             await roleManger.CreateAsync(role);
 
             // Act
-            var result = await _roleService.GetRoleByNameAsync(role.Name);
+            var result = await _roleService.GetRoleByName(role.Name);
 
             // Assert
             Assert.IsNotNull(result);
@@ -138,7 +139,7 @@ namespace RustyTech.Tests
             string roleName = null;
 
             // Act
-            var result = await _roleService.GetRoleByNameAsync(roleName);
+            var result = await _roleService.GetRoleByName(roleName);
 
             // Assert
             Assert.IsNull(result);
@@ -159,7 +160,7 @@ namespace RustyTech.Tests
             await userManager.AddToRoleAsync(user, role2.Name);
 
             // Act
-            var result = await _roleService.GetUserRolesAsync(user.Id);
+            var result = await _roleService.GetUserRoles(user.Id);
 
             // Assert
             Assert.IsNotNull(result);
@@ -175,7 +176,7 @@ namespace RustyTech.Tests
             Guid id = Guid.Empty;
 
             // Act
-            var result = await _roleService.GetUserRolesAsync(id);
+            var result = await _roleService.GetUserRoles(id);
 
             // Assert
             Assert.IsNull(result);
@@ -195,7 +196,7 @@ namespace RustyTech.Tests
             var request = new RoleRequest { RoleId = "1", RoleName = role.Name, UserId = user.Id };
 
             // Act
-            var result = await _roleService.AddRoleToUserAsync(request);
+            var result = await _roleService.AddRoleToUser(request);
 
             // Assert
             Assert.That(result, Is.EqualTo(Messages.Role.AddedToUser));
@@ -209,7 +210,7 @@ namespace RustyTech.Tests
             var request = new RoleRequest { RoleId = "1",  RoleName = "", UserId = user.Id };
 
             // Act
-            var result = await _roleService.AddRoleToUserAsync(request);
+            var result = await _roleService.AddRoleToUser(request);
 
             // Assert
             Assert.That(result, Is.EqualTo(Messages.Error.BadRequest));
@@ -222,7 +223,7 @@ namespace RustyTech.Tests
             var request = new RoleRequest { RoleId = "1", RoleName = "TestRole", UserId = Guid.Empty };
 
             // Act
-            var result = await _roleService.AddRoleToUserAsync(request);
+            var result = await _roleService.AddRoleToUser(request);
 
             // Assert
             Assert.That(result, Is.EqualTo(Messages.Error.BadRequest));
@@ -235,7 +236,7 @@ namespace RustyTech.Tests
             var request = new RoleRequest { RoleId = "1", RoleName = "TestRole", UserId = Guid.NewGuid() };
 
             // Act
-            var result = await _roleService.AddRoleToUserAsync(request);
+            var result = await _roleService.AddRoleToUser(request);
 
             // Assert
             Assert.That(result, Is.EqualTo(Messages.Info.UserNotFound));
@@ -252,7 +253,7 @@ namespace RustyTech.Tests
             var request = new RoleRequest { RoleId = "1", RoleName = "TestRole", UserId = user.Id };
 
             // Act
-            var result = await _roleService.AddRoleToUserAsync(request);
+            var result = await _roleService.AddRoleToUser(request);
 
             // Assert
             Assert.That(result, Is.EqualTo(Messages.Role.NotFound));
@@ -274,7 +275,7 @@ namespace RustyTech.Tests
             var request = new RoleRequest { RoleName = "TestRole", RoleId = role.Id, UserId = user.Id };
 
             // Act
-            var result = await _roleService.RemoveRoleFromUserAsync(request);
+            var result = await _roleService.RemoveRoleFromUser(request);
 
             // Assert
             Assert.That(result, Is.EqualTo(Messages.Role.Removed));
@@ -288,7 +289,7 @@ namespace RustyTech.Tests
             var request = new RoleRequest { RoleName = string.Empty, RoleId = string.Empty, UserId = user.Id };
 
             // Act
-            var result = await _roleService.RemoveRoleFromUserAsync(request);
+            var result = await _roleService.RemoveRoleFromUser(request);
 
             // Assert
             Assert.That(result, Is.EqualTo(Messages.Error.BadRequest));
@@ -301,7 +302,7 @@ namespace RustyTech.Tests
             var request = new RoleRequest { RoleName = string.Empty, RoleId = "TestRoleId", UserId = Guid.Empty };
 
             // Act
-            var result = await _roleService.RemoveRoleFromUserAsync(request);
+            var result = await _roleService.RemoveRoleFromUser(request);
 
             // Assert
             Assert.That(result, Is.EqualTo(Messages.Error.BadRequest));
@@ -314,7 +315,7 @@ namespace RustyTech.Tests
             var request = new RoleRequest { RoleName = string.Empty, RoleId = "TestRoleId", UserId = Guid.NewGuid() };
 
             // Act
-            var result = await _roleService.RemoveRoleFromUserAsync(request);
+            var result = await _roleService.RemoveRoleFromUser(request);
 
             // Assert
             Assert.That(result, Is.EqualTo(Messages.Info.UserNotFound));
@@ -331,7 +332,7 @@ namespace RustyTech.Tests
             var request = new RoleRequest { RoleName = string.Empty, RoleId = "TestRoleId", UserId = user.Id };
 
             // Act
-            var result = await _roleService.RemoveRoleFromUserAsync(request);
+            var result = await _roleService.RemoveRoleFromUser(request);
 
             // Assert
             Assert.That(result, Is.EqualTo(Messages.Info.UserNotFound));

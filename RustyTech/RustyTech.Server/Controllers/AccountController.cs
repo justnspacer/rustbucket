@@ -48,13 +48,20 @@ namespace RustyTech.Server.Controllers
             var result = await _authService.ResendEmail(email);
             _logger.LogInformation($"Email resent to {email}");
             return Ok(result);
-        }
+        }   
 
         [HttpPost("forgot/password")]
         public async Task<IActionResult> ForgotPassword(string email)
         {
             var result = await _authService.ForgotPassword(email);
             _logger.LogInformation($"Forgot password: {email}");
+            return Ok(result);
+        }
+
+        [HttpPost("reset/password")]
+        public async Task<IActionResult> ResetPassword([FromBody] CustomResetPasswordRequest model)
+        {
+            var result = await _authService.ResetPassword(model);
             return Ok(result);
         }
 
@@ -68,14 +75,6 @@ namespace RustyTech.Server.Controllers
         }
 
         [Authorize]
-        [HttpPost("reset/password")]
-        public async Task<IActionResult> ResetPassword([FromBody] CustomResetPasswordRequest model)
-        {
-            var result = await _authService.ResetPassword(model);
-            return Ok(result);
-        }
-
-        [Authorize]
         [HttpPost("manage/2fa")]
         public async Task<IActionResult> ToggleTwoFactorAuth(Guid userId)
         {
@@ -83,7 +82,7 @@ namespace RustyTech.Server.Controllers
             return Ok(result);
         }
 
-        [Authorize]
+        [Authorize(Roles = "SuperAdmin")]        
         [HttpGet("manage/info")]
         public async Task<IActionResult> GetInfo(Guid userId)
         {

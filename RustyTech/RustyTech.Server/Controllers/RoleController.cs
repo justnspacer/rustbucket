@@ -2,77 +2,95 @@
 using Microsoft.AspNetCore.Mvc;
 using RustyTech.Server.Interfaces;
 using RustyTech.Server.Models.Role;
-using RustyTech.Server.Services;
 
 namespace RustyTech.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Administrator")]
+    [Authorize(Roles = "SuperAdmin")]
     public class RoleController : ControllerBase
     {
         private readonly IRoleService _roleService;
-        private readonly ILogger<RoleController> _logger;
 
-        public RoleController(RoleService roleService, ILogger<RoleController> logger)
+        public RoleController(IRoleService roleService)
         {
             _roleService = roleService;
-            _logger = logger;
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> CreateRoleAsync(string roleName)
+        public async Task<IActionResult> Create(string roleName)
         {
-            var result = await _roleService.CreateRoleAsync(roleName);
-            _logger.LogInformation($"Role {roleName} created");
+            var result = await _roleService.CreateRole(roleName);
             return Ok(result);
         }
 
         [HttpGet("get/all")]
-        public async Task<IActionResult> GetAllAsync()
+        public async Task<IActionResult> GetAll()
         {
-            var result = await _roleService.GetAllRolesAsync();
-            _logger.LogInformation($"All roles requested");
+            var result = await _roleService.GetAllRoles();            
             return Ok(result);
         }
 
-        [HttpGet("get/{roleId}")]
-        public async Task<IActionResult> GetRoleByIdAsync(string roleId)
+        [HttpGet("get")]
+        public async Task<IActionResult> GetRoleById(Guid roleId)
         {
-            var result = await _roleService.GetRoleByIdAsync(roleId);
-            _logger.LogInformation($"Role requested");
+            var result = await _roleService.GetRoleById(roleId.ToString());
             return Ok(result);
         }
 
-        [HttpGet("get/name/{roleName}")]
-        public async Task<IActionResult> GetRoleByNameAsync(string roleName)
+        [HttpGet("get/name")]
+        public async Task<IActionResult> GetRoleByName(string roleName)
         {
-            var result = await _roleService.GetRoleByNameAsync(roleName);
-            _logger.LogInformation($"Role requested by name");
+            var result = await _roleService.GetRoleByName(roleName);
             return Ok(result);
         }
 
-        [HttpGet("get/user/{userId}")]
-        public async Task<IActionResult> GetUserRolesAsync(Guid userId)
+        [HttpGet("get/user")]
+        public async Task<IActionResult> GetUserRoles(Guid userId)
         {
-            var result = await _roleService.GetUserRolesAsync(userId);
-            _logger.LogInformation($"User roles requested");
+            var result = await _roleService.GetUserRoles(userId);
             return Ok(result);
         }
 
         [HttpPost("add/user")]
-        public async Task<IActionResult> AddRoleToUserAsync([FromBody] RoleRequest request)
+        public async Task<IActionResult> AddRoleToUser([FromBody] RoleRequest request)
         {
-            var result = await _roleService.AddRoleToUserAsync(request);
-            _logger.LogInformation($"Role {request.RoleName} added to user");
+            var result = await _roleService.AddRoleToUser(request);
             return Ok(result);
         }
 
         [HttpDelete("remove/user")]
-        public async Task<IActionResult> RemoveRoleFromUserAsync([FromBody] RoleRequest request)
+        public async Task<IActionResult> RemoveRoleFromUser([FromBody] RoleRequest request)
         {
-            var result = await _roleService.RemoveRoleFromUserAsync(request);
-            _logger.LogInformation($"Role {request.RoleName} removed from user");
+            var result = await _roleService.RemoveRoleFromUser(request);
+            return Ok(result);
+        }
+
+        [HttpDelete("delete")]
+        public async Task<IActionResult> DeleteRole(string roleName)
+        {
+            var result = await _roleService.DeleteRole(roleName);
+            return Ok(result);
+        }
+
+        [HttpPost("add/claim")]
+        public async Task<IActionResult> AddClaimToRole([FromBody] ClaimRequest request)
+        {
+            var result = await _roleService.AddClaimToRole(request);
+            return Ok(result);
+        }
+
+        [HttpGet("get/claims")]
+        public async Task<IActionResult> GetRoleClaims(string roleName)
+        {
+            var result = await _roleService.GetRoleClaims(roleName);
+            return Ok(result);
+        }
+
+        [HttpDelete("remove/claim")]
+        public async Task<IActionResult> RemoveClaimFromRole([FromBody] ClaimRequest request)
+        {
+            var result = await _roleService.RemoveClaimFromRole(request);
             return Ok(result);
         }
     }
