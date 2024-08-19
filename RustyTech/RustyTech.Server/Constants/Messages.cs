@@ -15,7 +15,8 @@
             public const string UserLoggedOut = "User logged out";
             public const string UserNotFound = "User not found";
             public const string UserNotVerified = "User not verified";
-            public const string UserPasswordReset = "User password reset, please check email";
+            public const string UserPasswordReset = "User password reset code created, please check email";
+            public const string UserPasswordChanged = "User password changed, please check email";
             public const string UserExists = "User already exists";
             public const string UserRegistered = "User registered, please check email for confirmation";
             public const string PasswordReset = "Password can be reset";

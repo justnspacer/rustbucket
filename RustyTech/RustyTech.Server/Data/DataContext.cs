@@ -1,9 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using RustyTech.Server.Models.Account;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using RustyTech.Server.Models.Posts;
-using RustyTech.Server.Models.Role;
-using System.Text;
 
 namespace RustyTech.Server.Data
 {
@@ -21,26 +17,7 @@ namespace RustyTech.Server.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
-            User user = CreateUser("admin@rustbucket.io");
-            modelBuilder.Entity<User>().HasData(user);
-
-            IdentityRole<string> adminRole = new IdentityRole<string>
-            {
-                Id = "1",
-                Name = "SuperAdmin",
-                ConcurrencyStamp = "1",
-                NormalizedName = "SUPERADMINISTRATOR"
-            };
-            modelBuilder.Entity<IdentityRole>().HasData(adminRole);
-
-            IdentityUserRole<string> userRole = new IdentityUserRole<string>
-            {
-                UserId = user.Id.ToString(),
-                RoleId = adminRole.Id
-            };
-            modelBuilder.Entity<IdentityUserRole<string>>().HasData(userRole);
-
+            
             // Configure the relationships and inheritance
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.UserName)
@@ -93,23 +70,6 @@ namespace RustyTech.Server.Data
         public DbSet<ImagePost> ImagePosts { get; set; }
         public DbSet<VideoPost> VideoPosts { get; set; }
         public DbSet<Keyword> Keywords { get; set; }
-        public DbSet<PostKeyword> PostKeywords { get; set; }
-
-        private User CreateUser(string email)
-        {
-            var hasher = new PasswordHasher<User>();
-            User user = new User()
-            {
-                Id = Guid.NewGuid(),
-                UserName = email,
-                Email = email,
-                PasswordHash = "JackNJill1!",
-                NormalizedEmail = email.ToUpper(),
-                NormalizedUserName = email.ToUpper(),
-                EmailConfirmed = true,
-                VerifiedAt = DateTime.Now
-            };            
-            return user;
-        }
+        public DbSet<PostKeyword> PostKeywords { get; set; }       
     }
 }

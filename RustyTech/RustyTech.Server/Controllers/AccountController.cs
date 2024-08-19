@@ -42,10 +42,10 @@ namespace RustyTech.Server.Controllers
             return Ok(result);
         }
 
-        [HttpPost("resend")]
-        public IActionResult ResendEmail(string email)
+        [HttpPost("resend/email")]
+        public async Task<IActionResult> ResendEmail(string email)
         {
-            var result = _authService.ResendEmail(email);
+            var result = await _authService.ResendEmail(email);
             _logger.LogInformation($"Email resent to {email}");
             return Ok(result);
         }
@@ -85,9 +85,9 @@ namespace RustyTech.Server.Controllers
 
         [Authorize]
         [HttpGet("manage/info")]
-        public IActionResult GetInfo(Guid userId)
+        public async Task<IActionResult> GetInfo(Guid userId)
         {
-            var result = _authService.GetInfo(userId);
+            var result = await _authService.GetInfo(userId);
             _logger.LogInformation($"2fa status for: {userId}");
             return Ok(result);
         }
@@ -96,8 +96,8 @@ namespace RustyTech.Server.Controllers
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
-            await _authService.Logout();
-            return Ok("User logged out.");
+            var result = await _authService.Logout();
+            return Ok(result);
         }
     }
 }

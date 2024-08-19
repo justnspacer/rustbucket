@@ -11,10 +11,7 @@ using Microsoft.AspNetCore.Localization;
 using RustyTech.Server.Middleware;
 using RustyTech.Server.Services.Interfaces;
 using RustyTech.Server.Interfaces;
-using Microsoft.AspNetCore.Antiforgery;
 using RustyTech.Server.Utilities;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Identity.UI.Services;
 
 var builder = WebApplication.CreateBuilder(args); // Create a WebApplication builder instance.
 
@@ -100,13 +97,18 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.Password.RequiredUniqueChars = 1;
 
     //lockout settings
-    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromSeconds(10); // ADDRESS THIS!!!!!!!!!
-    options.Lockout.MaxFailedAccessAttempts = 5;
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(10);
+    options.Lockout.MaxFailedAccessAttempts = 6;
     options.Lockout.AllowedForNewUsers = true;
 
     //user settings
     options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
     options.User.RequireUniqueEmail = true;
+});
+
+builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
+{
+    options.TokenLifespan = TimeSpan.FromHours(3);
 });
 
 builder.Services.ConfigureApplicationCookie(options =>
@@ -149,6 +151,15 @@ builder.Logging.ClearProviders(); // Clear default logging providers.
 builder.Logging.AddNLog(); // Add NLog provider for logging.
 builder.Logging.AddConsole(); // Add console provider for logging.
 builder.Logging.AddDebug(); // Add debug provider for logging.
+
+// Check if the superadmin user exists
+var superadminUserExists = await CheckSuperadminUserExistsAsync(builder.Services);
+
+if (!superadminUserExists)
+{
+    // Create the superadmin user
+    await CreateSuperadminUserAsync(builder.Services);
+}
 
 var app = builder.Build(); // Build the WebApplication.
 
@@ -202,6 +213,53 @@ app.Use(next => context =>
 app.MapControllers(); // Map controller routes.
 app.MapFallbackToFile("/index.html"); // Map fallback route to serve index.html for SPA.
 
-//app.MapIdentityApi<User>(); // Map identity API endpoints.
+async Task<bool> CheckSuperadminUserExistsAsync(IServiceCollection services)
+{
+    using (var scope = services.BuildServiceProvider().CreateScope())
+    {
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+        var user = await userManager.FindByEmailAsync("justin@rustbucket.io");
+
+        return user != null;
+    }
+}
+
+async Task CreateSuperadminUserAsync(IServiceCollection services)
+{
+    using (var scope = services.BuildServiceProvider().CreateScope())
+    {
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+        // Create the superadmin role if it doesn't exist
+        var superadminRoleExists = await roleManager.RoleExistsAsync("SuperAdmin");
+        if (!superadminRoleExists)
+        {
+            await roleManager.CreateAsync(new IdentityRole("SuperAdmin"));
+        }
+
+        // Create the superadmin user
+        var superadminUser = new User
+        {
+            UserName = builder.Configuration.GetSection("AdminUser:Email").Value,
+            Email = builder.Configuration.GetSection("AdminUser:Email").Value,
+            VerifiedAt = DateTime.Now,
+            EmailConfirmed = true            
+        };
+        var result = await userManager.CreateAsync(superadminUser, builder.Configuration.GetSection("AdminUser:Password").Value);
+
+        if (result.Succeeded)
+        {
+            // Add the superadmin user to the superadmin role
+            await userManager.AddToRoleAsync(superadminUser, "SuperAdmin");
+        }
+        else
+        {
+            // Handle the error if user creation fails
+            throw new Exception("Failed to create superadmin user.");
+        }
+    }
+}
 
 app.Run(); // Run the application.
+

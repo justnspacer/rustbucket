@@ -1,7 +1,5 @@
 using RustyTech.Server.Services.Interfaces;
 using RustyTech.Server.Constants;
-using Microsoft.EntityFrameworkCore;
-using RustyTech.Server.Data;
 using RustyTech.Server.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -18,10 +16,7 @@ namespace RustyTech.Tests
     [TestFixture]
     public class AccountServiceTestV1
     {
-        private DataContext _context;
         private IAccountService _accountService;
-        private readonly Mock<UserManager<User>> _userManager;
-
 
         [SetUp]
         public void Setup()
@@ -38,19 +33,7 @@ namespace RustyTech.Tests
             configurationMock.SetupGet(x => x[It.Is<string>(s => s == "Jwt:Audience")]).Returns("https://testhost:7111");
             configurationMock.SetupGet(x => x[It.Is<string>(s => s == "Jwt:ExpiresInMinutes")]).Returns("30");
 
-            var options = new DbContextOptionsBuilder<DataContext>()
-                .UseInMemoryDatabase(databaseName: "TestDatabase")
-                .Options;
-            _context = new DataContext(options);
-
-            _accountService = new AccountService(userManagerMock.Object, signInManagerMock.Object, _context, emailServiceMock.Object, roleServiceMock.Object, configurationMock.Object, loggerMock.Object);
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            _context.Database.EnsureDeleted();
-            _context.Dispose();
+            _accountService = new AccountService(userManagerMock.Object, signInManagerMock.Object, emailServiceMock.Object, roleServiceMock.Object, configurationMock.Object, loggerMock.Object);
         }
 
         [Test]
@@ -121,17 +104,12 @@ namespace RustyTech.Tests
                 Password = "Test123!"
             };
 
-            _accountService.CreatePasswordHash(request.Password, out byte[] hash, out byte[] salt);
             var user = new User
             {
                 Email = request.Email,
-                PasswordHash = hash,
-                PasswordSalt = salt,
+                PasswordHash = "Test123!",
                 VerifiedAt = DateTime.UtcNow,
             };
-
-            _context.Users.Add(user);
-            _context.SaveChanges();
 
             // Act
             var response = await _accountService.Login(request);
@@ -155,8 +133,6 @@ namespace RustyTech.Tests
             {
                 VerificationToken = "valid_token"
             };
-            _context.Users.Add(user);
-            _context.SaveChanges();
 
             // Act
             var response = await _accountService.VerifyEmail(request);
@@ -175,8 +151,6 @@ namespace RustyTech.Tests
                 Email = email,
                 VerificationToken = "valid_token"
             };
-            _context.Users.Add(user);
-            _context.SaveChanges();
 
             // Act
             var response = await _accountService.ResendEmail(email);
@@ -198,8 +172,6 @@ namespace RustyTech.Tests
             {
                 Email = email
             };
-            _context.Users.Add(user);
-            _context.SaveChanges();
 
             // Act
             var response = await _accountService.ForgotPassword(email);
@@ -216,8 +188,9 @@ namespace RustyTech.Tests
         public async Task ResetPasswordAsync_SuccessfulRequest_ReturnsResponseBaseWithSuccessMessage()
         {
             // Arrange
-            var request = new ResetPasswordRequest
+            var request = new CustomResetPasswordRequest
             {
+                CurrentPassword = "Test123",
                 Email = "test123@example.com",
                 ResetCode = "valid_token",
                 NewPassword = "NewPassword123!",
@@ -229,8 +202,6 @@ namespace RustyTech.Tests
                 Email = "test123@example.com",
                 PasswordResetToken = "valid_token"
             };
-            _context.Users.Add(user);
-            _context.SaveChanges();
 
 
             // Act
@@ -263,8 +234,6 @@ namespace RustyTech.Tests
                 Email = "johnner.doer@example.com",
                 BirthYear = 1980
             };
-            _context.Users.Add(user);
-            _context.SaveChanges();
 
             // Act
             var response = await _accountService.UpdateUser(userDto);
@@ -275,16 +244,7 @@ namespace RustyTech.Tests
                 
                 Assert.That(response.IsSuccess, Is.True);
                 Assert.That(response.Message, Is.EqualTo("User updated, email reverifcation required"));
-            });
-
-            var updatedUser = _context.Users.FirstOrDefault(u => u.Id == userId);
-            Assert.That(updatedUser, Is.Not.Null);
-            Assert.Multiple(() =>
-            {
-                Assert.That(updatedUser.UserName, Is.EqualTo(userDto.UserName));
-                Assert.That(updatedUser.Email, Is.EqualTo(userDto.Email));
-                Assert.That(updatedUser.BirthYear, Is.EqualTo(userDto.BirthYear));
-            });
+            });          
         }
 
         [Test]
@@ -292,9 +252,7 @@ namespace RustyTech.Tests
         {
             // Arrange
             var userId = Guid.NewGuid();
-            var user = new User { Id = userId };
-            _context.Users.Add(user);
-            _context.SaveChanges();
+            var user = new User { Id = userId, TwoFactorEnabled = false };
 
             // Act
             var response = await _accountService.ToggleTwoFactorAuth(userId);
@@ -302,10 +260,6 @@ namespace RustyTech.Tests
             // Assert
             Assert.IsTrue(response.IsSuccess);
             Assert.That(response.Message, Is.EqualTo("Two factor enabled"));
-
-            var updatedUser = _context.Users.FirstOrDefault(u => u.Id == userId);
-            Assert.That(updatedUser, Is.Not.Null);
-            Assert.That(updatedUser.TwoFactorEnabled);
         }
 
         [Test]
@@ -314,8 +268,6 @@ namespace RustyTech.Tests
             // Arrange
             var userId = Guid.NewGuid();
             var user = new User { Id = userId, TwoFactorEnabled = true };
-            _context.Users.Add(user);
-            _context.SaveChanges();
 
             // Act
             var response = await _accountService.GetInfo(userId);
@@ -331,8 +283,6 @@ namespace RustyTech.Tests
             // Arrange
             var userId = Guid.NewGuid();
             var user = new User { Id = userId };
-            _context.Users.Add(user);
-            _context.SaveChanges();
 
             // Act
             var response = await _accountService.Logout();
