@@ -57,7 +57,7 @@ namespace RustyTech.Tests
             var post = new CreateBlogRequest()
             {
                 Id = 1,
-                UserId = Guid.NewGuid(),
+                UserId = Guid.NewGuid().ToString(),
                 Title = "Test Post",
                 Content = "This is a test post",
                 CreatedAt = new DateTime(7775, 3, 09),
@@ -89,7 +89,7 @@ namespace RustyTech.Tests
             // Arrange
             var user = new User
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.NewGuid().ToString(),
                 UserName = "testuser",
                 VerifiedAt = new DateTime(7775, 3, 09)
             };
@@ -200,7 +200,7 @@ namespace RustyTech.Tests
             // Arrange
             var user = new User
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.NewGuid().ToString(),
                 UserName = "testuser",
                 VerifiedAt = new DateTime(7775, 3, 09)
             };
@@ -237,7 +237,7 @@ namespace RustyTech.Tests
             // Arrange
             var user = new User
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.NewGuid().ToString(),
                 UserName = "testuser",
                 VerifiedAt = new DateTime(7775, 3, 09)
             };

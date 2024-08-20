@@ -10,7 +10,7 @@ namespace RustyTech.Server.Interfaces
         Task<List<GetRoleRequest>> GetAllRoles();
         Task<GetRoleRequest?> GetRoleById(string id);
         Task<GetRoleRequest?> GetRoleByName(string roleName);
-        Task<IList<string>?> GetUserRoles(Guid id);
+        Task<IList<string>?> GetUserRoles(string id);
         Task<ResponseBase> AddRoleToUser(RoleRequest request);
         Task<ResponseBase> RemoveRoleFromUser(RoleRequest request);
         Task<ResponseBase> DeleteRole(string roleName);

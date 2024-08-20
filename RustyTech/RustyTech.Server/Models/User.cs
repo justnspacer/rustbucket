@@ -5,7 +5,6 @@ namespace RustyTech.Server.Models
 {
     public class User : IdentityUser
     {
-        public new Guid Id { get; set; }
         public override string? Email { get; set; }
         public override string? UserName { get; set; }
         public string? VerificationToken { get; set; }

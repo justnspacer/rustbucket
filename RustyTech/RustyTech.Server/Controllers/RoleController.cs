@@ -7,7 +7,6 @@ namespace RustyTech.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "SuperAdmin")]
     public class RoleController : ControllerBase
     {
         private readonly IRoleService _roleService;
@@ -17,6 +16,7 @@ namespace RustyTech.Server.Controllers
             _roleService = roleService;
         }
 
+        [Authorize(Roles = "SuperAdmin")]
         [HttpPost("create")]
         public async Task<IActionResult> Create(string roleName)
         {
@@ -24,6 +24,7 @@ namespace RustyTech.Server.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "SuperAdmin")]
         [HttpGet("get/all")]
         public async Task<IActionResult> GetAll()
         {
@@ -31,13 +32,15 @@ namespace RustyTech.Server.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "SuperAdmin")]
         [HttpGet("get")]
-        public async Task<IActionResult> GetRoleById(Guid roleId)
+        public async Task<IActionResult> GetRoleById(string roleId)
         {
-            var result = await _roleService.GetRoleById(roleId.ToString());
+            var result = await _roleService.GetRoleById(roleId);
             return Ok(result);
         }
 
+        [Authorize(Roles = "SuperAdmin")]
         [HttpGet("get/name")]
         public async Task<IActionResult> GetRoleByName(string roleName)
         {
@@ -45,13 +48,15 @@ namespace RustyTech.Server.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "SuperAdmin")]
         [HttpGet("get/user")]
-        public async Task<IActionResult> GetUserRoles(Guid userId)
+        public async Task<IActionResult> GetUserRoles(string userId)
         {
             var result = await _roleService.GetUserRoles(userId);
             return Ok(result);
         }
 
+        [Authorize(Roles = "SuperAdmin")]
         [HttpPost("add/user")]
         public async Task<IActionResult> AddRoleToUser([FromBody] RoleRequest request)
         {
@@ -59,6 +64,7 @@ namespace RustyTech.Server.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "SuperAdmin")]
         [HttpDelete("remove/user")]
         public async Task<IActionResult> RemoveRoleFromUser([FromBody] RoleRequest request)
         {
@@ -66,6 +72,7 @@ namespace RustyTech.Server.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "SuperAdmin")]
         [HttpDelete("delete")]
         public async Task<IActionResult> DeleteRole(string roleName)
         {
@@ -73,6 +80,7 @@ namespace RustyTech.Server.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "SuperAdmin")]
         [HttpPost("add/claim")]
         public async Task<IActionResult> AddClaimToRole([FromBody] ClaimRequest request)
         {
@@ -80,6 +88,7 @@ namespace RustyTech.Server.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "SuperAdmin")]
         [HttpGet("get/claims")]
         public async Task<IActionResult> GetRoleClaims(string roleName)
         {
@@ -87,6 +96,7 @@ namespace RustyTech.Server.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "SuperAdmin")]
         [HttpDelete("remove/claim")]
         public async Task<IActionResult> RemoveClaimFromRole([FromBody] ClaimRequest request)
         {

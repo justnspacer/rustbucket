@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using RustyTech.Server.Models.Account;
 using RustyTech.Server.Models.Dtos;
 using RustyTech.Server.Services.Interfaces;
+using System.Security.Claims;
 
 namespace RustyTech.Server.Controllers
 {
@@ -11,19 +12,16 @@ namespace RustyTech.Server.Controllers
     public class AccountController : ControllerBase
     {
         private readonly IAccountService _authService;
-        private readonly ILogger<AccountController> _logger;
 
-        public AccountController(IAccountService authService, ILogger<AccountController> logger)
+        public AccountController(IAccountService authService)
         {
             _authService = authService;
-            _logger = logger;
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] CustomRegisterRequest request)
         {
             var result = await _authService.Register(request);
-            _logger.LogInformation($"User {request.Email} registered successfully");
             return Ok(result);
         }
 
@@ -38,7 +36,6 @@ namespace RustyTech.Server.Controllers
         public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailRequest request)
         {
             var result = await _authService.VerifyEmail(request);
-            _logger.LogInformation($"Email verified");
             return Ok(result);
         }
 
@@ -46,7 +43,6 @@ namespace RustyTech.Server.Controllers
         public async Task<IActionResult> ResendEmail(string email)
         {
             var result = await _authService.ResendEmail(email);
-            _logger.LogInformation($"Email resent to {email}");
             return Ok(result);
         }   
 
@@ -54,7 +50,6 @@ namespace RustyTech.Server.Controllers
         public async Task<IActionResult> ForgotPassword(string email)
         {
             var result = await _authService.ForgotPassword(email);
-            _logger.LogInformation($"Forgot password: {email}");
             return Ok(result);
         }
 
@@ -69,25 +64,33 @@ namespace RustyTech.Server.Controllers
         [HttpPut("update")]
         public async Task<IActionResult> UpdateUser([FromBody] UpdateUserRequest user)
         {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId != user.UserId)
+            {
+                return Forbid();
+            }
             var result = await _authService.UpdateUser(user);
-            _logger.LogInformation($"User updated");
             return Ok(result);
         }
 
         [Authorize]
         [HttpPost("manage/2fa")]
-        public async Task<IActionResult> ToggleTwoFactorAuth(Guid userId)
+        public async Task<IActionResult> ToggleTwoFactorAuth(string userId)
         {
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (currentUserId != userId)
+            {
+                return Forbid();
+            }
             var result = await _authService.ToggleTwoFactorAuth(userId);
             return Ok(result);
         }
 
         [Authorize(Roles = "SuperAdmin")]        
         [HttpGet("manage/info")]
-        public async Task<IActionResult> GetInfo(Guid userId)
+        public async Task<IActionResult> GetInfo(string userId)
         {
             var result = await _authService.GetInfo(userId);
-            _logger.LogInformation($"2fa status for: {userId}");
             return Ok(result);
         }
 

@@ -14,6 +14,8 @@ namespace RustyTech.Tests
     public class RoleServiceTestV1
     {
         private IRoleService _roleService;
+        private Mock<RoleManager<IdentityRole>> _roleManager;
+        private Mock<UserManager<User>> _userManager;
 
         [SetUp]
         public void Setup()
@@ -34,7 +36,7 @@ namespace RustyTech.Tests
             var result = await _roleService.CreateRole(roleName);
 
             // Assert
-            Assert.That(result, Is.EqualTo(Messages.Role.Created));
+            Assert.That(result.Message, Is.EqualTo(Messages.Role.Created));
         }
 
         [Test]
@@ -47,7 +49,7 @@ namespace RustyTech.Tests
             var result = await _roleService.CreateRole(roleName);
 
             // Assert
-            Assert.That(result, Is.EqualTo(Messages.Role.NameRequired));
+            Assert.That(result.Message, Is.EqualTo(Messages.Role.NameRequired));
         }
 
         [Test]
@@ -55,7 +57,7 @@ namespace RustyTech.Tests
         {
             // Arrange
             var roleName = "TestRole";
-            var role = new IdentityRole { Name = roleName, NormalizedName = roleName.ToUpper(), ConcurrencyStamp = Guid.NewGuid().ToString() };
+            var role = new IdentityRole { Name = roleName };
             var roleManger = _roleManager.Object;
             await roleManger.CreateAsync(role);
 
@@ -63,7 +65,7 @@ namespace RustyTech.Tests
             var result = await _roleService.CreateRole(roleName);
 
             // Assert
-            Assert.That(result, Is.EqualTo(Messages.Role.Exists));
+            Assert.That(result.Message, Is.EqualTo(Messages.Role.Exists));
         }
 
         [Test]
@@ -149,7 +151,7 @@ namespace RustyTech.Tests
         public async Task GetUserRolesAsync_WhenIdIsValid_ShouldReturnUserRoles()
         {
             // Arrange
-            var user = new User { Id = Guid.NewGuid() };
+            var user = new User { Id = Guid.NewGuid().ToString() };
             var role1 = new IdentityRole { Name = "Role1", NormalizedName = "ROLE1", ConcurrencyStamp = Guid.NewGuid().ToString() };
             var role2 = new IdentityRole { Name = "Role2", NormalizedName = "ROLE2", ConcurrencyStamp = Guid.NewGuid().ToString() };
             var roleManger = _roleManager.Object;
@@ -173,7 +175,7 @@ namespace RustyTech.Tests
         public async Task GetUserRolesAsync_WhenIdIsEmpty_ShouldReturnNull()
         {
             // Arrange
-            Guid id = Guid.Empty;
+            string id = string.Empty;
 
             // Act
             var result = await _roleService.GetUserRoles(id);
@@ -186,8 +188,8 @@ namespace RustyTech.Tests
         public async Task AddRoleToUserAsync_WhenRequestIsValid_ShouldReturnAddedToUser()
         {
             // Arrange
-            var user = new User { Id = Guid.NewGuid() };
-            var role = new IdentityRole { Name = "TestRole", NormalizedName = "TESTROLE", ConcurrencyStamp = Guid.NewGuid().ToString() };
+            var user = new User { Id = Guid.NewGuid().ToString() };
+            var role = new IdentityRole { Name = "TestRole" };
             var roleManger = _roleManager.Object;
             var userManager = _userManager.Object;
             await roleManger.CreateAsync(role);
@@ -199,54 +201,54 @@ namespace RustyTech.Tests
             var result = await _roleService.AddRoleToUser(request);
 
             // Assert
-            Assert.That(result, Is.EqualTo(Messages.Role.AddedToUser));
+            Assert.That(result.Message, Is.EqualTo(Messages.Role.AddedToUser));
         }
 
         [Test]
         public async Task AddRoleToUserAsync_WhenRoleNameIsNullOrWhiteSpace_ShouldReturnBadRequest()
         {
             // Arrange
-            var user = new User { Id = Guid.NewGuid() };
+            var user = new User { Id = Guid.NewGuid().ToString() };
             var request = new RoleRequest { RoleId = "1",  RoleName = "", UserId = user.Id };
 
             // Act
             var result = await _roleService.AddRoleToUser(request);
 
             // Assert
-            Assert.That(result, Is.EqualTo(Messages.Error.BadRequest));
+            Assert.That(result.Message, Is.EqualTo(Messages.Error.BadRequest));
         }
 
         [Test]
         public async Task AddRoleToUserAsync_WhenUserIdIsEmpty_ShouldReturnBadRequest()
         {
             // Arrange
-            var request = new RoleRequest { RoleId = "1", RoleName = "TestRole", UserId = Guid.Empty };
+            var request = new RoleRequest { RoleId = "1", RoleName = "TestRole", UserId = string.Empty };
 
             // Act
             var result = await _roleService.AddRoleToUser(request);
 
             // Assert
-            Assert.That(result, Is.EqualTo(Messages.Error.BadRequest));
+            Assert.That(result.Message, Is.EqualTo(Messages.Error.BadRequest));
         }
 
         [Test]
         public async Task AddRoleToUserAsync_WhenUserNotFound_ShouldReturnUserNotFound()
         {
             // Arrange
-            var request = new RoleRequest { RoleId = "1", RoleName = "TestRole", UserId = Guid.NewGuid() };
+            var request = new RoleRequest { RoleId = "1", RoleName = "TestRole", UserId = Guid.NewGuid().ToString() };
 
             // Act
             var result = await _roleService.AddRoleToUser(request);
 
             // Assert
-            Assert.That(result, Is.EqualTo(Messages.Info.UserNotFound));
+            Assert.That(result.Message, Is.EqualTo(Messages.Info.UserNotFound));
         }
 
         [Test]
         public async Task AddRoleToUserAsync_WhenRoleNotFound_ShouldReturnNotFound()
         {
             // Arrange
-            var user = new User { Id = Guid.NewGuid() };
+            var user = new User { Id = Guid.NewGuid().ToString() };
             var userManager = _userManager.Object;
             await userManager.CreateAsync(user);
 
@@ -256,21 +258,20 @@ namespace RustyTech.Tests
             var result = await _roleService.AddRoleToUser(request);
 
             // Assert
-            Assert.That(result, Is.EqualTo(Messages.Role.NotFound));
+            Assert.That(result.Message, Is.EqualTo(Messages.Role.NotFound));
         }
 
         [Test]
         public async Task RemoveRoleFromUserAsync_WhenRequestIsValid_ShouldReturnRemoved()
         {
             // Arrange
-            var user = new User { Id = Guid.NewGuid() };
-            var role = new IdentityRole { Name = "TestRole", NormalizedName = "TESTROLE", ConcurrencyStamp = Guid.NewGuid().ToString() };
+            var user = new User { Id = Guid.NewGuid().ToString() };
+            var role = new IdentityRole { Name = "TestRole" };
             var roleManger = _roleManager.Object;
             var userManager = _userManager.Object;
             await roleManger.CreateAsync(role);
             await userManager.CreateAsync(user);
 
-            var userRole = new UserRole { RoleId = role.Id, UserId = user.Id, CreatedAt = DateTime.UtcNow };
             await userManager.AddToRoleAsync(user, role.Name);
             var request = new RoleRequest { RoleName = "TestRole", RoleId = role.Id, UserId = user.Id };
 
@@ -278,54 +279,54 @@ namespace RustyTech.Tests
             var result = await _roleService.RemoveRoleFromUser(request);
 
             // Assert
-            Assert.That(result, Is.EqualTo(Messages.Role.Removed));
+            Assert.That(result.Message, Is.EqualTo(Messages.Role.Removed));
         }
 
         [Test]
         public async Task RemoveRoleFromUserAsync_WhenRoleIdIsNullOrWhiteSpace_ShouldReturnBadRequest()
         {
             // Arrange
-            var user = new User { Id = Guid.NewGuid() };
+            var user = new User { Id = Guid.NewGuid().ToString() };
             var request = new RoleRequest { RoleName = string.Empty, RoleId = string.Empty, UserId = user.Id };
 
             // Act
             var result = await _roleService.RemoveRoleFromUser(request);
 
             // Assert
-            Assert.That(result, Is.EqualTo(Messages.Error.BadRequest));
+            Assert.That(result.Message, Is.EqualTo(Messages.Error.BadRequest));
         }
 
         [Test]
         public async Task RemoveRoleFromUserAsync_WhenUserIdIsEmpty_ShouldReturnBadRequest()
         {
             // Arrange
-            var request = new RoleRequest { RoleName = string.Empty, RoleId = "TestRoleId", UserId = Guid.Empty };
+            var request = new RoleRequest { RoleName = string.Empty, RoleId = "TestRoleId", UserId = string.Empty };
 
             // Act
             var result = await _roleService.RemoveRoleFromUser(request);
 
             // Assert
-            Assert.That(result, Is.EqualTo(Messages.Error.BadRequest));
+            Assert.That(result.Message, Is.EqualTo(Messages.Error.BadRequest));
         }
 
         [Test]
         public async Task RemoveRoleFromUserAsync_WhenUserNotFound_ShouldReturnUserNotFound()
         {
             // Arrange
-            var request = new RoleRequest { RoleName = string.Empty, RoleId = "TestRoleId", UserId = Guid.NewGuid() };
+            var request = new RoleRequest { RoleName = string.Empty, RoleId = "TestRoleId", UserId = Guid.NewGuid().ToString() };
 
             // Act
             var result = await _roleService.RemoveRoleFromUser(request);
 
             // Assert
-            Assert.That(result, Is.EqualTo(Messages.Info.UserNotFound));
+            Assert.That(result.Message, Is.EqualTo(Messages.Info.UserNotFound));
         }
 
         [Test]
         public async Task RemoveRoleFromUserAsync_WhenUserRoleNotFound_ShouldReturnNotFound()
         {
             // Arrange
-            var user = new User { Id = Guid.NewGuid() };
+            var user = new User { Id = Guid.NewGuid().ToString() };
             var userManager = _userManager.Object;
             await userManager.CreateAsync(user);
 
@@ -335,7 +336,7 @@ namespace RustyTech.Tests
             var result = await _roleService.RemoveRoleFromUser(request);
 
             // Assert
-            Assert.That(result, Is.EqualTo(Messages.Info.UserNotFound));
+            Assert.That(result.Message, Is.EqualTo(Messages.Info.UserNotFound));
         }
     }
 }

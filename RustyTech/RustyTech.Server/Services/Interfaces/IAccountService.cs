@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Identity.Data;
 using RustyTech.Server.Models.Account;
 using RustyTech.Server.Models.Dtos;
 
@@ -13,8 +12,8 @@ namespace RustyTech.Server.Services.Interfaces
         Task<ResponseBase> ForgotPassword(string email);
         Task<ResponseBase> ResetPassword(CustomResetPasswordRequest request);
         Task<ResponseBase> UpdateUser(UpdateUserRequest userDto);
-        Task<ResponseBase> ToggleTwoFactorAuth(Guid id);
-        Task<ResponseBase> GetInfo(Guid id);
+        Task<ResponseBase> ToggleTwoFactorAuth(string id);
+        Task<ResponseBase> GetInfo(string id);
         Task<ResponseBase> Logout();
     }
 }

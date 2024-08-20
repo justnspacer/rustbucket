@@ -22,16 +22,16 @@ builder.Services.AddMemoryCache(); // Add in-memory caching services.
 // Rate limiting configuration.
 builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimiting")); // Configure IP rate limit options from configuration.
 builder.Services.Configure<IpRateLimitPolicies>(builder.Configuration.GetSection("IpRateLimitPolicies")); // Configure IP rate limit policies from configuration.
-builder.Services.AddInMemoryRateLimiting(); // Add in-memory rate limiting services.
+builder.Services.AddInMemoryRateLimiting();
 
 // Add CORS policy
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("MyCorsPolicy", policy =>
     {
-        policy.WithOrigins("https://localhost:5173") // Allow requests from this origin.
-              .AllowAnyHeader() // Allow any header.
-              .AllowAnyMethod(); // Allow any HTTP method.
+        policy.WithOrigins("https://localhost:5173")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
     });
 });
 
@@ -42,50 +42,22 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull; // Ignore null values when serializing.
     });
 
-builder.Services.AddAntiforgery(options =>
-{
-    options.HeaderName = "X-CSRF-TOKEN"; // Set the header name for CSRF tokens in AJAX requests.
-    options.Cookie.Name = "XSRF-TOKEN";
-    options.FormFieldName = "XSRF-TOKEN";
-});
 
-// Add authentication
+builder.Services.AddAuthorization();
 
-/*
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-
-}).AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, option =>
-{
-    option.LoginPath = "/auth/login";
-    option.LogoutPath = "/auth/logout";
-    option.AccessDeniedPath = "/auth/access-denied";
-    option.SlidingExpiration = true;
-    option.ExpireTimeSpan = TimeSpan.FromMinutes(60);
-    option.Cookie.HttpOnly = true;
-    option.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-});
-*/
-
-builder.Services.AddAuthorization(); // Add authorization services.
-
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer(); // Add endpoint API explorer for Swagger.
-builder.Services.AddRouting(options => options.LowercaseUrls = true); // Configure routing to use lowercase URLs.
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
 builder.Services.AddSwaggerGen(config =>
 {
-    config.SwaggerDoc("v1", new() { Title = "RustyTech.Server", Version = "v1" }); // Configure Swagger document.
-    config.OperationFilter<AddFileUploadParams>(); // Add file upload parameters to Swagger UI.
+    config.SwaggerDoc("v1", new() { Title = "RustyTech.Server", Version = "v1" });
+    config.OperationFilter<AddFileUploadParams>();
 });
 
 builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))); // Add Entity Framework Core services with SQL Server configuration.
 
 builder.Services.AddIdentity<User, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<DataContext>().AddDefaultTokenProviders(); // Add ASP.NET Core Identity services with roles and EF Core store.
+    .AddEntityFrameworkStores<DataContext>().AddDefaultTokenProviders();
 builder.Services.Configure<IdentityOptions>(options =>
 {
     //password settings
@@ -116,25 +88,25 @@ builder.Services.ConfigureApplicationCookie(options =>
     //cookie settings
     options.Cookie.HttpOnly = true;
     options.ExpireTimeSpan = TimeSpan.FromMinutes(30); //double check this!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    options.LoginPath = "/account/login";
-    options.AccessDeniedPath = "/account/access-denied";
+    options.LoginPath = "/login";
+    options.AccessDeniedPath = "/access-denied";
     options.SlidingExpiration = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
 });
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>(); // Add rate limit configuration as a singleton.
+builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>(); 
 builder.Services.AddSingleton<Ganss.Xss.HtmlSanitizer>();
-builder.Services.AddTransient<ISmtpClientService, SmtpClientService>(); // Add smtp client service with transient lifetime.
-builder.Services.AddScoped<IAccountService, AccountService>(); // Add authentication service with scoped lifetime.
-builder.Services.AddScoped<IRoleService, RoleService>(); // Add role service with scoped lifetime.
-builder.Services.AddScoped<IUserService, UserService>(); // Add user service with scoped lifetime.
-builder.Services.AddTransient<IEmailService, EmailService>(); // Add email service with transient lifetime.
-builder.Services.AddTransient<IEmailSender<User>, EmailSender>(); // Add email sender with transient lifetime.
-builder.Services.AddScoped<IPostService, PostService>(); // Add post service with scoped lifetime.
-builder.Services.AddScoped<IImageService, ImageService>(); // Add image service with scoped lifetime.
-builder.Services.AddScoped<IVideoService, VideoService>(); // Add video service with scoped lifetime.
-builder.Services.AddScoped<IKeywordService, KeywordService>(); // Add keyword service with scoped lifetime.
-
+builder.Services.AddTransient<ISmtpClientService, SmtpClientService>(); 
+builder.Services.AddScoped<IAccountService, AccountService>(); 
+builder.Services.AddScoped<IRoleService, RoleService>(); 
+builder.Services.AddScoped<IUserService, UserService>(); 
+builder.Services.AddTransient<IEmailService, EmailService>(); 
+builder.Services.AddTransient<IEmailSender<User>, EmailSender>();
+builder.Services.AddScoped<IPostService, PostService>(); 
+builder.Services.AddScoped<IImageService, ImageService>();
+builder.Services.AddScoped<IVideoService, VideoService>();
+builder.Services.AddScoped<IKeywordService, KeywordService>();
 builder.Services.Configure<RequestLocalizationOptions>(options =>
 {
     var supportedCultures = new[]
@@ -142,76 +114,58 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
         new CultureInfo("en-US"), // Add US English culture.
         new CultureInfo("es-ES"), // Add Spanish culture.
     };
-    options.DefaultRequestCulture = new RequestCulture("en-US"); // Set default request culture to US English.
-    options.SupportedCultures = supportedCultures; // Set supported cultures.
-    options.SupportedUICultures = supportedCultures; // Set supported UI cultures.
+    options.DefaultRequestCulture = new RequestCulture("en-US");
+    options.SupportedCultures = supportedCultures;
+    options.SupportedUICultures = supportedCultures; 
 });
 
-builder.Logging.ClearProviders(); // Clear default logging providers.
-builder.Logging.AddNLog(); // Add NLog provider for logging.
-builder.Logging.AddConsole(); // Add console provider for logging.
-builder.Logging.AddDebug(); // Add debug provider for logging.
+builder.Logging.ClearProviders();
+builder.Logging.AddNLog();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
 
-// Check if the superadmin user exists
 var superadminUserExists = await CheckSuperadminUserExistsAsync(builder.Services);
 
 if (!superadminUserExists)
 {
-    // Create the superadmin user
     await CreateSuperadminUserAsync(builder.Services);
 }
 
-var app = builder.Build(); // Build the WebApplication.
+var app = builder.Build();
 
-// Middleware to use CORS policy.
+
 app.UseCors("MyCorsPolicy");
 
 app.UseCookiePolicy(new CookiePolicyOptions
 {
-    MinimumSameSitePolicy = SameSiteMode.Strict, // Set the minimum same site policy to strict.
+    MinimumSameSitePolicy = SameSiteMode.Strict,
 });
 
-
-
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger(); // Enable Swagger middleware.
+    app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "RustyTech.Server v1"); // Configure Swagger endpoint.
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "RustyTech.Server v1");
     });
 }
 
-// Middleware for handling responses and exceptions.
-app.UseMiddleware<ResponseMiddleware>(); // Use custom response middleware.
-app.UseMiddleware<ExceptionMiddleware>(); // Use custom exception middleware.
+app.UseMiddleware<ResponseMiddleware>();
+app.UseMiddleware<ExceptionMiddleware>();
 
-app.UseIpRateLimiting(); // Enable IP rate limiting.
+app.UseIpRateLimiting();
 
-app.UseHttpsRedirection(); // Redirect HTTP requests to HTTPS.
-app.UseDefaultFiles(); // Enable default file mapping for the app.
-app.UseStaticFiles(); // Enable static file serving.
+app.UseHttpsRedirection();
+app.UseDefaultFiles();
+app.UseStaticFiles();
 
-app.UseRouting(); // Enable routing middleware.
+app.UseRouting();
 
-app.UseAuthentication(); // Enable authentication middleware.
-app.UseAuthorization(); // Enable authorization middleware.
+app.UseAuthentication();
+app.UseAuthorization();
 
-//CSRF token is generated and stored in a cookie named XSRF-TOKEN
-/*
-app.Use(next => context =>
-{
-    var antiforgery = context.RequestServices.GetRequiredService<IAntiforgery>();
-    var tokens = antiforgery.GetAndStoreTokens(context);
-    context.Response.Cookies.Append("XSRF-TOKEN", tokens.RequestToken!, new CookieOptions { HttpOnly = false });
-
-    return next(context);
-});
-*/
-
-app.MapControllers(); // Map controller routes.
-app.MapFallbackToFile("/index.html"); // Map fallback route to serve index.html for SPA.
+app.MapControllers();
+app.MapFallbackToFile("/index.html");
 
 async Task<bool> CheckSuperadminUserExistsAsync(IServiceCollection services)
 {
@@ -228,38 +182,42 @@ async Task CreateSuperadminUserAsync(IServiceCollection services)
 {
     using (var scope = services.BuildServiceProvider().CreateScope())
     {
+        var adminPassword = builder.Configuration.GetSection("AdminUser:Password").Value;
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
         // Create the superadmin role if it doesn't exist
-        var superadminRoleExists = await roleManager.RoleExistsAsync("SuperAdmin");
-        if (!superadminRoleExists)
+        var roleExists = await roleManager.RoleExistsAsync("SuperAdmin");
+        if (!roleExists)
         {
             await roleManager.CreateAsync(new IdentityRole("SuperAdmin"));
         }
 
-        // Create the superadmin user
-        var superadminUser = new User
+        var user = new User
         {
             UserName = builder.Configuration.GetSection("AdminUser:Email").Value,
             Email = builder.Configuration.GetSection("AdminUser:Email").Value,
             VerifiedAt = DateTime.Now,
             EmailConfirmed = true            
         };
-        var result = await userManager.CreateAsync(superadminUser, builder.Configuration.GetSection("AdminUser:Password").Value);
+
+        if (adminPassword == null)
+        {
+            throw new Exception("Admin password required.");
+        }
+
+        var result = await userManager.CreateAsync(user, adminPassword);
 
         if (result.Succeeded)
         {
-            // Add the superadmin user to the superadmin role
-            await userManager.AddToRoleAsync(superadminUser, "SuperAdmin");
+            await userManager.AddToRoleAsync(user, "SuperAdmin");
         }
         else
         {
-            // Handle the error if user creation fails
             throw new Exception("Failed to create superadmin user.");
         }
     }
 }
 
-app.Run(); // Run the application.
+app.Run();
 

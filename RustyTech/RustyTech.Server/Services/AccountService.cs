@@ -228,29 +228,37 @@ namespace RustyTech.Server.Services
 
         public async Task<ResponseBase> ForgotPassword(string email)
         {
+            var tokenExpiry = _configuration["ResetTokenExpiresInDays"];
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
             {
                 return UserNotFoundResponse();
             }
-
-            user.PasswordResetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
-            user.ResetTokenExpires =
-                DateTime.UtcNow.AddDays(int.Parse(_configuration["ResetTokenExpiresInDays"]));
-            await _userManager.UpdateAsync(user);
-            var emailRequest = new EmailRequest
+            if (tokenExpiry != null)
             {
-                To = user.Email,
-                Subject = "Reset Password",
-                Body = CreateResetPasswordBody(user.Id, WebUtility.UrlEncode(user.PasswordResetToken))
-            };
+                user.PasswordResetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+                user.ResetTokenExpires =
+                    DateTime.UtcNow.AddDays(int.Parse(tokenExpiry));
+                await _userManager.UpdateAsync(user);
+                var emailRequest = new EmailRequest
+                {
+                    To = user.Email,
+                    Subject = "Reset Password",
+                    Body = CreateResetPasswordBody(user.Id, WebUtility.UrlEncode(user.PasswordResetToken))
+                };
 
-            await _emailService.SendEmailAsync(emailRequest);
-            _logger.LogInformation($"forgot password email sent");
+                await _emailService.SendEmailAsync(emailRequest);
+                _logger.LogInformation($"forgot password email sent");
+                return new ResponseBase()
+                {
+                    IsSuccess = true,
+                    Message = Constants.Messages.Info.UserPasswordReset
+                };
+            }
             return new ResponseBase()
             {
-                IsSuccess = true,
-                Message = Constants.Messages.Info.UserPasswordReset
+                IsSuccess = false,
+                Message = "Token expiration needed"
             };
         }
 
@@ -280,26 +288,13 @@ namespace RustyTech.Server.Services
                     Message = Constants.Messages.Token.Expired
                 };
             }
-            var isPassword = await _userManager.CheckPasswordAsync(user, request.CurrentPassword);
-            if (!isPassword)
-            {
-                return PasswordErrorResponse();
-            }
-            var result = await _userManager.ChangePasswordAsync(user, request.CurrentPassword,  request.NewPassword);
+            
+            var result = await _userManager.ResetPasswordAsync(user, decodedCode, request.NewPassword);
             if (result.Succeeded)
             {
                 user.PasswordResetToken = null;
                 user.ResetTokenExpires = null;
-                user.VerificationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-
                 await _userManager.UpdateAsync(user);
-
-                //send another verification notification after password reset to notify user of the change
-                if (user.Email != null)
-                {
-                    SendConfirmationEmail(user.Email, user.Id, WebUtility.UrlEncode(user.VerificationToken));
-                    _logger.LogInformation($"Email after password reset sent");
-                }
                 return new ResponseBase()
                 {
                     IsSuccess = true,
@@ -315,11 +310,11 @@ namespace RustyTech.Server.Services
 
         public async Task<ResponseBase> UpdateUser(UpdateUserRequest userDto)
         {
-            if (userDto.UserId == Guid.Empty)
+            if (userDto.UserId == null)
             {
                 return IdRequiredResponse();
             }
-            var user = await _userManager.FindByIdAsync(userDto.UserId.ToString());
+            var user = await _userManager.FindByIdAsync(userDto.UserId);
             if (user == null)
             {
                 return UserNotFoundResponse();
@@ -327,6 +322,15 @@ namespace RustyTech.Server.Services
 
             if (userDto.UserName != null)
             {
+                var existingUserName = await _userManager.FindByNameAsync(userDto.UserName);
+                if (existingUserName != null)
+                {
+                    return new ResponseBase()
+                    {
+                        IsSuccess = false,
+                        Message = "Username already exists"
+                    };
+                }
                 user.UserName = userDto.UserName;
                 await _userManager.UpdateNormalizedUserNameAsync(user);
             }
@@ -347,21 +351,26 @@ namespace RustyTech.Server.Services
                 {
                     user.VerificationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     SendConfirmationEmail(user.Email, user.Id, WebUtility.UrlEncode(user.VerificationToken));
-                    await _userManager.UpdateSecurityStampAsync(user);
-                    _logger.LogInformation($"reconfirm new email sent");
+                    _logger.LogInformation($"email reverification sent");
+                    await _userManager.UpdateAsync(user);
+                    return new ResponseBase()
+                    {
+                        IsSuccess = true,
+                        Message = "User data updated, email reverification required"
+                    };
                 }
             }
             await _userManager.UpdateAsync(user);
             return new ResponseBase()
             {
                 IsSuccess = true,
-                Message = "User updated, email reverifcation required"
+                Message = "User data updated"
             };
         }
 
-        public async Task<ResponseBase> ToggleTwoFactorAuth(Guid id)
+        public async Task<ResponseBase> ToggleTwoFactorAuth(string id)
         {
-            var user = await _userManager.FindByIdAsync(id.ToString());
+            var user = await _userManager.FindByIdAsync(id);
 
             if (user == null)
             {
@@ -383,9 +392,9 @@ namespace RustyTech.Server.Services
             };
         }
 
-        public async Task<ResponseBase> GetInfo(Guid id)
+        public async Task<ResponseBase> GetInfo(string id)
         {
-            if (id == Guid.Empty)
+            if (id == null)
             {
                 return IdRequiredResponse();
             }
@@ -413,15 +422,15 @@ namespace RustyTech.Server.Services
         }
 
         //helper methods
-        private string CreateConfirmEmailBody(Guid id, string token)
+        private string CreateConfirmEmailBody(string id, string token)
         {
             return $"<a href='{_configuration["ConfirmEmailUrl"]}id={id}&token={token}'>Confirm your email</a>";
         }
-        private string CreateResetPasswordBody(Guid id, string token)
+        private string CreateResetPasswordBody(string id, string token)
         {
             return $"<a href='{_configuration["ResetPasswordUrl"]}id={id}&token={token}'>Reset your password</a>";
         }
-        private void SendConfirmationEmail(string email, Guid id, string token)
+        private void SendConfirmationEmail(string email, string id, string token)
         {
             var emailRequest = new EmailRequest
             {
@@ -433,11 +442,15 @@ namespace RustyTech.Server.Services
         }
         private async Task AddLoginRecord(User user)
         {
-            var userLogin = new UserLoginInfo(
-                _configuration["LoginInfo:DefaultProvider:ProviderName"],
-                _configuration["LoginInfo:DefaultProvider:ProviderKey"],
-                _configuration["LoginInfo:DefaultProvider:ProviderName"]);
-            await _userManager.AddLoginAsync(user, userLogin);
+            var provider = _configuration["LoginInfo:DefaultProvider:ProviderName"];
+            var key = _configuration["LoginInfo:DefaultProvider:ProviderKey"];
+            var name = _configuration["LoginInfo:DefaultProvider:ProviderName"];
+            if (provider != null && key != null && name != null)
+            {
+                var userLogin = new UserLoginInfo(provider, key, name);
+                await _userManager.AddLoginAsync(user, userLogin);
+            }
+            
         }
         private bool IsPasswordValid(string password)
         {
@@ -445,7 +458,6 @@ namespace RustyTech.Server.Services
             Regex regex = new Regex(pattern);
             return regex.IsMatch(password);
         }
-        
         private LoginResponse UserNotFoundResponse()
         {
             return new LoginResponse()

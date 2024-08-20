@@ -11,7 +11,7 @@ namespace RustyTech.Server.Models.Dtos
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public GetUserRequest? User { get; set; }
-        public Guid UserId { get; set; }
+        public string? UserId { get; set; }
         public string? PostType { get; set; }
         public string? VideoFile { get; set; } 
         public string? ImageFile { get; set; }

@@ -12,7 +12,7 @@ namespace RustyTech.Server.Services
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ILogger<RoleService> _logger;
 
-        public RoleService(RoleManager<IdentityRole> roleManager, UserManager<User> userManager , ILogger<RoleService> logger)
+        public RoleService(RoleManager<IdentityRole> roleManager, UserManager<User> userManager, ILogger<RoleService> logger)
         {
             _roleManager = roleManager;
             _userManager = userManager;
@@ -102,9 +102,32 @@ namespace RustyTech.Server.Services
             return roleDto;
         }
 
-        public async Task<IList<string>?> GetUserRoles(Guid id)
+        public async Task<ResponseBase> DeleteRole(string roleName)
         {
-            if (id == Guid.Empty)
+            var role = await _roleManager.FindByNameAsync(roleName);
+            if (role != null)
+            {
+                var result = await _roleManager.DeleteAsync(role);
+                if (result.Succeeded)
+                {
+                    _logger.LogInformation($"Role {role.Name} deleted");
+                    return new ResponseBase { IsSuccess = true, Message = "Role deleted" };
+                }
+                else
+                {
+                    return new ResponseBase
+                    {
+                        IsSuccess = false,
+                        Message = result.Errors.Select(d => d.Description).FirstOrDefault()
+                    };
+                }
+            }
+            return new ResponseBase { IsSuccess = false, Message = Constants.Messages.Role.NotFound };
+        }
+
+        public async Task<IList<string>?> GetUserRoles(string id)
+        {
+            if (id == string.Empty)
             {
                 return null;
             }
@@ -124,7 +147,7 @@ namespace RustyTech.Server.Services
 
         public async Task<ResponseBase> AddRoleToUser(RoleRequest request)
         {
-            if (string.IsNullOrWhiteSpace(request.RoleName) || request.UserId == Guid.Empty)
+            if (string.IsNullOrWhiteSpace(request.RoleName) || request.UserId == string.Empty)
             {
                 return new ResponseBase { 
                     IsSuccess = false, 
@@ -178,7 +201,7 @@ namespace RustyTech.Server.Services
 
         public async Task<ResponseBase> RemoveRoleFromUser(RoleRequest request)
         {
-            if (string.IsNullOrWhiteSpace(request.RoleId) || request.UserId == Guid.Empty)
+            if (string.IsNullOrWhiteSpace(request.RoleId) || request.UserId == string.Empty)
             {
                 return new ResponseBase
                 {
@@ -220,29 +243,6 @@ namespace RustyTech.Server.Services
                 IsSuccess = false, 
                 Message = Constants.Messages.Role.Removed 
             };
-        }
-
-        public async Task<ResponseBase> DeleteRole(string roleName)
-        {
-            var role = await _roleManager.FindByNameAsync(roleName);
-            if (role != null)
-            {
-                var result = await _roleManager.DeleteAsync(role);
-                if (result.Succeeded)
-                {
-                    _logger.LogInformation($"Role {role.Name} deleted");
-                    return new ResponseBase { IsSuccess = true, Message = "Role deleted" };
-                }
-                else
-                {
-                    return new ResponseBase
-                    {
-                        IsSuccess = false,
-                        Message = result.Errors.Select(d => d.Description).FirstOrDefault()
-                    };
-                }
-            }
-            return new ResponseBase { IsSuccess = false, Message = Constants.Messages.Role.NotFound };
         }
 
         public async Task<ResponseBase> AddClaimToRole(ClaimRequest request)

@@ -12,7 +12,7 @@ namespace RustyTech.Server.Models.Dtos
         public bool IsPublished { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
-        public Guid UserId { get; set; }
+        public string? UserId { get; set; }
         [JsonIgnore]
         public GetUserRequest? User { get; set; }
     }

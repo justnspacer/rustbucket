@@ -190,7 +190,6 @@ namespace RustyTech.Tests
             // Arrange
             var request = new CustomResetPasswordRequest
             {
-                CurrentPassword = "Test123",
                 Email = "test123@example.com",
                 ResetCode = "valid_token",
                 NewPassword = "NewPassword123!",
@@ -198,7 +197,7 @@ namespace RustyTech.Tests
 
             var user = new User
             {
-                Id = new Guid(),
+                Id = Guid.NewGuid().ToString(),
                 Email = "test123@example.com",
                 PasswordResetToken = "valid_token"
             };
@@ -219,7 +218,7 @@ namespace RustyTech.Tests
         public async Task UpdateUserAsync_SuccessfulRequest_ReturnsResponseBaseWithSuccessMessage()
         {
             // Arrange
-            var userId = Guid.NewGuid();
+            var userId = Guid.NewGuid().ToString();
             var userDto = new UpdateUserRequest
             {
                 UserId = userId,
@@ -229,7 +228,7 @@ namespace RustyTech.Tests
             };
             var user = new User
             {
-                Id = userId,
+                Id = Guid.NewGuid().ToString(),
                 UserName = "Johnner",
                 Email = "johnner.doer@example.com",
                 BirthYear = 1980
@@ -251,7 +250,7 @@ namespace RustyTech.Tests
         public async Task EnableTwoFactorAuthenticationAsync_SuccessfulRequest_ReturnsResponseBaseWithSuccessMessage()
         {
             // Arrange
-            var userId = Guid.NewGuid();
+            var userId = Guid.NewGuid().ToString();
             var user = new User { Id = userId, TwoFactorEnabled = false };
 
             // Act
@@ -266,7 +265,7 @@ namespace RustyTech.Tests
         public async Task GetInfoAsync_SuccessfulRequest_ReturnsResponseBaseWithSuccessMessage()
         {
             // Arrange
-            var userId = Guid.NewGuid();
+            var userId = Guid.NewGuid().ToString();
             var user = new User { Id = userId, TwoFactorEnabled = true };
 
             // Act
@@ -281,7 +280,7 @@ namespace RustyTech.Tests
         public async Task LogoutAsync_SuccessfulRequest_ReturnsLoginResponseWithLoggedOutUser()
         {
             // Arrange
-            var userId = Guid.NewGuid();
+            var userId = Guid.NewGuid().ToString();
             var user = new User { Id = userId };
 
             // Act

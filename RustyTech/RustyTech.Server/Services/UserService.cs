@@ -33,9 +33,9 @@ namespace RustyTech.Server.Services
             return users;
         }
 
-        public async Task<GetUserRequest?> GetByIdAsync(Guid id)
+        public async Task<GetUserRequest?> GetByIdAsync(string id)
         {
-            if (id == Guid.Empty)
+            if (id == null)
             {
                 return null;
             }
@@ -48,9 +48,9 @@ namespace RustyTech.Server.Services
             return userDto;
         }
 
-        public async Task<ResponseBase> DeleteAsync(Guid id)
+        public async Task<ResponseBase> DeleteAsync(string id)
         {
-            if (id == Guid.Empty)
+            if (id == null)
             {
                 return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.IdRequired };
             }

@@ -156,7 +156,7 @@ namespace RustyTech.Server.Services
                 return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Error.BadRequest };
             }
 
-            if (post.UserId == Guid.Empty)
+            if (post.UserId == string.Empty)
             {
                 return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.IdRequired };
             }
@@ -180,7 +180,7 @@ namespace RustyTech.Server.Services
         {
             if (videoDto.VideoFile != null)
             {
-                var userfromDb = await _context.Users.FirstOrDefaultAsync(u => u.Id == user.Id);
+                var userfromDb = await _context.Users.FirstOrDefaultAsync(u => u.Id.ToString() == user.Id);
                 if (userfromDb == null)
                 {
                     return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Info.UserNotFound };
@@ -233,7 +233,7 @@ namespace RustyTech.Server.Services
                 return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Error.BadRequest };
             }
 
-            if (post.UserId == Guid.Empty)
+            if (post.UserId == string.Empty)
             {
                 return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.IdRequired };
             }
@@ -257,7 +257,7 @@ namespace RustyTech.Server.Services
         {
             if (imageDto.ImageFile != null)
             {
-                var userfromDb = await _context.Users.FirstOrDefaultAsync(u => u.Id == user.Id);
+                var userfromDb = await _context.Users.FirstOrDefaultAsync(u => u.Id.ToString() == user.Id);
                 if (userfromDb == null)
                 {
                     return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Info.UserNotFound };
@@ -310,7 +310,7 @@ namespace RustyTech.Server.Services
                 return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Error.BadRequest };
             }
 
-            if (post.UserId == Guid.Empty)
+            if (post.UserId == string.Empty)
             {
                 return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.IdRequired };
             }
@@ -342,7 +342,7 @@ namespace RustyTech.Server.Services
             }
             if (blogDto.Content != null)
             {
-                var userfromDb = await _context.Users.FirstOrDefaultAsync(u => u.Id == user.Id);
+                var userfromDb = await _context.Users.FirstOrDefaultAsync(u => u.Id.ToString() == user.Id);
                 if (userfromDb == null)
                 {
                     return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Info.UserNotFound };

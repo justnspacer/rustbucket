@@ -52,9 +52,9 @@ namespace RustyTech.Tests
         public async Task GetAllAsync_ShouldReturnAllUsers_WhenActiveIsTrue()
         {
             // Arrange
-            var user1 = new User { Id = Guid.NewGuid(), Email = "user1@example.com", EmailConfirmed = true };
-            var user2 = new User { Id = Guid.NewGuid(), Email = "user2@example.com", EmailConfirmed = true };
-            var user3 = new User { Id = Guid.NewGuid(), Email = "user3@example.com", EmailConfirmed = false };
+            var user1 = new User { Id = Guid.NewGuid().ToString(), Email = "user1@example.com", EmailConfirmed = true };
+            var user2 = new User { Id = Guid.NewGuid().ToString(), Email = "user2@example.com", EmailConfirmed = true };
+            var user3 = new User { Id = Guid.NewGuid().ToString(), Email = "user3@example.com", EmailConfirmed = false };
             _context.Users.AddRange(user1, user2, user3);
             await _context.SaveChangesAsync();
 
@@ -71,9 +71,9 @@ namespace RustyTech.Tests
         public async Task GetAllAsync_ShouldReturnAllUsers_WhenActiveIsFalse()
         {
             // Arrange
-            var user1 = new User { Id = Guid.NewGuid(), Email = "user1@example.com", EmailConfirmed = true };
-            var user2 = new User { Id = Guid.NewGuid(), Email = "user2@example.com", EmailConfirmed = true };
-            var user3 = new User { Id = Guid.NewGuid(), Email = "user3@example.com", EmailConfirmed = false };
+            var user1 = new User { Id = Guid.NewGuid().ToString(), Email = "user1@example.com", EmailConfirmed = true };
+            var user2 = new User { Id = Guid.NewGuid().ToString(), Email = "user2@example.com", EmailConfirmed = true };
+            var user3 = new User { Id = Guid.NewGuid().ToString(), Email = "user3@example.com", EmailConfirmed = false };
             _context.Users.AddRange(user1, user2, user3);
             await _context.SaveChangesAsync();
 
@@ -91,7 +91,7 @@ namespace RustyTech.Tests
         public async Task GetByIdAsync_ShouldReturnUserDto_WhenIdIsValid()
         {
             // Arrange
-            var userId = Guid.NewGuid();
+            var userId = Guid.NewGuid().ToString();
             var user = new User { Id = userId, Email = "user@example.com", EmailConfirmed = true };
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
@@ -109,7 +109,7 @@ namespace RustyTech.Tests
         public async Task GetByIdAsync_ShouldReturnNull_WhenIdIsEmpty()
         {
             // Act
-            var result = await _userService.GetByIdAsync(Guid.Empty);
+            var result = await _userService.GetByIdAsync(string.Empty);
 
             // Assert
             Assert.IsNull(result);
@@ -119,7 +119,7 @@ namespace RustyTech.Tests
         public async Task GetByIdAsync_ShouldReturnNull_WhenUserNotFound()
         {
             // Arrange
-            var userId = Guid.NewGuid();
+            var userId = Guid.NewGuid().ToString();
 
             // Act
             var result = await _userService.GetByIdAsync(userId);
@@ -132,7 +132,7 @@ namespace RustyTech.Tests
         public async Task DeleteAsync_ShouldReturnUserDeletedMessage_WhenIdIsValid()
         {
             // Arrange
-            var userId = Guid.NewGuid();
+            var userId = Guid.NewGuid().ToString();
             var user = new User { Id = userId, Email = "user@example.com", EmailConfirmed = true };
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
@@ -149,7 +149,7 @@ namespace RustyTech.Tests
         public async Task DeleteAsync_ShouldReturnIdRequiredMessage_WhenIdIsEmpty()
         {
             // Act
-            var result = await _userService.DeleteAsync(Guid.Empty);
+            var result = await _userService.DeleteAsync(string.Empty);
 
             // Assert
             Assert.That(result.Message, Is.EqualTo(Messages.IdRequired));
@@ -159,7 +159,7 @@ namespace RustyTech.Tests
         public async Task DeleteAsync_ShouldReturnUserBadRequestMessage_WhenUserNotFound()
         {
             // Arrange
-            var userId = Guid.NewGuid();
+            var userId = Guid.NewGuid().ToString();
 
             // Act
             var result = await _userService.DeleteAsync(userId);
