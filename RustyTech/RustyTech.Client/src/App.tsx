@@ -4,7 +4,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import LoginForm from './components/loginForm';
 import RegisterForm from './components/registerForm';
 import Home from './components/home';
-import AuthProvider from './contexts/authContext';
+import { AuthProvider } from './contexts/authContext';
 import Navbar from './components/navBar';
 import Footer from './components/footer';
 import Post from './components/post';

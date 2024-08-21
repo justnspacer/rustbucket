@@ -1,22 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/authContext';
 
 const LoginForm: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const { login, isAuthenticated, message, isTokenValid } = useAuth();
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        if (isAuthenticated && isTokenValid) {
-            navigate('/', { state: { message } });
-        }
-    }, [isAuthenticated, isTokenValid, navigate, message]);
+    const { loginUser } = useAuth();
 
     const handleLogin = async (event: React.FormEvent) => {
         event.preventDefault();
-        await login({ email, password });
+        try {
+            const getd = loginUser({ email, password });
+
+            console.log('Logged in, redirect?');
+        } catch (e) {
+            console.error(e);
+        }
     };
 
     return (
@@ -30,8 +29,7 @@ const LoginForm: React.FC = () => {
             <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required />
 
             <button type="submit">Login</button>
-            <p className="register-line">Need an account?<Link to="/register">Register</Link></p>
-            {message && <p>{message}</p>}
+            <p className="register-line">Need an account?<Link to="/register">Register</Link></p>            
         </form>
     );
 };

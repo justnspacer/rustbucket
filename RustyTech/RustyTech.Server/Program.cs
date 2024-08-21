@@ -102,7 +102,6 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IRoleService, RoleService>(); 
 builder.Services.AddScoped<IUserService, UserService>(); 
 builder.Services.AddTransient<IEmailService, EmailService>(); 
-builder.Services.AddTransient<IEmailSender<User>, EmailSender>();
 builder.Services.AddScoped<IPostService, PostService>(); 
 builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<IVideoService, VideoService>();

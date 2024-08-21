@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getAllPosts } from '../services/postService';
 import { PostDto } from '../types/apiResponse';
-import { MEDIA_URL } from '../types/urls';
+import { BASE_URL } from '../types/urls';
 import Spinner from './spinner';
 
 const formatDate = (datetime: Date) => {
@@ -48,18 +48,18 @@ const PostsList: React.FC = () => {
                         <li className='post' >
                            
                             {post.imageFile && (
-                                <img src={`${MEDIA_URL}${post.imageFile}`} alt={post.title} />
+                                <img src={`${BASE_URL}${post.imageFile}`} alt={post.title} />
                             )}
                             {post.videoFile && (
                                 <video controls>
-                                    <source src={`${MEDIA_URL}${post.videoFile}`} type="video/mp4" />
+                                    <source src={`${BASE_URL}${post.videoFile}`} type="video/mp4" />
                                     Your browser does not support the video tag.
                                 </video>
                             )}
                             {post?.imageFiles && (
                                 <>
                                     {post.imageFiles.map((imageFile, index) => (
-                                        <img key={index} src={`${MEDIA_URL}${imageFile}`} alt={post?.title} />
+                                        <img key={index} src={`${BASE_URL}${imageFile}`} alt={post?.title} />
                                     ))}
                                 </>
                             )}

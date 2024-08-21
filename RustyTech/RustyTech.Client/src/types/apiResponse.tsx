@@ -1,70 +1,45 @@
-export interface RegisterRequest {
-    type: "RegisterRequest";
-    email: string;
-    userName: string;
-    password: string;
-    confirmPassword: string;
-    birthYear: number;
-}
-
-export interface LoginRequest {
-    type: "LoginRequest";
-    email: string;
-    password: string;
-}
-
-export interface ResponseBase
-{
-    type: "ResponseBase";
-    statusCode: number;
+export interface ResponseBase {
     isSuccess: boolean;
     message: string;
 }
 
-export interface RoleDto {
-    type: "RoleRequest";
-    id: string;
-    roleName: string;
+export interface RegisterRequest {
+    email: string;
+    password: string;
 }
 
-export interface UserUpdateDto {
-    type: "UserUpdateRequest";
-    userId: string;
-    email?: string;
-    userName?: string;
-    birthYear: number;
+export interface LoginRequest {
+    email: string;
+    password: string;
+    rememberMe: boolean;
 }
 
-export interface UserDto {
-    type: "GetUserRequest";
+export interface LoginResponse extends ResponseBase {
+    isAuthenticated: boolean;
+    user: GetUserRequest; 
+}
+
+export interface GetUserRequest {
     id: string;
     email: string;
     userName: string;
     verifiedAt: Date;
 }
 
-export interface PostDto {
-    type: "GetPostRequest";
-    id: number;
-    title: string;
-    content: string;
-    plainTextContent: string;
-    keywords: string[];
-    postType: string;
+export interface VerifyEmailRequest {
+    id: string;
+    token: string;
+}
+
+export interface ResestPasswordRequest {
+    email: string;
+    resetCode : string;
+    newPassword: string;
+}
+
+export interface UpdateUserRequest {
     userId: string;
-    user: UserDto;
-    createdAt: Date;
-    updatedAt: Date;
-    isPublished: boolean;
-    imageFile?: string;
-    videoFile?: string;
-    imageFiles?: string[];
+    email: string;
+    userName: string;
+    birthYear: number;
 }
-
-export interface ApiData<T> {
-    data: T;
-}
-
-export type Data = RoleDto | UserUpdateDto | UserDto | PostDto | PostDto[] | ResponseBase | null;
-
-export interface ApiResponse extends ApiData<Data> { }
