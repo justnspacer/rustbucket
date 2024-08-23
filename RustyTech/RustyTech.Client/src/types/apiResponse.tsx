@@ -1,6 +1,17 @@
 export interface ResponseBase {
-    isSuccess: boolean;
-    message: string;
+    data: {
+        isSuccess: boolean;
+        message: string;
+    };
+}
+export interface LoginResponse {
+    data: {
+        isAuthenticated: boolean;
+        isSuccess: boolean;
+        user: GetUserRequest;
+        message?: string;
+    };
+    
 }
 
 export interface RegisterRequest {
@@ -12,11 +23,6 @@ export interface LoginRequest {
     email: string;
     password: string;
     rememberMe: boolean;
-}
-
-export interface LoginResponse extends ResponseBase {
-    isAuthenticated: boolean;
-    user: GetUserRequest; 
 }
 
 export interface GetUserRequest {
@@ -42,4 +48,20 @@ export interface UpdateUserRequest {
     email: string;
     userName: string;
     birthYear: number;
+}
+
+export interface GetPostRequest {
+    id: number;
+    title?: string;
+    content?: string;
+    isPublished: boolean;
+    keywords?: string[];
+    createdAt: Date;
+    updatedAt: Date;
+    user?: GetUserRequest;
+    userId?: string;
+    postType?: string;
+    videoFile?: string;
+    imageFile?: string;
+    imageFiles?: string[];
 }

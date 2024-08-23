@@ -3,13 +3,21 @@ import { BASE_URL } from '../types/urls';
 import {
     ResponseBase, RegisterRequest, LoginRequest,
     LoginResponse, VerifyEmailRequest, ResestPasswordRequest,
-    UpdateUserRequest
+    UpdateUserRequest,
+    AuthResponse
 } from '../types/apiResponse';
 
 async function sendPostRequest<TRequest, TResponse>(url: string, data: TRequest): Promise<TResponse> {
     const response = await axios.post<TResponse>(`${BASE_URL}${url}`, data, {
         headers: { 'Content-Type': 'application/json' },
         withCredentials: true
+    });
+    return response.data;
+}
+
+async function sendPostRequestNoCreds<TRequest, TResponse>(url: string, data: TRequest): Promise<TResponse> {
+    const response = await axios.post<TResponse>(`${BASE_URL}${url}`, data, {
+        headers: { 'Content-Type': 'application/json' },
     });
     return response.data;
 }
@@ -28,7 +36,7 @@ export async function register(data: RegisterRequest): Promise<ResponseBase> {
 }
 
 export async function login(data: LoginRequest): Promise<LoginResponse> {
-    return sendPostRequest<LoginRequest, LoginResponse>('/api/account/login', data);
+    return sendPostRequestNoCreds<LoginRequest, LoginResponse>('/api/account/login', data);
 }
 
 export async function verifyEmail(data: VerifyEmailRequest): Promise<ResponseBase> {
@@ -61,4 +69,8 @@ export async function getInfo(userId: string): Promise<ResponseBase> {
 
 export async function logout(): Promise<ResponseBase> {
     return sendPostRequest('/api/account/logout', {});
+}
+
+export async function isAuthenticated(): Promise<LoginResponse> {
+    return sendGetRequest('/api/account/isAuthenticated', {});
 }

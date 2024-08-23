@@ -161,6 +161,7 @@ namespace RustyTech.Server.Services
             return new LoginResponse()
             {
                 IsAuthenticated = false,
+                IsSuccess = false,
                 Message = Constants.Messages.Error.InvalidCredentials
             };
         }

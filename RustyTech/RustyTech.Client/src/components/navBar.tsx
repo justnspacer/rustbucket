@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/authContext';
 
 const NavBar: React.FC = () => {
-    const { isAuthenticated, isTokenValid, logout, user } = useAuth();
+    const { user, logoutUser } = useAuth();
     const [showDropdown, setShowDropdown] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
+    const navigate = useNavigate();
+
 
     const handleDropdownClick = () => {
         setShowDropdown(!showDropdown);
@@ -14,6 +16,13 @@ const NavBar: React.FC = () => {
     const handleClickOutside = (event: MouseEvent) => {
         if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
             setShowDropdown(false);
+        }
+    };
+
+    const handleLogout = async () => {
+        const response = await logoutUser();
+        if (response.data.isSuccess) {
+            navigate('/');
         }
     };
 
@@ -30,14 +39,14 @@ const NavBar: React.FC = () => {
                 <div>Rust Bucket</div>
             </Link>
             <div className="links">
-                {isAuthenticated && isTokenValid ? (
+                {user ? (
                     <>
                         <span className="username-container">
                             <span className="username" onClick={handleDropdownClick}>{user?.email}</span>
                             {showDropdown && (
                                 <div className="dropdown" ref={dropdownRef}>
                                     <Link to="/profile">Profile</Link>
-                                    <Link to="/" onClick={logout}>Logout</Link>
+                                    <Link to="/" onClick={handleLogout}>Logout</Link>
                                 </div>
                             )}
                         </span>

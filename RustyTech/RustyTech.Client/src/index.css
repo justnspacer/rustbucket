@@ -23,10 +23,19 @@
     --citrine: #EAD94C; /*yellow*/
 }
 
+body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    color: var(--timberwolf);
+    background: linear-gradient(to bottom, var(--rose-taupe), var(--charcoal)) no-repeat fixed center;
+}
+
+
 
 @media (prefers-color-scheme: light) {
     body {
-        background-color: #D1D1D1;
+        background: linear-gradient(to bottom, blue, red);
     }
 }
 
@@ -116,27 +125,19 @@ a {
         color: var(--jasper);
     }
 
-body {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    color: var(--charcoal);
-    background-color: var(--timberwolf);
-}
 
 
 
 nav {
     display: flex;
     align-items: center;
-    background-color: var(--prussian-blue);
     padding: 16px;
     gap: 20px;
     margin-bottom: 20px;
 }
 
 footer {
-    padding: 1rem;
+    padding: 4rem;
 }
 
     footer div {
@@ -164,7 +165,7 @@ footer {
     }
 
     .logo a:link, .logo a:visited {
-        color: var(--charcoal);
+        color: var(--citrine);
         text-decoration: none;
     }
 
@@ -184,19 +185,11 @@ nav .links {
     align-items: center;
 }
 
-.header-one {
-    margin: 0 0 1rem 0;
-}
-
 #loginForm, #registerForm {
     display: flex;
     flex-direction: column;
-    border-radius: 16px;
-    box-shadow: 8px 10px 7px rgba(0, 0, 0, 0.5);
     color: var(--white-color);
-    background-color: var(--prussian-blue);
-    padding: 2rem;
-    width: 300px;
+    width: 260px;
     margin: 0 auto;
 }
 
@@ -204,28 +197,31 @@ label {
     font-weight: bold;
 }
 
+#loginForm .checkbox {
+    width: 20px;
+}
+
 #loginForm input, #registerForm input {
     padding: 0.5rem;
     font-size: 1rem;
     border: none;
-    border-radius: 16px;
-    box-shadow: 8px 10px 7px rgba(0, 0, 0, 0.5);
-    margin-bottom: 1rem;
+    margin-bottom: 2rem;
 }
 
 #loginForm button, #registerForm button {
-    padding: 0.5rem;
-    font-size: 1rem;
+    padding: 1rem;
     border: none;
-    border-radius: 16px;
-    background-color: var(--jasper);
-    color: var(--white-color);
-    font-weight: bold;
-    text-transform: uppercase;
+    background-color: var(--citrine);
+    color: var(--rich-black);
+    font-weight: 900;
+    font-size: 1.8rem;
+    font-weight: 900;
+    font-family: "Titillium Web", sans-serif;
+    letter-spacing: 0.1rem;
+    text-transform: lowercase;
     cursor: pointer;
-    width: 50%;
     margin-top: 1rem;
-    box-shadow: 8px 10px 7px rgba(0, 0, 0, 0.5);
+    box-shadow: 4px 7px 2px rgba(0, 0, 0, 0.9);
 }
 
 .spinner-container {
@@ -246,7 +242,8 @@ label {
 
 .register-line {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    gap: .5rem;
     margin: 0;
     margin-top: 20px;
 }
@@ -280,24 +277,20 @@ a.login-link:link, a.login-link:visited {
     position: absolute;
     display: flex;
     flex-direction: column;
-    background-color: var(--timberwolf);
-    box-shadow: 4px 4px rgba(0,0,0,0.4);
     width: 150px;
-    border-radius: 4px;
-    overflow: hidden;
+    margin-top: 10px;
 }
 
     .dropdown a:link, .dropdown a:visited {
-        color: var(--black-color);
+        color: var(--white-color);
         text-decoration: none;
         padding: 10px 10px 10px 5px;
-        border-bottom: 1px solid var(--charcoal);
     }
 
     .dropdown a:hover {
-        background-color: var(--jasper);
-        color: var(--white-color);
-        
+        background-color: var(--white-color);
+        box-shadow: 4px 7px 2px rgba(0, 0, 0, 0.9);
+        color: var(--black-color);
     }
 
 
@@ -343,4 +336,13 @@ a.login-link:link, a.login-link:visited {
 
 .datelabel {
     font-size: 12px;
+}
+
+
+.inline {
+    display: inline-block;
+}
+
+.flex {
+    display: flex;
 }

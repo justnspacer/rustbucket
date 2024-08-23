@@ -23,6 +23,7 @@ namespace RustyTech.Server.Middleware
 
                     await _next(context);
 
+                    /*
                     if (context.Response.StatusCode == StatusCodes.Status403Forbidden)
                     {
                         context.Response.ContentType = "application/json";
@@ -31,13 +32,14 @@ namespace RustyTech.Server.Middleware
                     else if (context.Response.StatusCode == StatusCodes.Status401Unauthorized)
                     {
                         context.Response.ContentType = "application/json";
-                        await context.Response.WriteAsync("{\"message\": \"Authentication is required\"}");
+                        await context.Response.WriteAsync("{\"message\": \"Request unauthorized \"}");
                     }
                     else if (context.Response.StatusCode == StatusCodes.Status404NotFound)
                     {
                         context.Response.ContentType = "application/json";
                         await context.Response.WriteAsync("{\"message\": \"Resource not found\"}");
                     }
+                    */
 
                     context.Response.Body.Seek(0, SeekOrigin.Begin);
                     string readBuffer = await new StreamReader(context.Response.Body).ReadToEndAsync();
