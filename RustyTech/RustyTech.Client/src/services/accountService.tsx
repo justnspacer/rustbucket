@@ -3,8 +3,7 @@ import { BASE_URL } from '../types/urls';
 import {
     ResponseBase, RegisterRequest, LoginRequest,
     LoginResponse, VerifyEmailRequest, ResestPasswordRequest,
-    UpdateUserRequest,
-    AuthResponse
+    UpdateUserRequest
 } from '../types/apiResponse';
 
 async function sendPostRequest<TRequest, TResponse>(url: string, data: TRequest): Promise<TResponse> {
@@ -31,13 +30,22 @@ async function sendGetRequest<TRequest, TResponse>(url: string, data: TRequest):
     return response.data;
 }
 
+/*
+async function sendAuthRequest<AuthResponse>(url: string): Promise<AuthResponse> {
+    const response = await axios.get<AuthResponse>(`${BASE_URL}${url}`, {
+        withCredentials: true
+    });
+    return response.data;
+}
+*/
+
 export async function register(data: RegisterRequest): Promise<ResponseBase> {
     return sendPostRequest<RegisterRequest, ResponseBase>('/api/account/register', data );
 }
 
-export async function login(data: LoginRequest): Promise<LoginResponse> {
-    return sendPostRequestNoCreds<LoginRequest, LoginResponse>('/api/account/login', data);
-}
+//export async function login(data: LoginRequest): Promise<LoginResponse> {
+//    return sendPostRequestNoCreds<LoginRequest, LoginResponse>('/api/account/login', data);
+//}
 
 export async function verifyEmail(data: VerifyEmailRequest): Promise<ResponseBase> {
     return sendPostRequest<VerifyEmailRequest, ResponseBase>('/api/account/verify/email', data);
@@ -71,6 +79,28 @@ export async function logout(): Promise<ResponseBase> {
     return sendPostRequest('/api/account/logout', {});
 }
 
-export async function isAuthenticated(): Promise<LoginResponse> {
-    return sendGetRequest('/api/account/isAuthenticated', {});
+export async function login(loginRequest: LoginRequest) {
+    try {
+        const response = await axios.post(`${BASE_URL}/api/account/login`, {
+            email: loginRequest.email,
+            password: loginRequest.password,
+            rememberMe: loginRequest.rememberMe
+        }, {
+            withCredentials: true
+        });
+        return response.data.data;
+    } catch (e) {
+        console.log('Error logging in:', e);
+    }
+}
+
+export async function isAuthenticated() {
+    try {
+        const response = await axios.get(`${BASE_URL}/api/account/isAuthenticated`, {
+            withCredentials: true
+        });
+        return response.data.data;
+    } catch (e) {
+        console.error('Error authenicating user:', e);
+    }
 }

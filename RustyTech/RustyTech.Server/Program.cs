@@ -27,7 +27,7 @@ builder.Services.AddInMemoryRateLimiting();
 // Add CORS policy
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("MyCorsPolicy", policy =>
+    options.AddPolicy("RustyTechCors", policy =>
     {
         policy.WithOrigins("https://localhost:5173")
               .AllowAnyHeader()
@@ -89,8 +89,9 @@ builder.Services.ConfigureApplicationCookie(options =>
     //cookie settings
     options.Cookie.HttpOnly = true;
     options.ExpireTimeSpan = TimeSpan.FromMinutes(30); //double check this!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    options.LoginPath = "/login";
-    options.AccessDeniedPath = "/access-denied";
+    options.LoginPath = "/api/account/login";
+    options.LogoutPath = "/api/account/logout";
+    options.AccessDeniedPath = "/api/account/access-denied";
     options.SlidingExpiration = true;
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
 });
@@ -134,7 +135,9 @@ if (!superadminUserExists)
 var app = builder.Build();
 
 
-app.UseCors("MyCorsPolicy");
+app.UseCors("RustyTechCors");
+app.UseStaticFiles();
+
 
 app.UseCookiePolicy(new CookiePolicyOptions
 {
@@ -157,7 +160,6 @@ app.UseIpRateLimiting();
 
 app.UseHttpsRedirection();
 app.UseDefaultFiles();
-app.UseStaticFiles();
 
 app.UseRouting();
 
@@ -165,7 +167,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapFallbackToFile("/index.html");
+app.MapFallbackToFile("index.html");
 
 async Task<bool> CheckSuperadminUserExistsAsync(IServiceCollection services)
 {

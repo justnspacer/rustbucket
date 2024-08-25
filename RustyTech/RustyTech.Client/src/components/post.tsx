@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Spinner from './spinner';
 import { getPostById } from '../services/postService';
-import { PostDto } from '../types/apiResponse';
+import { GetPostRequest } from '../types/apiResponse';
 import { useParams } from 'react-router-dom';
 import { BASE_URL } from '../types/urls';
 
@@ -13,7 +13,7 @@ const formatDate = (datetime: Date) => {
 };
 
 const Post: React.FC = () => {
-    const [post, setPost] = useState<PostDto>();
+    const [post, setPost] = useState<GetPostRequest>();
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 

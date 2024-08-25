@@ -4,6 +4,16 @@ export interface ResponseBase {
         message: string;
     };
 }
+
+export interface AuthResponse {
+    data: {
+        isAuthenticated: boolean;
+        isSuccess: boolean;
+        user: GetUserRequest;
+        message?: string;
+    };
+}
+
 export interface LoginResponse {
     data: {
         isAuthenticated: boolean;
@@ -11,7 +21,6 @@ export interface LoginResponse {
         user: GetUserRequest;
         message?: string;
     };
-    
 }
 
 export interface RegisterRequest {
@@ -39,7 +48,7 @@ export interface VerifyEmailRequest {
 
 export interface ResestPasswordRequest {
     email: string;
-    resetCode : string;
+    resetCode: string;
     newPassword: string;
 }
 
@@ -58,7 +67,7 @@ export interface GetPostRequest {
     keywords?: string[];
     createdAt: Date;
     updatedAt: Date;
-    user?: GetUserRequest;
+    user: GetUserRequest;
     userId?: string;
     postType?: string;
     videoFile?: string;

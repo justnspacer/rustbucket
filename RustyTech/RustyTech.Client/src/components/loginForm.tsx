@@ -19,11 +19,11 @@ const LoginForm: React.FC = () => {
             rememberMe: rememberMe
         };
         const response = await loginUser(loginRequest);
-        if (response.data.isAuthenticated) {
+        if (response.isAuthenticated) {
             navigate('/');
         } else {
             console.log(response);
-            if (response.data.message != null) {
+            if (response.message != null) {
                 setError(response.data.message);
             }
         }        

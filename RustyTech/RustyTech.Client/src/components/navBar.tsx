@@ -13,10 +13,15 @@ const NavBar: React.FC = () => {
         setShowDropdown(!showDropdown);
     };
 
+    const handleMouseLeave = () => {
+        setShowDropdown(false);
+    };
+
     const handleClickOutside = (event: MouseEvent) => {
         if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
             setShowDropdown(false);
         }
+
     };
 
     const handleLogout = async () => {
@@ -44,7 +49,7 @@ const NavBar: React.FC = () => {
                         <span className="username-container">
                             <span className="username" onClick={handleDropdownClick}>{user?.email}</span>
                             {showDropdown && (
-                                <div className="dropdown" ref={dropdownRef}>
+                                <div className="dropdown" ref={dropdownRef} onMouseLeave={handleMouseLeave}>
                                     <Link to="/profile">Profile</Link>
                                     <Link to="/" onClick={handleLogout}>Logout</Link>
                                 </div>

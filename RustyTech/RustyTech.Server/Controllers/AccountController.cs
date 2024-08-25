@@ -102,23 +102,27 @@ namespace RustyTech.Server.Controllers
             return Ok(result);
         }
 
+        [Authorize]
         [HttpGet("isAuthenticated")]
-        public async Task<IActionResult> IsUserAuthenticated()
+        public IActionResult IsUserAuthenticated()
         {
+            var response = new AuthResponse() {
+                IsAuthenticated = false,
+                IsSuccess = false,
+                User = null
+            };
+
             if (User.Identity.IsAuthenticated)
             {
                 var user = new GetUserRequest();
                 user.Id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 user.Email = User.FindFirst(ClaimTypes.Email)?.Value;
                 user.UserName = User.FindFirst(ClaimTypes.Name)?.Value;
-
-                var response = new LoginResponse();
                 response.IsAuthenticated = true;
                 response.User = user;
                 response.IsSuccess = true;
-                return Ok(response);
-            }
-            return Unauthorized();
+            }            
+            return Ok(response);
         }
     }
 }

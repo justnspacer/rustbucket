@@ -36,18 +36,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         const isUserAuthenticated = async () => {
             try {
                 const response = await isAuthenticated();
-                if (response.data.isAuthenticated) {
-                    setUserAuthenticated(true);
-                    setUser(response.data.user);
-                }
-            } catch (e) {
-
-                console.error('Error checking auth status:', e);
-                setError(e);
-            } finally {
-                setUserAuthenticated(false);
-                setUser(null);
+                setUserAuthenticated(response.isAuthenticated);
+                setUser(response.user);
                 setLoading(false);
+            } catch (e) {
+                console.error('Error checking auth status:', e);
+                setError(e)
             }
         };
         isUserAuthenticated();
@@ -64,20 +58,20 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     };
 
-    const loginUser = async (data: LoginRequest): Promise<LoginResponse> => {
+    const loginUser = async (data: LoginRequest) => {
         const response = await login(data);
-        if (response.data.isSuccess && response.data.isAuthenticated) {
-            setUser(response.data.user);
-            setUserAuthenticated(response.data.isAuthenticated);
+        if (response.isSuccess && response.isAuthenticated) {
+            setUser(response.user);
+            setUserAuthenticated(response.isAuthenticated);
             return response;
         } else {
             return response;
         }
     };
 
-    const logoutUser = async (): Promise<ResponseBase> => {
+    const logoutUser = async () => {
         const response = await logout();
-        if (response.data.isSuccess) {
+        if (response.isSuccess) {
             setUser(null);
             setUserAuthenticated(false);
             console.log('user logged out');

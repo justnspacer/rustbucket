@@ -37,7 +37,7 @@ namespace RustyTech.Server.Services
             {
                 await file.CopyToAsync(stream);
             }
-            
+            /*
             // Optionally convert the video to reduce size
             var convertedFilePath = Path.Combine(_videoPath, Path.GetFileNameWithoutExtension(fileName) + "_converted.mp4");
             var newPath = await ConvertVideoAsync(originalFilePath, convertedFilePath);
@@ -50,7 +50,8 @@ namespace RustyTech.Server.Services
             {
                 return "Video conversion error.";
             }
-            var relativeFilePath = Path.Combine("/videos", Path.GetFileName(newPath)).Replace("\\", "/");            
+            */
+            var relativeFilePath = Path.Combine("/videos", Path.GetFileName(originalFilePath)).Replace("\\", "/");            
             return relativeFilePath;
         }
 
