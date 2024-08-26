@@ -3,16 +3,16 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { register, login, logout, isAuthenticated } from '../services/accountService';
 //import Spinner from '../components/spinner';
-import { RegisterRequest, LoginRequest, ResponseBase, LoginResponse } from '../types/apiResponse';
+import { RegisterRequest, LoginRequest } from '../types/apiResponse';
 
 interface AuthContextType {
     user: any;
     userAuthenticated: boolean;
     loading: boolean;
     error: any;
-    loginUser: (data: LoginRequest) => Promise<LoginResponse>;
-    registerUser: (data: RegisterRequest) => Promise<ResponseBase>;
-    logoutUser: () => Promise<ResponseBase>;
+    loginUser: (data: LoginRequest) => Promise<any>;
+    registerUser: (data: RegisterRequest) => Promise<any>;
+    logoutUser: () => Promise<any>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -47,40 +47,23 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         isUserAuthenticated();
     }, []);
 
-    const registerUser = async (data: RegisterRequest): Promise<ResponseBase> => {
+    const registerUser = async (data: RegisterRequest) => {
         const response = await register(data);
-        if (response.data.isSuccess) {
-            console.log('have user check email and redirect to email verification form?');
-            return response;
-        } else {
-            throw new Error(response.data.message);
-        }
-
+        return response;
     };
 
     const loginUser = async (data: LoginRequest) => {
         const response = await login(data);
-        if (response.isSuccess && response.isAuthenticated) {
-            setUser(response.user);
-            setUserAuthenticated(response.isAuthenticated);
-            return response;
-        } else {
-            return response;
-        }
+        setUser(response.user);
+        setUserAuthenticated(response.isAuthenticated);
+        return response;
     };
 
     const logoutUser = async () => {
         const response = await logout();
-        if (response.isSuccess) {
-            setUser(null);
-            setUserAuthenticated(false);
-            console.log('user logged out');
-            return response;
-        }
-        else {
-            console.log(response.data.message);
-            throw new Error(response.data.message);
-        }
+        setUser(response.user);
+        setUserAuthenticated(response.isAuthenticated);
+        return response;        
     };
 
     return (

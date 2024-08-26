@@ -80,7 +80,11 @@ namespace RustyTech.Server.Controllers
             var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (currentUserId != userId)
             {
-                return Forbid();
+                var response = new ResponseBase() {
+                    IsSuccess = false,
+                    Message = "You are not authorized to perform this action."
+                };
+                return Ok(response);
             }
             var result = await _authService.ToggleTwoFactorAuth(userId);
             return Ok(result);
@@ -102,7 +106,6 @@ namespace RustyTech.Server.Controllers
             return Ok(result);
         }
 
-        [Authorize]
         [HttpGet("isAuthenticated")]
         public IActionResult IsUserAuthenticated()
         {

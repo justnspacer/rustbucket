@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/authContext';
 import { LoginRequest } from '../types/apiResponse';
 
-const LoginForm: React.FC = () => {
+const LoginPage: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [rememberMe, setRememberMe] = useState(false);
@@ -24,7 +24,7 @@ const LoginForm: React.FC = () => {
         } else {
             console.log(response);
             if (response.message != null) {
-                setError(response.data.message);
+                setError(response.message);
             }
         }        
     };
@@ -49,4 +49,4 @@ const LoginForm: React.FC = () => {
     );
 };
 
-export default LoginForm;
+export default LoginPage;

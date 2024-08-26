@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Spinner from './spinner';
 import { getPostById } from '../services/postService';
 import { GetPostRequest } from '../types/apiResponse';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { BASE_URL } from '../types/urls';
 
 
@@ -43,41 +43,40 @@ const Post: React.FC = () => {
     }
 
     return (
-        <div className='post' key={post?.id}>
+        <div className='single-post' key={post?.id}>
             {post?.videoFile && (
-                <video controls>
+                <video className='post-main-video' controls>
                     <source src={`${BASE_URL}${post?.videoFile}`} type="video/mp4" />
                     Your browser does not support the video tag.
                 </video>
             )}
             {post?.imageFile && (
-                <img src={`${BASE_URL}${post?.imageFile}`} alt={post?.title} />
+                <img className='post-main-image' src={`${BASE_URL}${post?.imageFile}`} alt={post?.title} />
             )}
             {post?.imageFiles && (
                 <>
                     {post.imageFiles.map((imageFile, index) => (
-                        <img key={index} src={`${BASE_URL}${imageFile}`} alt={post?.title} />
+                        <img className='post-image' key={index} src={`${BASE_URL}${imageFile}`} alt={post?.title} />
                     ))}
                 </>
             )}
-            <h2>{post?.title}</h2>
-            <p>{post?.user.userName}</p>
-            <span className='date'>{post && formatDate(post.createdAt)}</span>
+            <div className='post-info'>
+                <h2 className="post-title">{post?.title}</h2>
+                <Link to={`/profile/${post?.userId}`} className="post-username">{post?.user.userName}</Link>
+                <span className='post-date'>{post && formatDate(post.createdAt)}</span>
 
 
-            {post?.createdAt != post?.updatedAt && (
-                <div>
-                    <span className='date'>{post && formatDate(post.updatedAt)} (updated)</span>
-                </div>
-            )}
-            <div dangerouslySetInnerHTML={{ __html: post?.content }}></div>
+                {post?.createdAt != post?.updatedAt && (
+                    <div>
+                        <span className='post-date'>{post && formatDate(post.updatedAt)} (updated)</span>
+                    </div>
+                )}
+                <div dangerouslySetInnerHTML={{ __html: post?.content }}></div>
 
-            <ul className='post-keyword-list'>
                 {post?.keywords && post.keywords.map((keyword, index) => (
-                    <li className='keyword-text' key={index}>{keyword}</li>
+                    <span className='keyword-text' key={index}>{keyword}</span>
                 ))}
-            </ul>
-
+            </div>
         </div>
     );
 };
