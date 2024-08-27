@@ -25,7 +25,6 @@ export const useAuth = () => {
     return context;
 }
 
-
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<any>(null);
     const [userAuthenticated, setUserAuthenticated] = useState<boolean>(false);
@@ -48,22 +47,40 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }, []);
 
     const registerUser = async (data: RegisterRequest) => {
-        const response = await register(data);
-        return response;
+        try {
+            const response = await register(data);
+            return response;
+        } catch (e) {
+            console.error('Error registering:', e);
+            setError(e)
+        }
+        
     };
 
     const loginUser = async (data: LoginRequest) => {
-        const response = await login(data);
-        setUser(response.user);
-        setUserAuthenticated(response.isAuthenticated);
-        return response;
+        try {
+            const response = await login(data);
+            setUser(response.user);
+            setUserAuthenticated(response.isAuthenticated);
+            return response;        
+
+        } catch (e) {
+            console.error('Error logging in:', e);
+            setError(e)
+        }
     };
 
     const logoutUser = async () => {
-        const response = await logout();
-        setUser(response.user);
-        setUserAuthenticated(response.isAuthenticated);
-        return response;        
+        try {
+            const response = await logout();
+            setUser(response.user);
+            setUserAuthenticated(response.isAuthenticated);
+            return response;  
+        } catch (e) {
+            console.error('Error logging out:', e);
+            setError(e)
+        }
+              
     };
 
     return (

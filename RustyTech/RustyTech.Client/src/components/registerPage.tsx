@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/authContext';
+import useRedirectIfAuthenticated from '../types/useRedirectIfAuthenticated';
 
 const RegisterPage: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [birthYear, setBirthYear] = useState('');
-    const { register, message, isSuccess } = useAuth();
+    const { registerUser } = useAuth();
     const navigate = useNavigate();
+    useRedirectIfAuthenticated();
 
     useEffect(() => {
         if (isSuccess) {
@@ -18,7 +20,7 @@ const RegisterPage: React.FC = () => {
 
     const handleRegister = async (event: React.FormEvent) => {
         event.preventDefault();
-        await register({ email, password, confirmPassword, birthYear: parseInt(birthYear) || 0 });
+        await registerUser({ email, password, birthYear: parseInt(birthYear) || 0 });
     };
 
     return (
@@ -38,7 +40,6 @@ const RegisterPage: React.FC = () => {
             <input type="number" placeholder="Birth Year" value={birthYear} onChange={e => setBirthYear(e.target.value)} />
 
             <button type="submit">Register</button>
-            {message && <p>{message}</p>}
         </form>
     );
 };

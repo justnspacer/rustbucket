@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/authContext';
 import { LoginRequest } from '../types/apiResponse';
+import useRedirectIfAuthenticated from '../types/useRedirectIfAuthenticated';
 
 const LoginPage: React.FC = () => {
     const [email, setEmail] = useState('');
@@ -10,6 +11,7 @@ const LoginPage: React.FC = () => {
     const [error, setError] = useState('');
     const { loginUser } = useAuth();
     const navigate = useNavigate();
+    useRedirectIfAuthenticated();
 
     const handleLogin = async (event: React.FormEvent) => {
         event.preventDefault();

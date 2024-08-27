@@ -100,6 +100,8 @@ export async function updateUser(request: UpdateUserRequest) {
             userName: request.userName,
             email: request.email,
             birthYear: request.birthYear,
+        }, {
+            withCredentials: true
         });
         return response.data.data;
     } catch (e) {
@@ -112,6 +114,8 @@ export async function toggleTwoFactorAuth(userId: string) {
     try {
         const response = await axios.post(`${BASE_URL}/api/account/manage/2fa`, {
             userId: userId,
+        }, {
+            withCredentials: true
         });
         return response.data.data;
     } catch (e) {
@@ -122,7 +126,9 @@ export async function toggleTwoFactorAuth(userId: string) {
 
 export async function getInfo(userId: string) {
     try {
-        const response = await axios.get(`${BASE_URL}/api/account/manage/info?userId=${userId}`);
+        const response = await axios.get(`${BASE_URL}/api/account/manage/info?userId=${userId}`,{
+            withCredentials: true
+        });
         return response.data.data;
     } catch (e) {
         console.log('Bad token for forgot password request:', e);
@@ -133,6 +139,7 @@ export async function getInfo(userId: string) {
 export async function logout() {
     try {
         const response = await axios.post(`${BASE_URL}/api/account/logout`, {
+        }, {
             withCredentials: true
         });
         console.log(response);

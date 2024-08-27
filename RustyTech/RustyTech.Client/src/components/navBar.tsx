@@ -26,7 +26,7 @@ const NavBar: React.FC = () => {
 
     const handleLogout = async () => {
         await logoutUser();
-        navigate('/');
+        navigate('/login');
     };
 
     useEffect(() => {
@@ -48,8 +48,8 @@ const NavBar: React.FC = () => {
                             <span className="username" onClick={handleDropdownClick}>{user?.email}</span>
                             {showDropdown && (
                                 <div className="dropdown" ref={dropdownRef} onMouseLeave={handleMouseLeave}>
-                                    <Link to="/profile">Profile</Link>
-                                    <Link to="/" onClick={handleLogout}>Logout</Link>
+                                    <Link to={`/profile/${user.id}`}>Profile</Link>
+                                    <button className='logout-button' onClick={handleLogout}>Logout</button>
                                 </div>
                             )}
                         </span>

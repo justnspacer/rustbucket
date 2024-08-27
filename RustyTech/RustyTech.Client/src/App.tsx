@@ -12,6 +12,7 @@ import ProfilePage from './components/profilePage';
 import RequestPage from './components/requestPage';
 import ContactPage from './components/contactPage';
 import ProjectsPage from './components/projectsPage';
+import NotFoundPage from './components/NotFoundPage';
 
 function App() {
 
@@ -20,16 +21,17 @@ function App() {
             <BrowserRouter>
                 <Navbar />
                 <Routes>
+                    <Route path="/" Component={HomePage} />
+                    <Route path="/login" Component={LoginPage} />
+                    <Route path="/register" Component={RegisterPage} />
                     <Route path="/profile/:id" Component={ProfilePage} />
                     <Route path="/posts/:id" Component={Post} />
                     <Route path="/posts/" Component={Posts} />
-                    <Route path="/login" Component={LoginPage} />
-                    <Route path="/register" Component={RegisterPage} />
                     <Route path="/projects" Component={ProjectsPage} />
                     <Route path="/about" Component={AboutPage} />
                     <Route path="/contact" Component={ContactPage} />
                     <Route path="/request" Component={RequestPage} />
-                    <Route path="/" Component={HomePage} />
+                    <Route path="*" Component={NotFoundPage} />
                 </Routes>
                 <Footer />
             </BrowserRouter>
