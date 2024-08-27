@@ -17,13 +17,15 @@ namespace RustyTech.Server.Services
         private readonly IRoleService _roleService;
         private readonly IConfiguration _configuration;
         private readonly ILogger<IAccountService> _logger;
+        private readonly IImageService _imageService;
 
         public AccountService(UserManager<User> userManager, 
-            SignInManager<User> signInManager, 
-            IEmailService emailService, 
-            IRoleService roleService, 
+            SignInManager<User> signInManager,
+            IEmailService emailService,
+            IRoleService roleService,
             IConfiguration configuration,
-            ILogger<IAccountService> logger)
+            ILogger<IAccountService> logger,
+            IImageService imageService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -31,6 +33,7 @@ namespace RustyTech.Server.Services
             _configuration = configuration;
             _logger = logger;
             _roleService = roleService;
+            _imageService = imageService;
         }
 
         public async Task<ResponseBase> Register(CustomRegisterRequest request)
@@ -340,6 +343,18 @@ namespace RustyTech.Server.Services
             {
                 user.BirthYear = userDto.BirthYear;
             }
+            
+            if (userDto.PictureUrl != null)
+            {
+                //delete old picture if exists
+                if (user.PictureUrl != null)
+                {
+                    _imageService.DeleteImage(user.PictureUrl);
+                    _logger.LogInformation($"user image deleted: {user.PictureUrl}");
+                }
+                user.PictureUrl = await _imageService.UploadImageAsync(userDto.PictureUrl);
+            }
+            
 
             if (userDto.Email != null)
             {

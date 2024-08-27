@@ -27,13 +27,14 @@ namespace RustyTech.Tests
             var loggerMock = new Mock<ILogger<IAccountService>>();
             var userManagerMock = new Mock<UserManager<User>>();
             var signInManagerMock = new Mock<SignInManager<User>>();
+            var imageServiceMock = new Mock<IImageService>();
 
             configurationMock.SetupGet(x => x[It.Is<string>(s => s == "Jwt:Key")]).Returns("J277A871-CDF3-D6B8-4167-D6B8-D85F255901CE");
             configurationMock.SetupGet(x => x[It.Is<string>(s => s == "Jwt:Issuer")]).Returns("https://testhost:7111");
             configurationMock.SetupGet(x => x[It.Is<string>(s => s == "Jwt:Audience")]).Returns("https://testhost:7111");
             configurationMock.SetupGet(x => x[It.Is<string>(s => s == "Jwt:ExpiresInMinutes")]).Returns("30");
 
-            _accountService = new AccountService(userManagerMock.Object, signInManagerMock.Object, emailServiceMock.Object, roleServiceMock.Object, configurationMock.Object, loggerMock.Object);
+            _accountService = new AccountService(userManagerMock.Object, signInManagerMock.Object, emailServiceMock.Object, roleServiceMock.Object, configurationMock.Object, loggerMock.Object, imageServiceMock.Object);
         }
 
         [Test]

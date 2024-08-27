@@ -16,7 +16,7 @@ using RustyTech.Server.Utilities;
 var builder = WebApplication.CreateBuilder(args); // Create a WebApplication builder instance.
 
 // Add services to the container.
-
+builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddMemoryCache(); // Add in-memory caching services.
 
 // Rate limiting configuration.
@@ -55,8 +55,6 @@ builder.Services.AddSwaggerGen(config =>
     config.OperationFilter<AddFileUploadParams>();
 });
 
-builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))); // Add Entity Framework Core services with SQL Server configuration.
-
 builder.Services.AddIdentity<User, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<DataContext>().AddDefaultTokenProviders();
 builder.Services.Configure<IdentityOptions>(options =>
@@ -88,7 +86,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 {
     //cookie settings
     options.Cookie.HttpOnly = true;
-    options.ExpireTimeSpan = TimeSpan.FromMinutes(30); //double check this!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    options.ExpireTimeSpan = TimeSpan.FromDays(30);
     options.LoginPath = "/api/account/login";
     options.LogoutPath = "/api/account/logout";
     options.AccessDeniedPath = "/api/account/access-denied";

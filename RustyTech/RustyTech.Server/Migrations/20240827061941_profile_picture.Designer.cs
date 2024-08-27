@@ -12,8 +12,8 @@ using RustyTech.Server.Data;
 namespace RustyTech.Server.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240817074720_unique_email_username")]
-    partial class unique_email_username
+    [Migration("20240827061941_profile_picture")]
+    partial class profile_picture
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -50,15 +50,6 @@ namespace RustyTech.Server.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "62bd08e4-de9e-4397-bcfe-a8c81e873b70",
-                            ConcurrencyStamp = "1",
-                            Name = "SuperAdmin",
-                            NormalizedName = "SUPERADMINISTRATOR"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -167,25 +158,6 @@ namespace RustyTech.Server.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("RustyTech.Server.Models.Auth.LoginInfo", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("LoginTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Logins");
-                });
-
             modelBuilder.Entity("RustyTech.Server.Models.Posts.Keyword", b =>
                 {
                     b.Property<int>("Id")
@@ -277,37 +249,6 @@ namespace RustyTech.Server.Migrations
                     b.ToTable("PostKeywords");
                 });
 
-            modelBuilder.Entity("RustyTech.Server.Models.Role.UserRole", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("RoleId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("UserRole");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            RoleId = "62bd08e4-de9e-4397-bcfe-a8c81e873b70",
-                            UserId = new Guid("37297628-8360-49ac-afa1-67d297e9818d")
-                        });
-                });
-
             modelBuilder.Entity("RustyTech.Server.Models.User", b =>
                 {
                     b.Property<string>("Id")
@@ -344,22 +285,20 @@ namespace RustyTech.Server.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
-                    b.Property<byte[]>("PasswordHash")
-                        .IsRequired()
-                        .HasColumnType("varbinary(max)");
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PasswordResetToken")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<byte[]>("PasswordSalt")
-                        .IsRequired()
-                        .HasColumnType("varbinary(max)");
 
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<string>("PictureUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("ResetTokenExpires")
                         .HasColumnType("datetime2");
@@ -399,27 +338,6 @@ namespace RustyTech.Server.Migrations
                         .HasFilter("[UserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "38f15d32-7f6f-473b-9f7c-64d3dec6fc4a",
-                            AccessFailedCount = 0,
-                            BirthYear = 0,
-                            ConcurrencyStamp = "b23a8ace-c560-4a0e-8560-9e195e25e645",
-                            Email = "admin@rustbucket.io",
-                            EmailConfirmed = true,
-                            LockoutEnabled = false,
-                            NormalizedEmail = "ADMIN@RUSTBUCKET.IO",
-                            NormalizedUserName = "ADMIN@RUSTBUCKET.IO",
-                            PasswordHash = new byte[] { 65, 81, 65, 65, 65, 65, 73, 65, 65, 89, 97, 103, 65, 65, 65, 65, 69, 65, 112, 77, 51, 86, 72, 97, 79, 118, 65, 87, 54, 80, 97, 90, 75, 100, 57, 74, 66, 71, 57, 68, 119, 43, 86, 76, 107, 85, 69, 105, 80, 67, 55, 49, 105, 88, 90, 120, 89, 112, 81, 114, 76, 106, 52, 115, 56, 85, 87, 66, 80, 113, 103, 83, 119, 66, 89, 78, 90, 43, 55, 47, 106, 65, 61, 61 },
-                            PasswordSalt = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "b2db6d50-060f-41af-b80f-0dd0aabaebca",
-                            TwoFactorEnabled = false,
-                            UserName = "admin@rustbucket.io",
-                            VerifiedAt = new DateTime(2024, 8, 17, 2, 47, 20, 396, DateTimeKind.Local).AddTicks(6517)
-                        });
                 });
 
             modelBuilder.Entity("RustyTech.Server.Models.Posts.BlogPost", b =>

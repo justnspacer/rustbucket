@@ -61,6 +61,15 @@ namespace RustyTech.Server.Services
             }
         }
 
+        public void DeleteImage(string filePath)
+        {
+            var file = Path.Combine(_imagePath, filePath.TrimStart('/').Replace("/", "\\"));
+            if (File.Exists(file))
+            {
+                File.Delete(file);
+            }
+        }
+
         private async Task<byte[]> ResizeImageAsync(IFormFile file, int maxWidth, int maxHeight)
         {
             using (var stream = new MemoryStream())

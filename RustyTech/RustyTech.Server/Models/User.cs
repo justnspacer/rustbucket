@@ -14,7 +14,10 @@ namespace RustyTech.Server.Models
         public int BirthYear { get; set; }
         public override bool TwoFactorEnabled { get; set; }
 
+
+
         public ICollection<Post> Posts { get; set; } // Navigation property
+        public string? PictureUrl { get; set; }
 
         public User() => Posts = new List<Post>();
     }

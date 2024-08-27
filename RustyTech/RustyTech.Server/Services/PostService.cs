@@ -146,7 +146,6 @@ namespace RustyTech.Server.Services
 
             return new ResponseBase() { IsSuccess = true, Message = $"Post {post.Id} publish status: {post.IsPublished}" };
         }
-
         
         //VideoPost Tasks
         public async Task<ResponseBase> CreateVideoPostAsync(CreateVideoRequest post)

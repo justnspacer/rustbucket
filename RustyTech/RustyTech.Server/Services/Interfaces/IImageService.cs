@@ -4,6 +4,7 @@
     {
         Task<string> UploadImageAsync(IFormFile file);
         Task<ImageMetadata> GetImageMetadataAsync(string filePath);
+        void DeleteImage(string filePath);
 
     }
 }

@@ -47,15 +47,6 @@ namespace RustyTech.Server.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "1",
-                            ConcurrencyStamp = "1",
-                            Name = "SuperAdmin",
-                            NormalizedName = "SUPERADMINISTRATOR"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -143,13 +134,6 @@ namespace RustyTech.Server.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            UserId = "f7a31ded-5866-465a-9d89-714f9ad3c9ae",
-                            RoleId = "1"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -310,6 +294,9 @@ namespace RustyTech.Server.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<string>("PictureUrl")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("ResetTokenExpires")
                         .HasColumnType("datetime2");
 
@@ -348,26 +335,6 @@ namespace RustyTech.Server.Migrations
                         .HasFilter("[UserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "efd7f1ae-cc96-46c7-a85a-75dc7a7636f4",
-                            AccessFailedCount = 0,
-                            BirthYear = 0,
-                            ConcurrencyStamp = "73eceff7-59a2-46e4-92f0-3fac0a304fd0",
-                            Email = "admin@rustbucket.io",
-                            EmailConfirmed = true,
-                            LockoutEnabled = false,
-                            NormalizedEmail = "ADMIN@RUSTBUCKET.IO",
-                            NormalizedUserName = "ADMIN@RUSTBUCKET.IO",
-                            PasswordHash = "AQAAAAIAAYagAAAAEG/CtYJr9TGdRaWiO4zMXIv+amrNKY3PiWIgm4KmRIwSckiJiL7npujBXjJDe8kPJg==",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "2126ea2a-098c-4a41-8417-95a2c52a4708",
-                            TwoFactorEnabled = false,
-                            UserName = "admin@rustbucket.io",
-                            VerifiedAt = new DateTime(2024, 8, 18, 5, 13, 6, 108, DateTimeKind.Local).AddTicks(8449)
-                        });
                 });
 
             modelBuilder.Entity("RustyTech.Server.Models.Posts.BlogPost", b =>

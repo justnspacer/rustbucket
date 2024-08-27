@@ -62,7 +62,8 @@ namespace RustyTech.Server.Controllers
 
         [Authorize]
         [HttpPut("update")]
-        public async Task<IActionResult> UpdateUser([FromBody] UpdateUserRequest user)
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UpdateUser([FromForm] UpdateUserRequest user)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId != user.UserId)
@@ -106,6 +107,7 @@ namespace RustyTech.Server.Controllers
             return Ok(result);
         }
 
+        [Authorize]
         [HttpGet("isAuthenticated")]
         public IActionResult IsUserAuthenticated()
         {
