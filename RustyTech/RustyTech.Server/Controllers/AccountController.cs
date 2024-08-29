@@ -33,7 +33,7 @@ namespace RustyTech.Server.Controllers
         }
 
         [HttpPost("verify/email")]
-        public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailRequest request)
+        public async Task<IActionResult> VerifyEmail(VerifyEmailRequest request)
         {
             var result = await _authService.VerifyEmail(request);
             return Ok(result);

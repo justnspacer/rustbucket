@@ -49,6 +49,7 @@
             public const string PasswordMismatch = "Password and confirm password mismatch";
             public const string InvalidEmail = "Invaild email";
             public const string Unauthorized = "Unauthorized";
+            public const string RecheckEmailPassword = "Please recheck email and password";
         }
 
         // Token Messages

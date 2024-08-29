@@ -1,46 +1,68 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/authContext';
 import useRedirectIfAuthenticated from '../types/useRedirectIfAuthenticated';
+import Form from './form';
+import { RegisterRequest } from '../types/apiResponse';
 
 const RegisterPage: React.FC = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [birthYear, setBirthYear] = useState('');
     const { registerUser } = useAuth();
     const navigate = useNavigate();
     useRedirectIfAuthenticated();
+    const [responseError, setResponseError] = React.useState<string>('');
 
-    useEffect(() => {
-        if (isSuccess) {
-            navigate('/login', { state: { message } });
+    const initialValues: RegisterRequest = { email: '', password: '', confirmPassword: '', birthYear: 0 };
+
+    const validate = (request: RegisterRequest) => {
+        const errors: Partial<RegisterRequest> = {};
+        if (!request.email) errors.email = 'Email is required';
+        if (!request.password) errors.password = 'Password is required';
+        if (!request.confirmPassword) {
+            errors.confirmPassword = 'Confirm Password is required';
+        } else if (request.password !== request.confirmPassword) {
+            errors.confirmPassword = 'Passwords do not match';
         }
-    }, [isSuccess, navigate, message]);
-
-    const handleRegister = async (event: React.FormEvent) => {
-        event.preventDefault();
-        await registerUser({ email, password, birthYear: parseInt(birthYear) || 0 });
+        return errors;
+    };
+    const handleSubmit = async (request: RegisterRequest) => {
+        const response = await registerUser(request);
+        if (response.isAuthenticated) {
+            navigate('/verify/email');
+        } else {
+            setResponseError(response.message);
+        }
     };
 
     return (
-        <form onSubmit={handleRegister} id="registerForm">
-            <h1 className="header-one">Register here</h1>
+        <><div>
+            {responseError && <span className="response-error">{responseError}</span>}
+        </div>
+            <Form
+                initialValues={initialValues}
+                validate={validate}
+                onSubmit={handleSubmit}>
+                {({ values, errors, handleChange }) => (
+                    <div id="registerForm">
+                        <label htmlFor="email">Email</label>
+                        <input id="email" autoComplete="email" type="email" name="email" placeholder="Email" value={values.email} onChange={handleChange} required />
 
-            <label htmlFor="email">Email</label>
-            <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
+                        <label htmlFor="password">Password</label>
+                        <input id="password" autoComplete="current-password" name="password" type="password" placeholder="Password" value={values.password} onChange={handleChange} required />
+                        {errors.password && <div>{errors.password}</div>}
 
-            <label htmlFor="password">Password</label>
-            <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required />
 
-            <label htmlFor="confirmPassword">Confirm Password</label>
-            <input type="password" placeholder="Confirm Password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required />
+                        <label htmlFor="confirmPassword">Confirm Password</label>
+                        <input id="confirm-password" autoComplete="current-password" name="confirm-password" type="password" placeholder="Confirm Password" value={values.confirmPassword} onChange={handleChange} required />
+                        {errors.confirmPassword && <div>{errors.confirmPassword}</div>}
 
-            <label htmlFor="birthYear">Birth Year</label>
-            <input type="number" placeholder="Birth Year" value={birthYear} onChange={e => setBirthYear(e.target.value)} />
 
-            <button type="submit">Register</button>
-        </form>
+                        <label htmlFor="birthYear">Optional Birth Year</label>
+                        <input type="number" placeholder="Year of Birth" value={values.birthYear} onChange={handleChange} />
+                        <button id="register-button" type="submit">Register</button>
+                        <p className="login-line">Have an account?<Link to="/login">Login</Link></p>
+                    </div>
+                )}
+            </Form></>
     );
 };
 

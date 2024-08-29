@@ -22,15 +22,15 @@ namespace RustyTech.Server.Controllers
             return Ok(users);
         }
 
-        [HttpGet("get/{id}")]
+        [HttpGet("get")]
         public async Task<IActionResult> GetByIdAsync(string id)
         {
             var user = await _userService.GetByIdAsync(id);
             return Ok(user);
         }
 
-        [Authorize(Roles = "Administrator")]
-        [HttpDelete("delete/{id}")]
+        [Authorize(Roles = "SuperAdmin")]
+        [HttpDelete("delete")]
         public async Task<IActionResult> DeleteAsync(string id)
         {
             var result = await _userService.DeleteAsync(id);

@@ -106,7 +106,11 @@ namespace RustyTech.Server.Services
             var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
             {
-                return UserNotFoundResponse();
+                return new LoginResponse()
+                {
+                    IsAuthenticated = false,
+                    Message = Constants.Messages.Error.RecheckEmailPassword
+                };
             }
             if (user.VerifiedAt == null || user.VerifiedAt == DateTime.MinValue)
             {
@@ -157,7 +161,7 @@ namespace RustyTech.Server.Services
                     else
                     {
                         await _userManager.AccessFailedAsync(user);
-                        return new LoginResponse() { IsAuthenticated = false, IsSuccess = false, Message = "User login error" };
+                        return new LoginResponse() { IsAuthenticated = false, IsSuccess = false, Message = Constants.Messages.Error.RecheckEmailPassword };
                     }
                 }
             }
@@ -181,7 +185,7 @@ namespace RustyTech.Server.Services
 
             if (user == null)
             {
-                return UserNotFoundResponse();
+                return BadRequestResponse();
             }
 
             user.VerifiedAt = DateTime.UtcNow;
@@ -209,7 +213,7 @@ namespace RustyTech.Server.Services
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
             {
-                return UserNotFoundResponse();
+                return BadRequestResponse();
             }
 
             if (user.Email != null)
@@ -236,7 +240,7 @@ namespace RustyTech.Server.Services
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
             {
-                return UserNotFoundResponse();
+                return BadRequestResponse();
             }
             if (tokenExpiry != null)
             {
@@ -276,7 +280,7 @@ namespace RustyTech.Server.Services
             var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
             {
-                return UserNotFoundResponse();
+                return BadRequestResponse();
             }
 
             var decodedCode = WebUtility.UrlDecode(request.ResetCode);
@@ -321,7 +325,7 @@ namespace RustyTech.Server.Services
             var user = await _userManager.FindByIdAsync(userDto.UserId);
             if (user == null)
             {
-                return UserNotFoundResponse();
+                return BadRequestResponse();
             }
 
             if (userDto.UserName != null)
@@ -390,7 +394,7 @@ namespace RustyTech.Server.Services
 
             if (user == null)
             {
-                return UserNotFoundResponse();
+                return BadRequestResponse();
             }
             if (user.TwoFactorEnabled)
             {
@@ -418,7 +422,7 @@ namespace RustyTech.Server.Services
             var user = await _userManager.FindByIdAsync(id.ToString());
             if (user == null)
             {
-                return UserNotFoundResponse();
+                return BadRequestResponse();
             }
             return new ResponseBase()
             {
@@ -474,12 +478,12 @@ namespace RustyTech.Server.Services
             Regex regex = new Regex(pattern);
             return regex.IsMatch(password);
         }
-        private LoginResponse UserNotFoundResponse()
+        private LoginResponse BadRequestResponse()
         {
             return new LoginResponse()
             {
                 IsAuthenticated = false,
-                Message = Constants.Messages.Info.UserNotFound
+                Message = Constants.Messages.Error.BadRequest
             };
         }
         private ResponseBase InvalidTokenResponse()

@@ -1,36 +1,32 @@
 import axios from 'axios';
-import { UserDto, ApiResponse } from '../types/apiResponse';
 import { BASE_URL } from '../types/urls';
 
 
-export async function getAllUsers(active: boolean = true): Promise<ApiResponse | null> {
+export async function getAllUsers(active: boolean = true) {
     try {
-        const response = await axios.get<ApiResponse>(`${BASE_URL}/api/users`, {
+        const response = await axios.get(`${BASE_URL}/api/user/all`, {
             params: { active },
         });
-        return response.data;
+        return response.data.data;
     } catch (error) {
         console.error('Error occurred while fetching users:', error);
-        return null;
     }
 }
 
-export async function getUserById(id: string): Promise<UserDto | null> {
+export async function getUserById(id?: string) {
     try {
-        const response = await axios.get<UserDto>(`${BASE_URL}/api/users/${id}`);
-        return response.data;
+        const response = await axios.get(`${BASE_URL}/api/user/get?id=${id}`);
+        return response.data.data;
     } catch (error) {
         console.error(`Error occurred while fetching user with id ${id}:`, error);
-        return null;
     }
 }
 
-export async function deleteUser(id: string): Promise<ApiResponse | null> {
+export async function deleteUser(id: string) {
     try {
-        const response = await axios.delete<ApiResponse>(`${BASE_URL}/api/users/${id}`);
-        return response.data;
+        const response = await axios.delete(`${BASE_URL}/api/user/delete?id=${id}`);
+        return response.data.data;
     } catch (error) {
         console.error(`Error occurred while deleting user with id ${id}:`, error);
-        return null;
     }
 }

@@ -30,20 +30,24 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const [userAuthenticated, setUserAuthenticated] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<any>(null);
-
+    
     useEffect(() => {
-        const isUserAuthenticated = async () => {
-            try {
-                const response = await isAuthenticated();
-                setUserAuthenticated(response.isAuthenticated);
-                setUser(response.user);
-                setLoading(false);
-            } catch (e) {
-                console.error('Error checking auth status:', e);
-                setError(e)
-            }
-        };
-        isUserAuthenticated();
+        const cookieValue = document.cookie;
+        if (cookieValue) {
+            const isUserAuthenticated = async () => {
+                try {
+                    const response = await isAuthenticated();
+                    setUserAuthenticated(response.isAuthenticated);
+                    setUser(response.user);
+                    setLoading(false);
+                } catch (e) {
+                    console.error('Error checking auth status:', e);
+                    setError(e)
+                }
+            };
+            isUserAuthenticated();
+        }
+
     }, []);
 
     const registerUser = async (data: RegisterRequest) => {
@@ -54,7 +58,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             console.error('Error registering:', e);
             setError(e)
         }
-        
+
     };
 
     const loginUser = async (data: LoginRequest) => {
@@ -62,7 +66,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             const response = await login(data);
             setUser(response.user);
             setUserAuthenticated(response.isAuthenticated);
-            return response;        
+            setLoading(false);
+            return response;
 
         } catch (e) {
             console.error('Error logging in:', e);
@@ -75,12 +80,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             const response = await logout();
             setUser(response.user);
             setUserAuthenticated(response.isAuthenticated);
-            return response;  
+            setLoading(false);
+            return response;
         } catch (e) {
             console.error('Error logging out:', e);
             setError(e)
         }
-              
+
     };
 
     return (

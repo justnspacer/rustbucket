@@ -142,7 +142,6 @@ export async function logout() {
         }, {
             withCredentials: true
         });
-        console.log(response);
         return response.data.data;
     } catch (e) {
         console.log('Error logging out user:', e);
