@@ -67,6 +67,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             setUser(response.user);
             setUserAuthenticated(response.isAuthenticated);
             setLoading(false);
+            console.log(document.cookie);
             return response;
 
         } catch (e) {

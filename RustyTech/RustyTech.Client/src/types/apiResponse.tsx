@@ -44,8 +44,8 @@ export interface GetUserRequest {
 }
 
 export interface VerifyEmailRequest {
-    id: string;
-    token: string;
+    id?: string;
+    token?: string;
 }
 
 export interface ResestPasswordRequest {
@@ -75,4 +75,15 @@ export interface GetPostRequest {
     videoFile?: string;
     imageFile?: string;
     imageFiles?: string[];
+}
+
+
+export interface VerifyEmailValues {
+    id: string;
+    token: string;
+}
+
+export interface ApiResponse {
+    message: string;
+    isSuccess: boolean;
 }

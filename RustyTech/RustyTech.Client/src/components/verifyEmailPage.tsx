@@ -1,68 +1,84 @@
-import React from 'react';
-import Form from './form';
-import { verifyEmail } from '../services/accountService';
-import { BASE_URL } from '../types/urls';
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { resendEmail, verifyEmail } from '../services/accountService'; // Import the resendEmail method from accountService
+import useRedirectIfAuthenticated from '../types/useRedirectIfAuthenticated';
+import useQuery from '../types/useQueryParams';
+import { ApiResponse, VerifyEmailRequest } from '../types/apiResponse';
 
-interface VerifyEmailFormValues {
-    id: string;
-    token: string;
-}
+const decodeBase64Token = (token: string) => {
+    try {
+        const decodedToken = atob(token); // Decode the Base64 string
+        return decodedToken;
+    } catch (error) {
+        console.error("Failed to decode token", error);
+        return undefined;
+    }
+};
 
 const VerifyEmailPage: React.FC = () => {
-    const initialValues: VerifyEmailFormValues = {
-        id: '',
-        token: '',
-    };
+    useRedirectIfAuthenticated();
+    const [isEmailConfirmed, setIsEmailConfirmed] = useState<boolean>(false);
+    const [isEmailSent, setIsEmailSent] = useState<boolean>(false);
+    const [message, setMessage] = useState<string>('');
+    const query = useQuery();
+    const id = query.get('id');
+    const token = query.get('token');
 
-    const handleSubmit = async (values: VerifyEmailFormValues) => {
+    useEffect(() => {
+        const verifyEmailAsync = async () => {
+            try {
+                if (id && token) {
+                    const decodedToken = decodeBase64Token(token);
+                    const values: VerifyEmailRequest = { id, token: decodedToken };
+                    const response: ApiResponse = await verifyEmail(values);
+                    if (response.isSuccess) {
+                        setIsEmailConfirmed(response.isSuccess);
+                        setMessage(response.message);
+                    } else {
+                        setMessage(response.message);
+                    }
+                }
+            } catch (e) {
+                setMessage(`error with frontend: ${e}`);
+            }
+        };
+        verifyEmailAsync();
+    }, [id, token]);
+
+    const handleResendEmail = async () => {
         try {
-            await verifyEmail(values);
-            // Handle success
-            console.log('Email verified successfully');
-        } catch (error) {
-            // Handle error
-            console.error('Error verifying email:', error);
+            if (id) {
+                const response: ApiResponse = await resendEmail(id);
+                if (response.isSuccess) {
+                    setIsEmailSent(response.isSuccess);
+                    setMessage(response.message);
+                } else {
+                    setMessage(response.message);
+                }
+            }
+            else {
+                setMessage('User id not found');
+            }
+            
+        } catch (e) {
+            setMessage(`error with frontend: ${e}`);
         }
     };
 
     return (
         <main>
-            <h1>Verify Email</h1>
-            <Form<VerifyEmailFormValues>
-                initialValues={initialValues}
-                onSubmit={handleSubmit}
-            >
-                {({ values, errors, handleChange, handleSubmit }) => (
-                    <>
-                        <div>
-                            <label htmlFor="id">ID:</label>
-                            <input
-                                type="text"
-                                id="id"
-                                name="id"
-                                value={values.id}
-                                onChange={handleChange}
-                            />
-                            {errors.id && <span>{errors.id}</span>}
-                        </div>
-                        <div>
-                            <label htmlFor="token">Token:</label>
-                            <input
-                                type="text"
-                                id="token"
-                                name="token"
-                                value={values.token}
-                                onChange={handleChange}
-                            />
-                            {errors.token && <span>{errors.token}</span>}
-                        </div>
-                        <button type="submit" onClick={handleSubmit}>
-                            Verify Email
-                        </button>
-                        <a className="resend-email-link" href={`${BASE_URL}/account/resend/email`}>Resend Verification Email</a>
-                    </>
-                )}
-            </Form>
+            {isEmailConfirmed ? (
+                <div>
+                    <h2 className="api-success-message">{message}</h2>
+                    <Link className="action-link" to="/login">Go to Login</Link>
+                </div>
+            ) : (
+                <div>
+                    <h2 className="api-error-message">{message}</h2>
+                        <button className="api-action-button" onClick={handleResendEmail}>Resend Email</button>
+                    {isEmailSent && <h3 className="api-success-message">Email sent successfully!</h3>}
+                </div>
+            )}
         </main>
     );
 };

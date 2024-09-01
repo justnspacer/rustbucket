@@ -32,6 +32,7 @@ namespace RustyTech.Server.Controllers
             return Ok(result);
         }
 
+        [Authorize] //adding here later in process, allow users to login and then verify email
         [HttpPost("verify/email")]
         public async Task<IActionResult> VerifyEmail(VerifyEmailRequest request)
         {
@@ -39,6 +40,7 @@ namespace RustyTech.Server.Controllers
             return Ok(result);
         }
 
+        [Authorize] //adding here later in process
         [HttpPost("resend/email")]
         public async Task<IActionResult> ResendEmail(string email)
         {

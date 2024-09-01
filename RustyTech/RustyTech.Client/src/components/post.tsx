@@ -3,7 +3,7 @@ import Spinner from './spinner';
 import { getPostById } from '../services/postService';
 import { GetPostRequest } from '../types/apiResponse';
 import { Link, useParams } from 'react-router-dom';
-import { BASE_URL } from '../types/urls';
+import { BASE_API_URL } from '../types/urls';
 
 
 const formatDate = (datetime: Date) => {
@@ -46,17 +46,17 @@ const Post: React.FC = () => {
         <div className='single-post' key={post?.id}>
             {post?.videoFile && (
                 <video className='post-main-video' controls>
-                    <source src={`${BASE_URL}${post?.videoFile}`} type="video/mp4" />
+                    <source src={`${BASE_API_URL}${post?.videoFile}`} type="video/mp4" />
                     Your browser does not support the video tag.
                 </video>
             )}
             {post?.imageFile && (
-                <img className='post-main-image' src={`${BASE_URL}${post?.imageFile}`} alt={post?.title} />
+                <img className='post-main-image' src={`${BASE_API_URL}${post?.imageFile}`} alt={post?.title} />
             )}
             {post?.imageFiles && (
                 <>
                     {post.imageFiles.map((imageFile, index) => (
-                        <img className='post-image' key={index} src={`${BASE_URL}${imageFile}`} alt={post?.title} />
+                        <img className='post-image' key={index} src={`${BASE_API_URL}${imageFile}`} alt={post?.title} />
                     ))}
                 </>
             )}

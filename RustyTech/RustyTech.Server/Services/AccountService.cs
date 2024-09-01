@@ -112,6 +112,7 @@ namespace RustyTech.Server.Services
                     Message = Constants.Messages.Error.RecheckEmailPassword
                 };
             }
+            /*
             if (user.VerifiedAt == null || user.VerifiedAt == DateTime.MinValue)
             {
                 return new LoginResponse()
@@ -119,7 +120,7 @@ namespace RustyTech.Server.Services
                     IsAuthenticated = false,
                     Message = Constants.Messages.Info.UserNotVerified
                 };
-            }
+            }*/
 
             if (user != null)
             {
@@ -179,9 +180,8 @@ namespace RustyTech.Server.Services
             {
                 return InvalidTokenResponse();
             }
-            var decodedToken = WebUtility.UrlDecode(request.Token);
             var user = _userManager.Users
-                .FirstOrDefault(user => user.VerificationToken == decodedToken);
+                .FirstOrDefault(user => user.VerificationToken == request.Token);
 
             if (user == null)
             {
@@ -189,7 +189,7 @@ namespace RustyTech.Server.Services
             }
 
             user.VerifiedAt = DateTime.UtcNow;
-            var result = await _userManager.ConfirmEmailAsync(user, decodedToken);
+            var result = await _userManager.ConfirmEmailAsync(user, request.Token);
             if (!result.Succeeded)
             {
                 return new ResponseBase() { IsSuccess = false, Message = result.Errors.Select(e => e.Description).FirstOrDefault() };
@@ -203,11 +203,7 @@ namespace RustyTech.Server.Services
         {
             if (string.IsNullOrEmpty(email))
             {
-                return new ResponseBase()
-                {
-                    IsSuccess = false,
-                    Message = Constants.Messages.EmailRequired
-                };
+                return BadRequestResponse();
             }
 
             var user = await _userManager.FindByEmailAsync(email);
@@ -448,14 +444,14 @@ namespace RustyTech.Server.Services
         }
         private string CreateResetPasswordBody(string id, string token)
         {
-            return $"<a href='{_configuration["ResetPasswordUrl"]}id={id}&token={token}'>Reset your password</a>";
+            return $"<a href='{_configuration["ResetPasswordUrl"]}id={id}&token={token}'>Reset your password</a> <p>If you did not request this, please let <a href='mailtto:{_configuration["AdminUser:Email"]}'>us</a> know!</p>";
         }
         private void SendConfirmationEmail(string email, string id, string token)
         {
             var emailRequest = new EmailRequest
             {
                 To = email,
-                Subject = "Confirm Email",
+                Subject = "Confirm your Rust Bucket email!",
                 Body = CreateConfirmEmailBody(id, token)
             };
             _emailService.SendEmailAsync(emailRequest);

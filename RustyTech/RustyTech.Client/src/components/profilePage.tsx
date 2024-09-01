@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from 'react';
 import { getUserById } from '../services/userService';
-import { BASE_URL } from '../types/urls';
+import { BASE_API_URL } from '../types/urls';
 import { useParams } from 'react-router-dom';
 
 const ProfilePage: React.FC = () => {
@@ -25,7 +25,7 @@ const ProfilePage: React.FC = () => {
         <main>
             {user ? (
                 <div>
-                    <img className="profile-picture" src={`${BASE_URL}${user.pictureUrl}`} />
+                    <img className="profile-picture" src={`${BASE_API_URL}${user.pictureUrl}`} />
                     <p>Username: {user.userName}</p>
                 </div>
             ) : (

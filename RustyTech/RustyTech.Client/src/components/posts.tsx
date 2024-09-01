@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getAllPosts } from '../services/postService';
 import { GetPostRequest } from '../types/apiResponse';
-import { BASE_URL } from '../types/urls';
+import { BASE_API_URL } from '../types/urls';
 import Spinner from './spinner';
 import { Link } from 'react-router-dom';
 
@@ -73,18 +73,18 @@ const Posts: React.FC = () => {
                     <div className='post' >
 
                         {post.imageFile && (
-                            <img className='post-main-image' src={`${BASE_URL}${post.imageFile}`} alt={post.title} />
+                            <img className='post-main-image' src={`${BASE_API_URL}${post.imageFile}`} alt={post.title} />
                         )}
                         {post.videoFile && (
                             <video controls className='post-main-video'>
-                                <source src={`${BASE_URL}${post.videoFile}`} type="video/mp4" />
+                                <source src={`${BASE_API_URL}${post.videoFile}`} type="video/mp4" />
                                 Your browser does not support the video tag.
                             </video>
                         )}
                         {post?.imageFiles && (
                             <>
                                 {post?.imageFiles && (
-                                    <img className='post-image' src={`${BASE_URL}${post.imageFiles[0]}`} alt={post?.title} />
+                                    <img className='post-image' src={`${BASE_API_URL}${post.imageFiles[0]}`} alt={post?.title} />
                                 )}
                             </>
                         )}

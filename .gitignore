@@ -17,3 +17,5 @@ node_modules/
 /dist/
 /RustyTech/RustyTech.Server/efbundle.exe
 /RustyTech/RustyTech.Server/wwwroot
+/RustyTech/RustyTech.Server/appsettings.json
+/RustyTech/RustyTech.Server/appsettings.Development.json
