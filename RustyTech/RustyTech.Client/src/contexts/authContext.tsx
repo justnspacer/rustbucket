@@ -1,18 +1,18 @@
 /* eslint-disable react-refresh/only-export-components */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { register, login, logout, isAuthenticated } from '../services/accountService';
+import useApiService from '../services/useApiService';
 //import Spinner from '../components/spinner';
-import { RegisterRequest, LoginRequest } from '../types/apiResponse';
+import { RegisterRequest, LoginRequest, ApiResponse, LoginResponse } from '../types/apiResponse';
 
 interface AuthContextType {
     user: any;
     userAuthenticated: boolean;
     loading: boolean;
-    error: any;
-    loginUser: (data: LoginRequest) => Promise<any>;
-    registerUser: (data: RegisterRequest) => Promise<any>;
-    logoutUser: () => Promise<any>;
+    error: string;
+    loginUser: (data: LoginRequest) => Promise<LoginResponse | undefined>;
+    registerUser: (data: RegisterRequest) => Promise<ApiResponse | undefined>;
+    logoutUser: () => Promise<ApiResponse | undefined>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -30,44 +30,47 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const [userAuthenticated, setUserAuthenticated] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<any>(null);
+    const { register, login, isAuthenticated, logout } = useApiService();
     
     useEffect(() => {
-        const cookieValue = document.cookie;
-        if (cookieValue) {
-            const isUserAuthenticated = async () => {
-                try {
-                    const response = await isAuthenticated();
-                    setUserAuthenticated(response.isAuthenticated);
-                    setUser(response.user);
+        const isUserAuthenticated = async () => {
+            try {
+                const response = await isAuthenticated();
+                if (response?.data.data.isSuccess) {
+                    setUserAuthenticated(response.data.data.isAuthenticated);
+                    setUser(response.data.data.user);
                     setLoading(false);
-                } catch (e) {
-                    console.error('Error checking auth status:', e);
-                    setError(e)
                 }
-            };
-            isUserAuthenticated();
-        }
-
+            } catch (e) {
+                console.error('Error checking auth status:', e);
+                setError(e)
+            }
+        };
+        isUserAuthenticated();
     }, []);
 
-    const registerUser = async (data: RegisterRequest) => {
+    const registerUser = async (data: RegisterRequest): Promise<ApiResponse | undefined> => {
         try {
             const response = await register(data);
+            if (response?.data.data.isSuccess) {
+                setLoading(false);
+            }
             return response;
         } catch (e) {
-            console.error('Error registering:', e);
+            console.error('Error registering user:', e);
             setError(e)
         }
 
     };
 
-    const loginUser = async (data: LoginRequest) => {
+    const loginUser = async (data: LoginRequest): Promise<LoginResponse | undefined> => {
         try {
             const response = await login(data);
-            setUser(response.user);
-            setUserAuthenticated(response.isAuthenticated);
-            setLoading(false);
-            console.log(document.cookie);
+            if (response?.data.data.isSuccess) {
+                setUser(response?.data.data.user);
+                setUserAuthenticated(response?.data.data.isAuthenticated);
+                setLoading(false);
+            }
             return response;
 
         } catch (e) {
@@ -76,13 +79,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
     };
 
-    const logoutUser = async () => {
+    const logoutUser = async (): Promise<ApiResponse | undefined> => {
         try {
             const response = await logout();
-            setUser(response.user);
-            setUserAuthenticated(response.isAuthenticated);
-            setLoading(false);
-            return response;
+            if (response?.data.data.isSuccess) {
+                setUser(null);
+                setUserAuthenticated(false);
+                setLoading(false);
+                return response;
+            }
         } catch (e) {
             console.error('Error logging out:', e);
             setError(e)

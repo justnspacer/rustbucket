@@ -71,7 +71,7 @@ const Post: React.FC = () => {
                         <span className='post-date'>{post && formatDate(post.updatedAt)} (updated)</span>
                     </div>
                 )}
-                <div dangerouslySetInnerHTML={{ __html: post?.content }}></div>
+                <div className="post-content" dangerouslySetInnerHTML={{ __html: post?.content }}></div>
 
                 {post?.keywords && post.keywords.map((keyword, index) => (
                     <span className='keyword-text' key={index}>{keyword}</span>

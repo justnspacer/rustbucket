@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { resendEmail, verifyEmail } from '../services/accountService'; // Import the resendEmail method from accountService
+import useApiService from '../services/useApiService'; // Import the resendEmail method from accountService
 import useRedirectIfAuthenticated from '../types/useRedirectIfAuthenticated';
 import useQuery from '../types/useQueryParams';
 import { ApiResponse, VerifyEmailRequest } from '../types/apiResponse';
@@ -23,6 +23,7 @@ const VerifyEmailPage: React.FC = () => {
     const query = useQuery();
     const id = query.get('id');
     const token = query.get('token');
+    const { verifyEmail, resendEmail } = useApiService();
 
     useEffect(() => {
         const verifyEmailAsync = async () => {
@@ -30,20 +31,17 @@ const VerifyEmailPage: React.FC = () => {
                 if (id && token) {
                     const decodedToken = decodeBase64Token(token);
                     const values: VerifyEmailRequest = { id, token: decodedToken };
-                    const response: ApiResponse = await verifyEmail(values);
-                    if (response.isSuccess) {
-                        setIsEmailConfirmed(response.isSuccess);
-                        setMessage(response.message);
-                    } else {
-                        setMessage(response.message);
-                    }
+                    const response = await verifyEmail(values);
+                    if (response?.data.data.isSuccess) {
+                        setIsEmailConfirmed(response?.data.data.isSuccess);
+                    } 
                 }
             } catch (e) {
                 setMessage(`error with frontend: ${e}`);
             }
         };
         verifyEmailAsync();
-    }, [id, token]);
+    }, [id, token, verifyEmail]);
 
     const handleResendEmail = async () => {
         try {

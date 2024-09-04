@@ -46,6 +46,7 @@ namespace RustyTech.Tests
                 UserName = "Test",
                 Email = "test@example.com",
                 Password = "Test123!",
+                ConfirmPassword = "Test123!",
                 BirthYear = 1990
             };
 
@@ -66,6 +67,7 @@ namespace RustyTech.Tests
                 UserName = "Test",
                 Email = "request@example.com",
                 Password = "Password123",
+                ConfirmPassword = "Password1234"
             };
 
             // Act
@@ -85,6 +87,7 @@ namespace RustyTech.Tests
                 UserName = "Test",
                 Email = "request@example.",
                 Password = "Password123",
+                ConfirmPassword = "Password123"
             };
 
             // Act

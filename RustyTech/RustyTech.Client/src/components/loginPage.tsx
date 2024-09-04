@@ -9,26 +9,17 @@ const LoginPage: React.FC = () => {
     const { loginUser } = useAuth();
     const navigate = useNavigate();
     useRedirectIfAuthenticated();
-    const [responseError, setResponseError] = React.useState<string>('');
+    const [responseError, setResponseError] = React.useState<string | undefined>('');
 
 
     const initialValues: LoginRequest = { email: '', password: '', rememberMe: false };
-    const validate = (request: LoginRequest) => {
-        const errors: Partial<LoginRequest> = {};
-        if (!request.email) {
-            errors.email = 'Email is required';
-        }
-        if (!request.password) {
-            errors.password = 'Password is required';
-        }
-        return errors;
-    };
+
     const handleSubmit = async (request: LoginRequest) => {
         const response = await loginUser(request);
-        if (response.isAuthenticated) {
+        if (response?.data.data.isAuthenticated) {
             navigate('/');
         } else {
-            setResponseError(response.message);
+            setResponseError(response?.data.data.message);
         }
     };
 
@@ -38,7 +29,6 @@ const LoginPage: React.FC = () => {
         </div>
             <Form
                 initialValues={initialValues}
-                validate={validate}
                 onSubmit={handleSubmit}>
                 {({ values, handleChange }) => (
                     <div id="loginForm">

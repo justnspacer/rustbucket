@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/authContext';
 import LoginPage from './components/loginPage';
@@ -14,13 +16,14 @@ import ContactPage from './components/contactPage';
 import ProjectsPage from './components/projectsPage';
 import NotFoundPage from './components/NotFoundPage';
 import VerifyEmailPage from './components/verifyEmailPage';
+import MessageDisplay from './components/messageDisplay';
 
 function App() {
-
     return (
         <AuthProvider>
             <BrowserRouter>
                 <Navbar />
+                <MessageDisplay />
                 <Routes>
                     <Route path="/" Component={HomePage} />
                     <Route path="/login" Component={LoginPage} />

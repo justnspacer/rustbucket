@@ -7,23 +7,28 @@ export interface ResponseBase {
 
 export interface AuthResponse {
     data: {
-        isAuthenticated: boolean;
-        isSuccess: boolean;
-        user: GetUserRequest;
-        message?: string;
-    };
+        data: {
+            isAuthenticated: boolean;
+            isSuccess: boolean;
+            user: GetUserRequest;
+            message?: string;
+        }
+    };    
 }
 
 export interface LoginResponse {
     data: {
-        isAuthenticated: boolean;
-        isSuccess: boolean;
-        user: GetUserRequest;
-        message?: string;
+        data: {
+            isAuthenticated: boolean;
+            isSuccess: boolean;
+            user?: GetUserRequest | null;
+            message: string;
+        }
     };
 }
 
 export interface RegisterRequest {
+    userName: string;
     email: string;
     password: string;
     confirmPassword: string;
@@ -84,6 +89,20 @@ export interface VerifyEmailValues {
 }
 
 export interface ApiResponse {
-    message: string;
-    isSuccess: boolean;
+    data: {
+        data: {
+            message: string;
+            isSuccess: boolean;
+        }
+    };
+}
+
+export interface BadRequeetResponse {
+    type: string;
+    title: string;
+    status: number;
+    errors: {
+        [key: string]: string[];
+    };
+    traceId: string;
 }

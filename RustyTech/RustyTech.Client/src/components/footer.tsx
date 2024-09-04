@@ -7,10 +7,8 @@ const Footer: React.FC = () => {
     return (
         <footer>
             <div>
-                <span>Built at </span>
-                <span className="logo">
-                    <Link to="/">Rust Bucket LLC</Link>
-                </span>
+                <p>Built at </p>
+                <Link className="logo" to="/">Rust Bucket LLC</Link>
             </div>
         </footer>
     );

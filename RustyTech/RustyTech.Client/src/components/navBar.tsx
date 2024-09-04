@@ -38,14 +38,12 @@ const NavBar: React.FC = () => {
 
     return (
         <nav>
-            <Link className="logo" to="/">
-                <div>Rust Bucket</div>
-            </Link>
+            <Link className="logo" to="/">Rust Bucket</Link>
             <div className="links">
                 {user ? (
                     <>
                         <span className="username-container">
-                            <span className="username" onClick={handleDropdownClick}>{user?.email}</span>
+                            <span className="username" onClick={handleDropdownClick}>Hey, {user.userName}</span>
                             {showDropdown && (
                                 <div className="dropdown" ref={dropdownRef} onMouseLeave={handleMouseLeave}>
                                     <Link to={`/profile/${user.id}`}>Profile</Link>

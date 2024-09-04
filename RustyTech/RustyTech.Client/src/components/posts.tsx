@@ -1,3 +1,5 @@
+/* eslint-disable react-refresh/only-export-components */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from 'react';
 import { getAllPosts } from '../services/postService';
 import { GetPostRequest } from '../types/apiResponse';
@@ -69,9 +71,8 @@ const Posts: React.FC = () => {
     return (
         <div className='post-list'>
             {posts?.map((post: GetPostRequest) => (
-                <Link to={`/posts/${post.id}`} key={post.id}>
-                    <div className='post' >
-
+                <Link className="post-list-link" to={`/posts/${post.id}`} key={post.id}>
+                    <div className='post'>
                         {post.imageFile && (
                             <img className='post-main-image' src={`${BASE_API_URL}${post.imageFile}`} alt={post.title} />
                         )}
@@ -90,18 +91,13 @@ const Posts: React.FC = () => {
                         )}
                         <div className='post-info'>
                             <h2 className="post-title">{post.title}</h2>
-                            <Link to={`/profile/${post.userId}`} className="post-username">{post.user.userName}</Link>
+                            <span className="post-username">{post.user.userName}</span>
                             <span className='post-date'>{formatDate(post.createdAt)}</span>
                             {post.createdAt != post.updatedAt && (
                                 <div>
                                     <span className='post-date'>{formatDate(post.updatedAt)} (updated)</span>
                                 </div>
                             )}
-                            <div className='keyword-container'>
-                                {post?.keywords && post.keywords.map((keyword, index) => (
-                                    <span className='keyword-text' key={index}>{keyword}</span>
-                                ))}
-                            </div>
                         </div>
                     </div>
                 </Link>

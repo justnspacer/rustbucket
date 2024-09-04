@@ -41,6 +41,15 @@ namespace RustyTech.Server.Services
             var existingUserName = await _userManager
                 .FindByNameAsync(request.UserName);
 
+            if (request.Password != request.ConfirmPassword)
+            {
+                return new ResponseBase()
+                {
+                    IsSuccess = false,
+                    Message = "Password and confirm password do not match"
+                };
+            }
+
             if (existingUserName != null)
             {
                 return new ResponseBase()

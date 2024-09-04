@@ -17,6 +17,9 @@ namespace RustyTech.Server.Models.Account
         [SwaggerSchema(Description = "string")]
         public required string Password { get; set; }
 
+        [Compare("Password", ErrorMessage = "Passwords do not match")]
+        public required string ConfirmPassword { get; set; }
+
         public int BirthYear { get; set; }
     }
 }

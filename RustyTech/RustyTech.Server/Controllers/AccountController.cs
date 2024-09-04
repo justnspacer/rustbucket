@@ -46,7 +46,7 @@ namespace RustyTech.Server.Controllers
         {
             var result = await _authService.ResendEmail(email);
             return Ok(result);
-        }   
+        }
 
         [HttpPost("forgot/password")]
         public async Task<IActionResult> ForgotPassword(string email)
@@ -83,7 +83,8 @@ namespace RustyTech.Server.Controllers
             var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (currentUserId != userId)
             {
-                var response = new ResponseBase() {
+                var response = new ResponseBase()
+                {
                     IsSuccess = false,
                     Message = "You are not authorized to perform this action."
                 };
@@ -93,7 +94,7 @@ namespace RustyTech.Server.Controllers
             return Ok(result);
         }
 
-        [Authorize(Roles = "SuperAdmin")]        
+        [Authorize(Roles = "SuperAdmin")]
         [HttpGet("manage/info")]
         public async Task<IActionResult> GetInfo(string userId)
         {
@@ -109,11 +110,11 @@ namespace RustyTech.Server.Controllers
             return Ok(result);
         }
 
-        [Authorize]
         [HttpGet("isAuthenticated")]
         public IActionResult IsUserAuthenticated()
         {
-            var response = new AuthResponse() {
+            var response = new AuthResponse()
+            {
                 IsAuthenticated = false,
                 IsSuccess = false,
                 User = null
@@ -121,14 +122,17 @@ namespace RustyTech.Server.Controllers
 
             if (User.Identity.IsAuthenticated)
             {
-                var user = new GetUserRequest();
-                user.Id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                user.Email = User.FindFirst(ClaimTypes.Email)?.Value;
-                user.UserName = User.FindFirst(ClaimTypes.Name)?.Value;
+                var user = new GetUserRequest()
+                {
+                    Id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value,
+                    Email = User.FindFirst(ClaimTypes.Email)?.Value,
+                    UserName = User.FindFirst(ClaimTypes.Name)?.Value
+                };
+
                 response.IsAuthenticated = true;
                 response.User = user;
                 response.IsSuccess = true;
-            }            
+            }
             return Ok(response);
         }
     }
