@@ -43,7 +43,7 @@ const NavBar: React.FC = () => {
                 {user ? (
                     <>
                         <span className="username-container">
-                            <span className="username" onClick={handleDropdownClick}>Hey, {user.userName}</span>
+                            <span className="username" onClick={handleDropdownClick}>Hey {user.userName}</span>
                             {showDropdown && (
                                 <div className="dropdown" ref={dropdownRef} onMouseLeave={handleMouseLeave}>
                                     <Link to={`/profile/${user.id}`}>Profile</Link>

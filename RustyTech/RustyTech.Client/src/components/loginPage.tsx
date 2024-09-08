@@ -9,7 +9,6 @@ const LoginPage: React.FC = () => {
     const { loginUser } = useAuth();
     const navigate = useNavigate();
     useRedirectIfAuthenticated();
-    const [responseError, setResponseError] = React.useState<string | undefined>('');
 
 
     const initialValues: LoginRequest = { email: '', password: '', rememberMe: false };
@@ -18,15 +17,11 @@ const LoginPage: React.FC = () => {
         const response = await loginUser(request);
         if (response?.data.data.isAuthenticated) {
             navigate('/');
-        } else {
-            setResponseError(response?.data.data.message);
         }
     };
 
     return (
-        <><div>
-            {responseError && <span className="response-error">{responseError}</span>}
-        </div>
+        <>
             <Form
                 initialValues={initialValues}
                 onSubmit={handleSubmit}>

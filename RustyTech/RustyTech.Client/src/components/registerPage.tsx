@@ -9,7 +9,6 @@ const RegisterPage: React.FC = () => {
     const { registerUser } = useAuth();
     const navigate = useNavigate();
     useRedirectIfAuthenticated();
-    const [responseError, setResponseError] = React.useState<string | undefined>('');
 
     const initialValues: RegisterRequest = { userName: '', email: '', password: '', confirmPassword: '', birthYear: 0 };
 
@@ -17,15 +16,11 @@ const RegisterPage: React.FC = () => {
         const response = await registerUser(request);
         if (response?.data.data.isSuccess) {
             navigate('/login');
-        } else {
-            setResponseError(response?.data.data.message);
         }
     };
 
     return (
-        <><div>
-            {responseError && <span className="response-error">{responseError}</span>}
-        </div>
+        <>
             <Form
                 initialValues={initialValues}
                 onSubmit={handleSubmit}>

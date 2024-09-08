@@ -16,7 +16,7 @@ const useApiService = () => {
         } else if (response?.title) {
             return response.title;
         } else {
-            return 'An unexpected error occurred. Please try again.';
+            return '';
         }
     };
 

@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/authContext';
+import { MessageProvider } from './contexts/messageContext';
 import LoginPage from './components/loginPage';
 import RegisterPage from './components/registerPage';
 import HomePage from './components/homePage';
@@ -20,6 +21,7 @@ import MessageDisplay from './components/messageDisplay';
 
 function App() {
     return (
+        <MessageProvider>
         <AuthProvider>
             <BrowserRouter>
                 <Navbar />
@@ -40,8 +42,9 @@ function App() {
                     <Route path="*" Component={NotFoundPage} />
                 </Routes>
                 <Footer />
-            </BrowserRouter>
-        </AuthProvider>
+                </BrowserRouter>
+            </AuthProvider>
+        </MessageProvider>
     );
 }
 
