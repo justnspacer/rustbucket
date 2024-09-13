@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RustyTech.Server.Data;
 
@@ -11,9 +12,11 @@ using RustyTech.Server.Data;
 namespace RustyTech.Server.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20240909212126_video_thumbnails")]
+    partial class video_thumbnails
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -188,10 +191,6 @@ namespace RustyTech.Server.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("ImageFile")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("IsPublished")
                         .HasColumnType("bit");
 
@@ -355,6 +354,10 @@ namespace RustyTech.Server.Migrations
                 {
                     b.HasBaseType("RustyTech.Server.Models.Posts.Post");
 
+                    b.Property<string>("ImageFile")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasDiscriminator().HasValue("ImagePost");
                 });
 
@@ -362,9 +365,19 @@ namespace RustyTech.Server.Migrations
                 {
                     b.HasBaseType("RustyTech.Server.Models.Posts.Post");
 
+                    b.Property<string>("ImageFile")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("VideoFile")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.ToTable("Post", t =>
+                        {
+                            t.Property("ImageFile")
+                                .HasColumnName("VideoPost_ImageFile");
+                        });
 
                     b.HasDiscriminator().HasValue("VideoPost");
                 });

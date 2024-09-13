@@ -3,10 +3,10 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import useApiService from '../services/useApiService';
 //import Spinner from '../components/spinner';
-import { RegisterRequest, LoginRequest, ApiResponse, LoginResponse } from '../types/apiResponse';
+import { RegisterRequest, LoginRequest, ApiResponse, LoginResponse, GetUserRequest } from '../types/apiResponse';
 
 interface AuthContextType {
-    user: any;
+    user: GetUserRequest;
     userAuthenticated: boolean;
     loading: boolean;
     error: string;
@@ -47,7 +47,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             }
         };
         isUserAuthenticated();
-    }, []);
+    }, [isAuthenticated]);
 
     const registerUser = async (data: RegisterRequest): Promise<ApiResponse | undefined> => {
         try {

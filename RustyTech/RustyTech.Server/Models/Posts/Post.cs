@@ -20,5 +20,6 @@ namespace RustyTech.Server.Models.Posts
         public DateTime UpdatedAt { get; set; }
         public required string UserId { get; set; } // Foreign key
         public required User User { get; set; } // Navigation property
+        public virtual string? ImageFile { get; set; }
     }
 }

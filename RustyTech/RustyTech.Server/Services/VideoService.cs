@@ -8,6 +8,7 @@ namespace RustyTech.Server.Services
     {
         private string _dir;
         private readonly string _videoPath;
+        private readonly string _thumbnailPath;
         private readonly string _ffmpegPath;
         private readonly IWebHostEnvironment? _webHostEnvironment;
 
@@ -15,10 +16,15 @@ namespace RustyTech.Server.Services
         {
             _dir = webHostEnvironment.WebRootPath;
             _videoPath = Path.Combine(_dir, "videos");
+            _thumbnailPath = Path.Combine(_videoPath, "thumbnails");
             _ffmpegPath = Path.Combine(_dir, "ffmpeg");
             if (!Directory.Exists(_videoPath))
             {
                 Directory.CreateDirectory(_videoPath);
+            }
+            if (!Directory.Exists(_thumbnailPath))
+            {
+                Directory.CreateDirectory(_thumbnailPath);
             }
             FFmpeg.SetExecutablesPath(_ffmpegPath, "ffmpeg");
         }
@@ -37,21 +43,7 @@ namespace RustyTech.Server.Services
             {
                 await file.CopyToAsync(stream);
             }
-            /*
-            // Optionally convert the video to reduce size
-            var convertedFilePath = Path.Combine(_videoPath, Path.GetFileNameWithoutExtension(fileName) + "_converted.mp4");
-            var newPath = await ConvertVideoAsync(originalFilePath, convertedFilePath);
-            // Delete the original uploaded file
-            if (File.Exists(originalFilePath))
-            {
-               File.Delete(originalFilePath);
-            }
-            if (newPath == null)
-            {
-                return "Video conversion error.";
-            }
-            */
-            var relativeFilePath = Path.Combine("/videos", Path.GetFileName(originalFilePath)).Replace("\\", "/");            
+            var relativeFilePath = Path.Combine("/videos", Path.GetFileName(originalFilePath)).Replace("\\", "/");
             return relativeFilePath;
         }
 

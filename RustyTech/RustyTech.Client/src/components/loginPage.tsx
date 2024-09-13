@@ -22,27 +22,30 @@ const LoginPage: React.FC = () => {
 
     return (
         <>
-            <Form
-                initialValues={initialValues}
-                onSubmit={handleSubmit}>
-                {({ values, handleChange }) => (
-                    <div id="loginForm">
-                        <label htmlFor="email">Email</label>
-                        <input id="email" autoComplete="email" type="email" name="email" placeholder="Email" value={values.email} onChange={handleChange} required />
+            <main>
+                <Form
+                    initialValues={initialValues}
+                    onSubmit={handleSubmit}>
+                    {({ values, handleChange }) => (
+                        <div id="loginForm">
+                            <label htmlFor="email">Email</label>
+                            <input id="email" autoComplete="email" type="email" name="email" placeholder="Email" value={values.email} onChange={handleChange} required />
 
-                        <label htmlFor="password">Password</label>
-                        <input id="password" autoComplete="current-password" name="password" type="password" placeholder="Password" value={values.password} onChange={handleChange} required />
+                            <label htmlFor="password">Password</label>
+                            <input id="password" autoComplete="current-password" name="password" type="password" placeholder="Password" value={values.password} onChange={handleChange} required />
 
-                        <span className="flex">
-                            <label className="rememberMeLabel" htmlFor="rememberMe">Remember Me</label>
-                            <input id="rememberMe" className="rememberMe" name="rememberMe" type="checkbox" checked={values.rememberMe} onChange={handleChange} />
-                        </span>
-                        <button id="login-button" type="submit">Login</button>
-                        <p className="register-line">Need an account?<Link to="/register">Register</Link></p>
-                        <p><Link className="forgot-password" to="/forgot-password">Forgot Password?</Link></p>
-                    </div>
-                )}
-            </Form></>
+                            <span className="flex">
+                                <label className="rememberMeLabel" htmlFor="rememberMe">Remember Me</label>
+                                <input id="rememberMe" className="rememberMe" name="rememberMe" type="checkbox" checked={values.rememberMe} onChange={handleChange} />
+                            </span>
+                            <button id="login-button" type="submit">Login</button>
+                            <p className="register-line">Need an account?<Link to="/register">Register</Link></p>
+                            <p><Link className="forgot-password" to="/forgot-password">Forgot Password?</Link></p>
+                        </div>
+                    )}
+                </Form>
+            </main>
+        </>
     );
 };
 

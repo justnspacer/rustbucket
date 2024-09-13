@@ -14,7 +14,7 @@ namespace RustyTech.Server.AutoMapper
             CreateMap<ImagePost, CreateImageRequest>().ForMember(destionation => destionation.User, option => option.MapFrom(source => source.User));
             CreateMap<VideoPost, CreateVideoRequest>().ForMember(destionation => destionation.User, option => option.MapFrom(source => source.User));
 
-            CreateMap<BlogPost, GetPostRequest>().ForMember(destionation => destionation.User, option => option.MapFrom(source => source.User));
+            CreateMap<BlogPost, GetPostRequest>().ForMember(destionation => destionation.User, option => option.MapFrom(source => source.User)).ForMember(destionation => destionation.ImageFile, option => option.Ignore());
             CreateMap<ImagePost, GetPostRequest>().ForMember(destionation => destionation.User, option => option.MapFrom(source => source.User));
             CreateMap<VideoPost, GetPostRequest>().ForMember(destionation => destionation.User, option => option.MapFrom(source => source.User));
 

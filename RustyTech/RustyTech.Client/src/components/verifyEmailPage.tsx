@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import useApiService from '../services/useApiService'; // Import the resendEmail method from accountService
 import useRedirectIfAuthenticated from '../types/useRedirectIfAuthenticated';
 import useQuery from '../types/useQueryParams';
-import { ApiResponse, VerifyEmailRequest } from '../types/apiResponse';
+import { VerifyEmailRequest } from '../types/apiResponse';
 
 const decodeBase64Token = (token: string) => {
     try {
@@ -46,12 +46,12 @@ const VerifyEmailPage: React.FC = () => {
     const handleResendEmail = async () => {
         try {
             if (id) {
-                const response: ApiResponse = await resendEmail(id);
-                if (response.isSuccess) {
-                    setIsEmailSent(response.isSuccess);
-                    setMessage(response.message);
+                const response = await resendEmail(id);
+                if (response?.data.data.isSuccess) {
+                    setIsEmailSent(response?.data.data.isSuccess);
+                    setMessage(response?.data.data.message);
                 } else {
-                    setMessage(response.message);
+                    setMessage("error with response");
                 }
             }
             else {

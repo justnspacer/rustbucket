@@ -160,7 +160,8 @@ namespace RustyTech.Tests
                     CreatedAt = new DateTime(2022, 1, 5),
                     UpdatedAt = new DateTime(2022, 1, 5),
                     IsPublished = true,
-                    VideoFile = "test.mp4"
+                    VideoFile = "test.mp4",
+                    ImageFile = "test.png"
                 },
                 new VideoPost
                 {
@@ -172,7 +173,8 @@ namespace RustyTech.Tests
                     CreatedAt = new DateTime(2022, 1, 6),
                     UpdatedAt = new DateTime(2022, 1, 6),
                     IsPublished = true,
-                    VideoFile = "test.mp4"
+                    VideoFile = "test.mp4",
+                    ImageFile = "test.png"
                 }
             };
 

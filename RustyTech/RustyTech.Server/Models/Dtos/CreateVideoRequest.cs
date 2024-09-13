@@ -8,6 +8,7 @@ namespace RustyTech.Server.Models.Dtos
         public required string Title { get; set; }
         public required string Content { get; set; }
         public required IFormFile VideoFile { get; set; }
+        public required IFormFile ThumbnailFile { get; set; }
         public List<string>? Keywords { get; set; }
         public bool IsPublished { get; set; }
         public DateTime CreatedAt { get; set; }

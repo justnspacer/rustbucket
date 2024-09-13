@@ -21,6 +21,7 @@ const RegisterPage: React.FC = () => {
 
     return (
         <>
+            <main>
             <Form
                 initialValues={initialValues}
                 onSubmit={handleSubmit}>
@@ -44,7 +45,9 @@ const RegisterPage: React.FC = () => {
                         <p className="login-line">Have an account?<Link to="/login">Login</Link></p>
                     </div>
                 )}
-            </Form></>
+                </Form>
+            </main>
+        </>
     );
 };
 

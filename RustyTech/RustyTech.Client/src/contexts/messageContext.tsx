@@ -1,7 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useState, useContext, ReactNode } from 'react';
 
-
 // Message context
 interface MessageContextType {
     message: string;
@@ -29,7 +28,7 @@ export const MessageProvider = ({ children }: { children: ReactNode }) => {
         setMessageState(msg);
         setTimeout(() => {
             clearMessage();
-        }, 30000); // Clears after 30 seconds
+        }, 1000000);
     };
 
     return (

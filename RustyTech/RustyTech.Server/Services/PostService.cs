@@ -177,7 +177,7 @@ namespace RustyTech.Server.Services
         
         private async Task<ResponseBase> CreateVideoPost(CreateVideoRequest videoDto, GetUserRequest user)
         {
-            if (videoDto.VideoFile != null)
+            if (videoDto.VideoFile != null && videoDto.ThumbnailFile != null)
             {
                 var userfromDb = await _context.Users.FirstOrDefaultAsync(u => u.Id.ToString() == user.Id);
                 if (userfromDb == null)
@@ -192,11 +192,13 @@ namespace RustyTech.Server.Services
                     Content = content,
                     PlainTextContent = StringHelper.ConvertHtmlToPlainText(content),
                     VideoFile = await _videoService.UploadVideoAsync(videoDto.VideoFile),
+                    ImageFile = await _imageService.UploadImageAsync(videoDto.ThumbnailFile),
                     CreatedAt = date,
                     UpdatedAt = date,
-                    UserId = user.Id.ToString(),
+                    UserId = userfromDb.Id,
                     User = userfromDb,
                     IsPublished = true //maybe change this to false, need publish automation
+                    
                 };
 
                 _keywordService.AddPostKeywords(video, videoDto.Keywords);
@@ -205,7 +207,7 @@ namespace RustyTech.Server.Services
                 _logger.LogInformation($"Video post {video.Id} created");
                 return new ResponseBase() { IsSuccess = true, Message = Constants.Messages.Info.PostCreated };
             }
-            return new ResponseBase() { IsSuccess = false, Message = Constants.Messages.Error.InvalidRequest };
+            return new ResponseBase() { IsSuccess = false, Message = "Video file and thumbnail required" };
         }
 
         private async Task<List<GetPostRequest>> GetAllVideoPosts(bool isPublished = true)
@@ -271,7 +273,7 @@ namespace RustyTech.Server.Services
                     ImageFile = await _imageService.UploadImageAsync(imageDto.ImageFile),
                     CreatedAt = date,
                     UpdatedAt = date,
-                    UserId = user.Id.ToString(),
+                    UserId = userfromDb.Id,
                     User = userfromDb,
                     IsPublished = true
                 };
@@ -356,7 +358,7 @@ namespace RustyTech.Server.Services
                     ImageFiles = imageUrls,
                     CreatedAt = date,
                     UpdatedAt = date,
-                    UserId = user.Id.ToString(),
+                    UserId = userfromDb.Id,
                     User = userfromDb,
                     IsPublished = true
                 };

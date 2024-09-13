@@ -8,7 +8,6 @@ const NavBar: React.FC = () => {
     const dropdownRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
 
-
     const handleDropdownClick = () => {
         setShowDropdown(!showDropdown);
     };
@@ -21,7 +20,6 @@ const NavBar: React.FC = () => {
         if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
             setShowDropdown(false);
         }
-
     };
 
     const handleLogout = async () => {
@@ -39,28 +37,28 @@ const NavBar: React.FC = () => {
     return (
         <nav>
             <Link className="logo" to="/">Rust Bucket</Link>
-            <div className="links">
-                {user ? (
-                    <>
-                        <span className="username-container">
-                            <span className="username" onClick={handleDropdownClick}>Hey {user.userName}</span>
-                            {showDropdown && (
-                                <div className="dropdown" ref={dropdownRef} onMouseLeave={handleMouseLeave}>
-                                    <Link to={`/profile/${user.id}`}>Profile</Link>
-                                    <button className='logout-button' onClick={handleLogout}>Logout</button>
-                                </div>
-                            )}
-                        </span>
-                    </>
-                ) : (
-                    <>
-                        <Link className="login-link" to="/login">
-                            <i className="fa-solid fa-user icon"></i>
-                            Login
-                        </Link>
-                    </>
-                )}
-            </div>
+
+            {user ? (
+                <>
+                    <div className="drop-container">
+                        <i className="fa-solid fa-ellipsis-vertical" onClick={handleDropdownClick}></i>
+                        {showDropdown && (
+                            <div className="dropdown" ref={dropdownRef} onMouseLeave={handleMouseLeave}>
+                                <span className="username">Hey {user.userName}</span>
+                                <Link to={`/profile/${user.id}`}>Check Profile</Link>
+                                <button className='logout-button' onClick={handleLogout}>Logout</button>
+                            </div>
+                        )}
+                    </div>
+                </>
+            ) : (
+                <>
+                    <Link className="login-link" to="/login">
+                        <i className="fa-solid fa-user icon"></i>
+                        Login
+                    </Link>
+                </>
+            )}
         </nav>
     );
 };

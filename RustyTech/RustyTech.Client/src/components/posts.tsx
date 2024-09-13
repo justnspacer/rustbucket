@@ -74,14 +74,14 @@ const Posts: React.FC = () => {
                 <Link className="post-list-link" to={`/posts/${post.id}`} key={post.id}>
                     <div className='post'>
                         {post.imageFile && (
-                            <img className='post-main-image' src={`${BASE_API_URL}${post.imageFile}`} alt={post.title} />
+                            <>
+                                {post.videoFile && (
+                                    <div>play button</div>
+                                )}
+                                <img className='post-main-image' src={`${BASE_API_URL}${post.imageFile}`} alt={post.title} />
+                            </>
                         )}
-                        {post.videoFile && (
-                            <video controls className='post-main-video'>
-                                <source src={`${BASE_API_URL}${post.videoFile}`} type="video/mp4" />
-                                Your browser does not support the video tag.
-                            </video>
-                        )}
+                        
                         {post?.imageFiles && (
                             <>
                                 {post?.imageFiles && (
@@ -93,7 +93,7 @@ const Posts: React.FC = () => {
                             <h2 className="post-title">{post.title}</h2>
                             <span className="post-username">{post.user.userName}</span>
                             <span className='post-date'>{formatDate(post.createdAt)}</span>
-                            {post.createdAt != post.updatedAt && (
+                            {post.createdAt !== post.updatedAt && (
                                 <div>
                                     <span className='post-date'>{formatDate(post.updatedAt)} (updated)</span>
                                 </div>
