@@ -121,15 +121,6 @@ namespace RustyTech.Server.Services
                     Message = Constants.Messages.Error.RecheckEmailPassword
                 };
             }
-            /*
-            if (user.VerifiedAt == null || user.VerifiedAt == DateTime.MinValue)
-            {
-                return new LoginResponse()
-                {
-                    IsAuthenticated = false,
-                    Message = Constants.Messages.Info.UserNotVerified
-                };
-            }*/
 
             if (user != null)
             {

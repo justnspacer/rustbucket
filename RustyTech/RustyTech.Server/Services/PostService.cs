@@ -8,13 +8,13 @@ namespace RustyTech.Server.Services
 {
     public class PostService : IPostService
     {
-        private DataContext _context;
+        private readonly DataContext _context;
         private readonly IMapper _mapper;
-        private IUserService _userService;
-        private ILogger<IPostService> _logger;
-        private IImageService _imageService;
-        private IVideoService _videoService;
-        private IKeywordService _keywordService;
+        private readonly IUserService _userService;
+        private readonly ILogger<IPostService> _logger;
+        private readonly IImageService _imageService;
+        private readonly IVideoService _videoService;
+        private readonly IKeywordService _keywordService;
 
         public PostService(DataContext context, IMapper mapper,
             IUserService userService, ILogger<IPostService> logger,
@@ -57,6 +57,29 @@ namespace RustyTech.Server.Services
             }
 
             allPosts = allPosts.OrderByDescending(p => p.CreatedAt).ToList();
+            return allPosts;
+        }
+
+        public async Task<List<GetPostRequest>> GetUserPostsAsync(string userId)
+        {
+            List<GetPostRequest> allPosts = new List<GetPostRequest>();
+            if (userId != null)
+            {
+                var user = await _userService.GetByIdAsync(userId);
+                if (user?.Id == null)
+                {
+                    return allPosts;
+                }
+                var blogs = await GetAllUserBlogPosts(user.Id);
+                allPosts.AddRange(blogs);
+                var images = await GetAllUserImagePosts(user.Id);
+                allPosts.AddRange(images);
+                var videos = await GetAllUserVideoPosts(user.Id);
+                allPosts.AddRange(videos);
+                _logger.LogInformation("All user posts retrieved");
+                allPosts = allPosts.OrderByDescending(p => p.CreatedAt).ToList();
+            }
+
             return allPosts;
         }
 
@@ -380,6 +403,51 @@ namespace RustyTech.Server.Services
             {
                 var dto = _mapper.Map<BlogPost, GetPostRequest>(blog);
                 dto.PostType = "BlogPost";
+                var keywords = await _keywordService.GetPostKeywordsAsync(dto.Id);
+                dto.Keywords = keywords;
+                dtos.Add(dto);
+            }
+            return dtos;
+        }
+
+        private async Task<List<GetPostRequest>> GetAllUserBlogPosts(string userId)
+        {
+            var blogs = await _context.BlogPosts.Where(post => post.UserId == userId && post.IsPublished == true).Include(user => user.User).ToListAsync();
+            var dtos = new List<GetPostRequest>();
+            foreach (var blog in blogs)
+            {
+                var dto = _mapper.Map<BlogPost, GetPostRequest>(blog);
+                dto.PostType = "BlogPost";
+                var keywords = await _keywordService.GetPostKeywordsAsync(dto.Id);
+                dto.Keywords = keywords;
+                dtos.Add(dto);
+            }
+            return dtos;
+        }
+
+        private async Task<List<GetPostRequest>> GetAllUserImagePosts(string userId)
+        {
+            var images = await _context.ImagePosts.Where(post => post.UserId == userId && post.IsPublished == true).Include(user => user.User).ToListAsync();
+            var dtos = new List<GetPostRequest>();
+            foreach (var image in images)
+            {
+                var dto = _mapper.Map<ImagePost, GetPostRequest>(image);
+                dto.PostType = "ImagePost";
+                var keywords = await _keywordService.GetPostKeywordsAsync(dto.Id);
+                dto.Keywords = keywords;
+                dtos.Add(dto);
+            }
+            return dtos;
+        }
+
+        private async Task<List<GetPostRequest>> GetAllUserVideoPosts(string userId)
+        {
+            var videos = await _context.VideoPosts.Where(post => post.UserId == userId && post.IsPublished == true).Include(user => user.User).ToListAsync();
+            var dtos = new List<GetPostRequest>();
+            foreach (var video in videos)
+            {
+                var dto = _mapper.Map<VideoPost, GetPostRequest>(video);
+                dto.PostType = "VideoPost";
                 var keywords = await _keywordService.GetPostKeywordsAsync(dto.Id);
                 dto.Keywords = keywords;
                 dtos.Add(dto);

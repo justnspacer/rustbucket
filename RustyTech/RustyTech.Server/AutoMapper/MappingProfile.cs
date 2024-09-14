@@ -10,13 +10,15 @@ namespace RustyTech.Server.AutoMapper
         {
             CreateMap<User, GetUserRequest>();
 
-            CreateMap<BlogPost, CreateBlogRequest>().ForMember(destionation => destionation.User, option => option.MapFrom(source => source.User));
-            CreateMap<ImagePost, CreateImageRequest>().ForMember(destionation => destionation.User, option => option.MapFrom(source => source.User));
-            CreateMap<VideoPost, CreateVideoRequest>().ForMember(destionation => destionation.User, option => option.MapFrom(source => source.User));
+            CreateMap<BlogPost, CreateBlogRequest>().ForMember(destination => destination.User, option => option.MapFrom(source => source.User));
+            CreateMap<ImagePost, CreateImageRequest>().ForMember(destination => destination.User, option => option.MapFrom(source => source.User));
+            CreateMap<VideoPost, CreateVideoRequest>().ForMember(destination => destination.User, option => option.MapFrom(source => source.User));
 
-            CreateMap<BlogPost, GetPostRequest>().ForMember(destionation => destionation.User, option => option.MapFrom(source => source.User)).ForMember(destionation => destionation.ImageFile, option => option.Ignore());
-            CreateMap<ImagePost, GetPostRequest>().ForMember(destionation => destionation.User, option => option.MapFrom(source => source.User));
-            CreateMap<VideoPost, GetPostRequest>().ForMember(destionation => destionation.User, option => option.MapFrom(source => source.User));
+            CreateMap<BlogPost, GetPostRequest>().ForMember(destination => destination.User, option => option.MapFrom(source => source.User));
+
+            CreateMap<ImagePost, GetPostRequest>().ForMember(destination => destination.User, option => option.MapFrom(source => source.User));
+
+            CreateMap<VideoPost, GetPostRequest>().ForMember(destination => destination.User, option => option.MapFrom(source => source.User));
 
         }
     }

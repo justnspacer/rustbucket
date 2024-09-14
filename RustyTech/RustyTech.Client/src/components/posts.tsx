@@ -76,7 +76,7 @@ const Posts: React.FC = () => {
                         {post.imageFile && (
                             <>
                                 {post.videoFile && (
-                                    <div>play button</div>
+                                    <i className="fa-solid fa-play play-button"></i>
                                 )}
                                 <img className='post-main-image' src={`${BASE_API_URL}${post.imageFile}`} alt={post.title} />
                             </>

@@ -19,7 +19,6 @@ namespace RustyTech.Server.Data
         {
             base.OnModelCreating(modelBuilder);
             
-            // Configure the relationships and inheritance
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.UserName)
                 .IsUnique();

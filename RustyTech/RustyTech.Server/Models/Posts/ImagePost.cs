@@ -2,6 +2,5 @@
 {
     public class ImagePost : Post
     {
-        public override required string ImageFile { get; set; }
     }
 }

@@ -30,6 +30,13 @@ namespace RustyTech.Server.Controllers
             return Ok(posts);
         }
 
+        [HttpGet("user")]
+        public async Task<IActionResult> GetUserPostAsync([FromQuery] string userId)
+        {
+            var posts = await _postService.GetUserPostsAsync(userId);
+            return Ok(posts);
+        }
+
         [HttpGet("{postId}")]
         public async Task<IActionResult> GetPostByIdAsync(int postId)
         {
