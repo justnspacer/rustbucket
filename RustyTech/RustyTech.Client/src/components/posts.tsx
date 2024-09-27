@@ -1,11 +1,12 @@
-/* eslint-disable react-refresh/only-export-components */
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useEffect, useState } from 'react';
-import { getAllPosts } from '../services/postService';
+import { useState, useEffect, useRef } from 'react';
 import { GetPostRequest } from '../types/apiResponse';
-import { BASE_API_URL } from '../types/urls';
-import Spinner from './spinner';
 import { Link } from 'react-router-dom';
+import { BASE_API_URL } from '../types/urls';
+import { getAllPosts } from '../services/postService';
+import Spinner from './spinner';
+
 
 const formatDate = (datetime: Date) => {
     const date = new Date(datetime);
@@ -17,7 +18,7 @@ const Posts: React.FC = () => {
     const [posts, setPosts] = useState<GetPostRequest[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-
+    const refs = useRef<(HTMLDivElement | null)[]>([]);
 
     useEffect(() => {
         const fetchPosts = async () => {
@@ -30,33 +31,25 @@ const Posts: React.FC = () => {
                 setLoading(false);
             }
         };
-
         fetchPosts();
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible'); // Add 'visible' class when in view
+                } else {
+                    entry.target.classList.remove('visible'); // Optionally remove when out of view
+                }
+            });
+        });
 
-        const handleScrollToPost = (event) => {
-            const postElement = event.target.closest('.post');
-            if (postElement) {
-                const postId = postElement.id;
-                scrollToPost(postId);
-            }
-        };
+        refs.current.forEach(ref => {
+            if (ref) observer.observe(ref);
+        });
 
-        const scrollToPost = (postId: string) => {
-            const post = document.getElementById(postId);
-            if (post) {
-                window.scrollTo({
-                    top: post.offsetTop,
-                    behavior: 'smooth'
-                });
-            }
-        };
-
-        const postListElement = document.querySelector('.post-list');
-        postListElement?.addEventListener('click', handleScrollToPost);
-
-        // Cleanup the event listener on component unmount
         return () => {
-            postListElement?.removeEventListener('click', handleScrollToPost);
+            refs.current.forEach(ref => {
+                if (ref) observer.unobserve(ref);
+            });
         };
     }, []);
 
@@ -69,10 +62,10 @@ const Posts: React.FC = () => {
     }
 
     return (
-        <div className='post-list'>
-            {posts?.map((post: GetPostRequest) => (
-                <Link className="post-list-link" to={`/posts/${post.id}`} key={post.id}>
-                    <div className='post'>
+        <div className="post-list">
+            {posts.map((post, index) => (
+                <div key={index} ref={(el) => (refs.current[index] = el)} className='hidden'>
+                    <Link className={`post-list-link`} to={`/posts/${post.id}`} key={post.id.toString()} id={post.id.toString()}>
                         {post.imageFile && (
                             <>
                                 {post.videoFile && (
@@ -81,7 +74,7 @@ const Posts: React.FC = () => {
                                 <img className='post-main-image' src={`${BASE_API_URL}${post.imageFile}`} alt={post.title} />
                             </>
                         )}
-                        
+
                         {post?.imageFiles && (
                             <>
                                 {post?.imageFiles && (
@@ -90,17 +83,11 @@ const Posts: React.FC = () => {
                             </>
                         )}
                         <div className='post-info'>
+                            <span className='post-date'>{formatDate(post.createdAt)}</span>
                             <h2 className="post-title">{post.title}</h2>
                             <span className="post-username">{post.user.userName}</span>
-                            <span className='post-date'>{formatDate(post.createdAt)}</span>
-                            {post.createdAt !== post.updatedAt && (
-                                <div>
-                                    <span className='post-date'>{formatDate(post.updatedAt)} (updated)</span>
-                                </div>
-                            )}
                         </div>
-                    </div>
-                </Link>
+                    </Link></div>
             ))}
         </div>
     );

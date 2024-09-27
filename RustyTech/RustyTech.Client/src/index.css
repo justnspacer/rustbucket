@@ -21,14 +21,15 @@
     --white-color: #fff;
     --timberwolf: #D1D1D1;
     --citrine: #EAD94C; /*yellow*/
+    --trans-black: rgba(0, 0, 0, 0.5);
+    --trans-white: rgba(255, 255, 255, 0.5);
 }
 
 body {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    /*    color: var(--timberwolf);
-*/ background: linear-gradient(to bottom, #eef2f3, #8399a2) no-repeat fixed center;
+    background: linear-gradient(to bottom, var(--charcoal), var(--timberwolf)) no-repeat fixed center;
 }
 
 p {
@@ -55,6 +56,18 @@ main {
     width: 80%; /*yikes*/
     max-width: 800px; /*yikes*/
     margin: 0 auto;
+    color: var(--timberwolf);
+    height: 100vh;
+}
+
+main h1 {
+    font-size: 2.5rem;
+    line-height: 0.9;
+    margin-bottom: 1rem;
+}
+
+main {
+    font-weight: 500;
 }
 
 .titillium-web-extralight {
@@ -128,30 +141,27 @@ a {
 }
 
 
-
-
 nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    z-index: 100;
-/*    background: linear-gradient(to bottom, #eef2f3, transparent);*/    
-    width: 80%;
-    max-width: 800px;
-    padding: 0 2rem;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* five equal columns */
+    gap: 5px; /* Space between grid items */
     position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    z-index: 100;
+    width: 100%;
+    background-color: var(--trans-black);
+    backdrop-filter: blur( 4px );
+    -webkit-backdrop-filter: blur( 4px );
 }
 
+.nav-item {
+    padding: 1rem 2rem;
+}
+
+
+
     nav .fa-solid.fa-ellipsis-vertical {
-        font-size: 1.4rem;
-        color: var(--black-color);
-        background-color: var(--citrine);
-        box-shadow: 4px 7px 2px rgba(0, 0, 0, 0.9);
-        width: 2rem;
-        height: 2rem;
+        font-size: 1.6rem;
+        color: var(--white-color);
         display: flex;
         justify-content: center;
         align-items: center;
@@ -163,37 +173,71 @@ nav {
         }
 
 .drop-container {
-
+    grid-column: 5;
+    display: flex;
+    justify-content: right;
 }
 
 footer {
-    padding: 2rem;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* five equal columns */
+    gap: 5px; /* Space between grid items */
+    background-color: var(--rich-black);
+/*    box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );*/    
+backdrop-filter: blur( 4px );
+    -webkit-backdrop-filter: blur( 4px );
 }
 
-    footer div {
+    footer .footer-item {
         display: flex;
         flex-direction: column;
         align-items: center;
+        grid-column: 3;
+        padding: 2rem;
     }
 
+.footer-logo {
+    letter-spacing: 2px;
+    font-weight: 700;
+    color: var(--white-color);
+    white-space: nowrap;
+}
 .mainlogo {
     width: 25px;
     height: 25px;
 }
 
-.logo {
+@media (max-width: 768px) {
+    nav, footer {
+        grid-template-columns: repeat(3, 1fr); /* Two equal columns */
+    }
+
+    .login-link, .drop-container {
+        grid-column: 3 !important;
+    }
+
+
+    footer .footer-item {
+        grid-column: 2 !important;
+    }
+}
+/*.logo {
     display: flex;
     align-items: center;
     gap: 1rem;
-}
+}*/
 
 .logo {
     font-size: 2rem;
-    font-weight: 900;
+    font-weight: 700;
+    color: var(--white-color);
+    font-style: normal;
+    white-space: nowrap;
+    letter-spacing: 2px;
 }
 
     .logo:link, .logo:visited {
-        color: var(--black-color);
+        color: var(--white-color);
     }
 
     .logo:hover {
@@ -207,7 +251,7 @@ footer {
 }
 
     .username a:link, .username a:visited {
-        color: var(--rose-taupe);
+        color: var(--white-color);
         text-decoration: none;
     }
 
@@ -328,12 +372,16 @@ label {
 .login-link {
     display: flex;
     align-items: center;
-    gap: .5rem;
+    justify-content: flex-end;
+    gap: 8px;
     text-transform: capitalize;
+    letter-spacing: 2px;
+    font-weight: 700;
+    grid-column: 5; /* Place it in the last column */
 }
 
 a.login-link:link, a.login-link:visited {
-    color: var(--black-color);
+    color: var(--white-color);
 }
 
 @keyframes spin {
@@ -346,12 +394,26 @@ a.login-link:link, a.login-link:visited {
     }
 }
 
+.dropdown-backdrop {
+    position: absolute;
+    display: flex;
+    justify-content: right;
+    width: 100%;
+    height: 100vh;
+    background-color: var(--trans-black);
+    z-index: 2;
+    top: 0;
+    right: 0;
+    padding: 16px;
+}
+
 .dropdown {
+    width: 120px;
     position: absolute;
     display: flex;
     flex-direction: column;
     width: 120px;
-    margin-top: 5px;
+    margin-top: 38px;
     background-color: var(--white-color);
     z-index: 2;
 }
@@ -377,12 +439,6 @@ a.login-link:link, a.login-link:visited {
             color: var(--white-color);
         }
 
-.single-post {
-    width: 80%;
-    max-width: 800px;
-    margin-bottom: 20px;
-    margin: 0 auto;
-}
 
 .post-content {
     display: flex;
@@ -392,6 +448,7 @@ a.login-link:link, a.login-link:visited {
 }
 
 .post-username {
+    text-transform: capitalize;
     margin-right: 7px;
 }
 
@@ -408,59 +465,119 @@ a.login-link:link, a.login-link:visited {
 
 .post-list {
     display: flex;
-    flex-direction:column;
+    flex-direction: column;
     width: 100%;
+    align-items: stretch;
 }
 
 .post-list-link {
+    display: flex;
+    overflow: hidden;
     text-decoration: none;
     color: inherit;
     position: relative;
+    height: 800px;
+    width: 100%;
 }
 
-.post {
-    position: relative;
-    overflow: hidden;
+.hidden {
+    opacity: 0;
+    transform: translateX(-100%); /* Adjust this based on the desired direction */
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
 }
 
-    .post img.post-image,
-    .post img.post-main-image {
+.visible {
+    opacity: 1;
+    transform: translateX(0); /* Slides the div into its position */
+}
+
+
+    img.post-image,
+    img.post-main-image {
         width: 100%;
-        height: 200px;
+        height: 100%;
         flex-grow: 1;
         object-fit: cover;
         filter: brightness(70%);
     }
 
 .post-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     position: absolute;
+    border-radius: 20rem;
     bottom: 0;
     left: 0;
     right: 0;
-    padding: 20px;
-    background: rgba(0, 0, 0, 0.5);
+    background-color: var(--trans-black);
+    backdrop-filter: blur( 4px );
+    -webkit-backdrop-filter: blur( 4px );
     color: white;
     transition: background 0.3s;
+    margin: 0 10px 10px 10px;
+    padding: 7px;
 }
 
+.post-main {
+    background-color: var(--trans-black);
+    backdrop-filter: blur( 4px );
+    -webkit-backdrop-filter: blur( 4px );
+    color: white;
+    transition: background 0.3s;
+    margin: 0 10px 10px 10px;
+    padding: 2rem;
+    position: absolute;
+    margin-top: 100px;
+}
+
+.post-details {
+    display: flex;
+    margin-top: 10px;
+}
+.imgFiles {
+    display: flex;
+    gap: 10px;
+}
+.imgFiles img {
+    width: 200px;
+    height: 500px;
+    object-fit: cover;
+}
 .post-title {
-    font-size: 1.5em;
+    font-size: 1.6rem;
     margin: 0;
+    text-align: center;
+    line-height: 1.0;
+}
+
+.post-main-title {
+    font-size: 1.6rem;
+    margin: 0;
+    line-height: 1.0;
 }
 
 .post-username,
 .post-date {
     display: block;
-    font-size: 0.9em;
-    margin-top: 5px;
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--white-color);
+    
 }
 
-.post:hover .post-info {
-    background: rgba(0, 0, 0, 0.7);
+.post-date {
+    color: var(--citrine);
 }
+
+    .post:hover .post-info {
+        background: rgba(0, 0, 0, 0.8);
+    }
 
 .post:hover .play-button {
-    color: var(--citrine);
+    color: red;
+    border-radius: 4rem;
 }
 
 .play-button {
@@ -469,10 +586,17 @@ a.login-link:link, a.login-link:visited {
     left: 50%;
     transform: translate(-50%, -50%);
     font-size: 2em;
-    color: white;
-    opacity: 0.8;
     pointer-events: none; /* Prevent interfering with post link */
     z-index: 6;
+    font-size: 1.7rem;
+    color: var(--black-color);
+    background-color: var(--white-color);
+    width: 3rem;
+    height: 3rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: border-radius 0.2s ease-in;
 }
 
 
@@ -482,7 +606,6 @@ a.login-link:link, a.login-link:visited {
 
 .keyword-text {
     font-size: 1rem;
-    color: var(--black-color);
     margin-right: 5px;
 }
 
@@ -496,6 +619,10 @@ a.login-link:link, a.login-link:visited {
 
     .post-text {
         flex: 1;
+    }
+
+    .post-list-link {
+        height: 340px;    
     }
 }
 
@@ -547,3 +674,84 @@ a.login-link:link, a.login-link:visited {
         cursor: pointer;
         font-weight: 400;
     }
+
+
+.accordion {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 2rem 0rem;
+}
+
+.accordion-item {
+    margin-bottom: 20px;
+    background-color: var(--timberwolf);
+/*    box-shadow: 4px 7px 0px var(--timberwolf);
+*/}
+
+.accordion-header {
+    background-color: var(--black-color);
+    font-weight: 900;
+    text-transform: uppercase;
+    color: white;
+    cursor: pointer;
+    padding: 2rem;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    transition: background-color 0.3s ease;
+}
+
+    .accordion-header:hover {
+        background-color: var(--citrine);
+        color: var(--black-color);
+    }
+
+.accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease, padding 0.5s ease;
+    padding: 0 15px;
+}
+
+    .accordion-content p {
+        margin: 15px 0;
+    }
+
+.accordion-item.active .accordion-content {
+    max-height: 300px; /* You can set this to a large enough height for your content */
+    padding: 15px 15px;
+}
+
+.accordion-item.inactive .accordion-content {
+    max-height: 0;
+}
+
+.parallax-image {
+    height: 90vh;
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    position: relative;
+}
+
+.image-list {
+    display: flex;
+    flex-direction: column;
+}
+
+
+@media screen and (max-width: 768px) {
+    .parallax-image {
+        height: 80vh;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    p {
+        font-size: 0.9rem;
+    }
+}

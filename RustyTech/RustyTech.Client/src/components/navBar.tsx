@@ -36,25 +36,27 @@ const NavBar: React.FC = () => {
 
     return (
         <nav>
-            <Link className="logo" to="/">Rust Bucket</Link>
+            <Link className="logo nav-item" to="/">Rust Bucket</Link>
 
             {user ? (
                 <>
-                    <div className="drop-container">
+                    <div className="drop-container nav-item">
                         <i className="fa-solid fa-ellipsis-vertical" onClick={handleDropdownClick}></i>
                         {showDropdown && (
-                            <div className="dropdown" ref={dropdownRef} onMouseLeave={handleMouseLeave}>
-                                <span className="username">Hey {user.userName}</span>
-                                <Link to={`/profile/${user.id}`}>Check Profile</Link>
-                                <button className='logout-button' onClick={handleLogout}>Logout</button>
-                            </div>
+                            <section className="dropdown-backdrop">
+                                <div className="dropdown" ref={dropdownRef} onMouseLeave={handleMouseLeave}>
+                                    <span className="username">Hey {user.userName}</span>
+                                    <Link to={`/profile/${user.id}`}>Check Profile</Link>
+                                    <button className='logout-button' onClick={handleLogout}>Logout</button>
+                                </div>
+                            </section>
                         )}
                     </div>
                 </>
             ) : (
                 <>
-                    <Link className="login-link" to="/login">
-                        <i className="fa-solid fa-user icon"></i>
+                    <Link className="login-link nav-item" to="/login">
+                        {/*                        <i className="fa-solid fa-user icon"></i>*/}
                         Login
                     </Link>
                 </>

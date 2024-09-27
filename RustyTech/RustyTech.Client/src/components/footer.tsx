@@ -6,8 +6,8 @@ const Footer: React.FC = () => {
 
     return (
         <footer>
-            <div>
-                <Link className="logo" to="/">Rust Bucket LLC</Link>
+            <div className='footer-item'>
+                <Link className="footer-logo" to="/">Rust Bucket LLC</Link>
             </div>
         </footer>
     );

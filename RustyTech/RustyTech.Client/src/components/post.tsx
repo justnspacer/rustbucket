@@ -43,7 +43,7 @@ const Post: React.FC = () => {
     }
 
     return (
-        <div className='single-post' key={post?.id}>
+        <div className="post-list" key={post?.id}>
             {post?.videoFile && (
                 <video className='post-main-video' controls>
                     <source src={`${BASE_API_URL}${post?.videoFile}`} type="video/mp4" />
@@ -55,23 +55,26 @@ const Post: React.FC = () => {
             )}
             {post?.imageFiles && (
                 <>
-                    {post.imageFiles.map((imageFile, index) => (
-                        <img className='post-image' key={index} src={`${BASE_API_URL}${imageFile}`} alt={post?.title} />
-                    ))}
+                    <section className='image-list'>
+                        {post.imageFiles.map((imageFile, index) => (
+                            <div className="parallax-image" role='img' aria-label={`${post?.title}`} key={index} style={{ backgroundImage: `url(${BASE_API_URL}${imageFile})`}}></div>
+                        ))}
+                    </section>
                 </>
             )}
-            <div className='post-info'>
-                <h2 className="post-title">{post?.title}</h2>
-                <Link to={`/profile/${post?.userId}`} className="post-username">{post?.user.userName}</Link>
-                <span className='post-date'>{post && formatDate(post.createdAt)}</span>
-
+            <div className='post-main'>
+                <h2 className="post-main-title">{post?.title}</h2>
+                <div className='post-details'>
+                    <Link to={`/profile/${post?.userId}`} className="post-username">{post?.user.userName}</Link>
+                    <span className='post-date'>{post && formatDate(post.createdAt)}</span>
+                </div>
 
                 {post?.createdAt != post?.updatedAt && (
                     <div>
                         <span className='post-date'>{post && formatDate(post.updatedAt)} (updated)</span>
                     </div>
                 )}
-                <div className="post-content" dangerouslySetInnerHTML={{ __html: post?.content }}></div>
+                <div dangerouslySetInnerHTML={{ __html: post?.content }}></div>
 
                 {post?.keywords && post.keywords.map((keyword, index) => (
                     <span className='keyword-text' key={index}>{keyword}</span>
