@@ -47,9 +47,9 @@ const ProfilePage: React.FC = () => {
     return (
         <main>
             {user ? (
-                <div>
+                <div className="pic-text">
+                    <span className="picture-username">{user.userName}</span>
                     <img className="profile-picture" src={`${BASE_API_URL}${user.pictureUrl}`} />
-                    <p>Username: {user.userName}</p>
                 </div>
             ) : (
                 <p>Loading user data...</p>

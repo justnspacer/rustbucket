@@ -650,7 +650,17 @@ a.login-link:link, a.login-link:visited {
     height: 200px;
     object-fit: cover;
     border-radius: 50%;
-    margin: 0 auto;
+    position: relative;
+}
+
+.picture-username {
+    color: var(--white-color);
+    text-transform: capitalize;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+    position: absolute;
+    z-index: 1;
 }
 
 .message-display {

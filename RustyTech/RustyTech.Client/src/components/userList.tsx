@@ -5,7 +5,7 @@ import { BASE_API_URL } from '../types/urls';
 import { Link } from 'react-router-dom';
 
 
-const Users: React.FC = () => {
+const UserList: React.FC = () => {
     const [users, setUsers] = useState<any>(null);
 
     useEffect(() => {
@@ -25,13 +25,10 @@ const Users: React.FC = () => {
             {users ? (
                 <div>
                     {users.map((user: any) => (
-                        <div key={user.id}>
-                            <Link to={`/profile/${user.id}`}>
+                        <Link to={`/profile/${user.id}`} className="pic-text" key={user.id}>
+                            <span className="picture-username">{user.userName}</span>
                             <img className="profile-picture" src={`${BASE_API_URL}${user.pictureUrl}`} />
-                                <p>Username: {user.userName}</p>
-                            </Link>
-
-                        </div>
+                        </Link>
                     ))}
                 </div>
             ) : (
@@ -41,4 +38,4 @@ const Users: React.FC = () => {
     );
 };
 
-export default Users;
+export default UserList;
