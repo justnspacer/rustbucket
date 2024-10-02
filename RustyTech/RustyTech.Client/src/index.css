@@ -26,10 +26,14 @@
 }
 
 body {
-    margin: 0;
-    padding: 0;
     box-sizing: border-box;
     background: linear-gradient(to bottom, var(--charcoal), var(--timberwolf)) no-repeat fixed center;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
 }
 
 p {
@@ -53,11 +57,17 @@ p {
 
 main {
     padding: 6rem 2rem 0rem 2rem;
-    width: 80%; /*yikes*/
-    max-width: 800px; /*yikes*/
-    margin: 0 auto;
     color: var(--timberwolf);
-    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    min-height: 89.7vh;
+}
+
+ul, ol {
+        list-style: none;
+    padding: 0;
+    margin: 0;
+
 }
 
 main h1 {
@@ -480,11 +490,11 @@ a.login-link:link, a.login-link:visited {
     width: 100%;
 }
 
-.hidden {
+/*.hidden {
     opacity: 0;
-    transform: translateX(-100%); /* Adjust this based on the desired direction */
-    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
-}
+    transform: translateX(-100%);*/ /* Adjust this based on the desired direction */
+    /*transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+}*/
 
 .visible {
     opacity: 1;
@@ -636,7 +646,10 @@ a.login-link:link, a.login-link:visited {
 
 
 .profile-picture {
+    width: 200px;
     height: 200px;
+    object-fit: cover;
+    border-radius: 50%;
     margin: 0 auto;
 }
 
@@ -678,14 +691,13 @@ a.login-link:link, a.login-link:visited {
 
 .accordion {
     max-width: 100%;
-    margin: 0 auto;
     padding: 2rem 0rem;
 }
 
 .accordion-item {
     margin-bottom: 20px;
-    background-color: var(--timberwolf);
-/*    box-shadow: 4px 7px 0px var(--timberwolf);
+/*    background-color: var(--timberwolf);
+*//*    box-shadow: 4px 7px 0px var(--timberwolf);
 */}
 
 .accordion-header {
@@ -699,7 +711,7 @@ a.login-link:link, a.login-link:visited {
     border: none;
     text-align: left;
     outline: none;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.5s ease;
 }
 
     .accordion-header:hover {
@@ -708,22 +720,32 @@ a.login-link:link, a.login-link:visited {
     }
 
 .accordion-content {
+    color: var(--black-color);
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.5s ease, padding 0.5s ease;
     padding: 0 15px;
 }
+    .accordion-content a:link, .accordion-content a:visited {
+        color: var(--black-color);
+        font-weight: 700;
+        transition: color 0.5s ease;
+    }
+
+    .accordion-content a:hover {
+        color: var(--citrine);
+    }
 
     .accordion-content p {
         margin: 15px 0;
     }
 
-.accordion-item.active .accordion-content {
-    max-height: 300px; /* You can set this to a large enough height for your content */
+.active {
+    max-height: 300px;
     padding: 15px 15px;
 }
 
-.accordion-item.inactive .accordion-content {
+.inactive {
     max-height: 0;
 }
 

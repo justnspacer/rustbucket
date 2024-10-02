@@ -31,6 +31,15 @@ export async function getPostById(postId: number) {
     }
 }
 
+export async function getPostByUserId(userId?: string) {
+    try {
+        const response = await axios.get(`${BASE_API_URL}/api/post/user?userId=${userId}`);
+        return response.data.data;
+    } catch (e) {
+        console.error('Error fetching user post:', e);
+    }
+}
+
 export const editPost = async <T extends GetPostRequest>(newData: T) => {
     try {
         const response = await axios.put<ResponseBase>(`${BASE_API_URL}/api/posts/${newData.id}`, newData);

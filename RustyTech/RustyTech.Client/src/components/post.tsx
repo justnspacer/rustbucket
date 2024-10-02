@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Spinner from './spinner';
 import { getPostById } from '../services/postService';
 import { GetPostRequest } from '../types/apiResponse';
@@ -16,6 +16,7 @@ const Post: React.FC = () => {
     const [post, setPost] = useState<GetPostRequest>();
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const refs = useRef<(HTMLDivElement | null)[]>([]);
 
     const { id } = useParams();
 
@@ -32,6 +33,25 @@ const Post: React.FC = () => {
         };
 
         fetchPost(Number(id));
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible'); // Add 'visible' class when in view
+                } else {
+                    entry.target.classList.remove('visible'); // Optionally remove when out of view
+                }
+            });
+        });
+
+        refs.current.forEach(ref => {
+            if (ref) observer.observe(ref);
+        });
+
+        return () => {
+            refs.current.forEach(ref => {
+                if (ref) observer.unobserve(ref);
+            });
+        };
     }, [id]);
 
     if (loading) {

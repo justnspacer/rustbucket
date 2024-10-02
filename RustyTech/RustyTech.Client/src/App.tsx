@@ -9,7 +9,7 @@ import HomePage from './components/homePage';
 import Navbar from './components/navBar';
 import Footer from './components/footer';
 import Post from './components/post';
-import Posts from './components/posts';
+import Users from './components/users';
 import AboutPage from './components/aboutPage';
 import ProfilePage from './components/profilePage';
 import RequestPage from './components/requestPage';
@@ -33,7 +33,7 @@ function App() {
                     <Route path="/verify/email" Component={VerifyEmailPage} />
                     <Route path="/profile/:id" Component={ProfilePage} />
                     <Route path="/posts/:id" Component={Post} />
-                    <Route path="/posts/" Component={Posts} />
+                    <Route path="/users" Component={Users} />
                     <Route path="/projects" Component={ProjectsPage} />
                     <Route path="/verify/email" Component={VerifyEmailPage} />
                     <Route path="/about" Component={AboutPage} />

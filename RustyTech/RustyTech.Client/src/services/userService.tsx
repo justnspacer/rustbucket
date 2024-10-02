@@ -2,11 +2,9 @@ import axios from 'axios';
 import { BASE_API_URL } from '../types/urls';
 
 
-export async function getAllUsers(active: boolean = true) {
+export async function getAllUsers() {
     try {
-        const response = await axios.get(`${BASE_API_URL}/api/user/all`, {
-            params: { active },
-        });
+        const response = await axios.get(`${BASE_API_URL}/api/user/get/all`);
         return response.data.data;
     } catch (error) {
         console.error('Error occurred while fetching users:', error);
