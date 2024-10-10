@@ -23,9 +23,9 @@ const UserList: React.FC = () => {
     return (
         <main>
             {users ? (
-                <div>
+                <div className="user-list">
                     {users.map((user: any) => (
-                        <Link to={`/profile/${user.id}`} className="pic-text" key={user.id}>
+                        <Link to={`/profile/${user.id}`} className="user" key={user.id}>
                             <span className="picture-username">{user.userName}</span>
                             <img className="profile-picture" src={`${BASE_API_URL}${user.pictureUrl}`} />
                         </Link>

@@ -37,6 +37,9 @@ const NavBar: React.FC = () => {
     return (
         <nav>
             <Link className="logo nav-item" to="/">Rust Bucket</Link>
+            <div className="nav-item">
+                <div className="searchBar"></div>
+            </div>
 
             {user ? (
                 <>

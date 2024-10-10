@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { getUserById } from '../services/userService';
 import { getPostByUserId } from '../services/postService';
 import { BASE_API_URL } from '../types/urls';
@@ -16,7 +16,6 @@ const ProfilePage: React.FC = () => {
     const [user, setUser] = useState<any>(null);
     const [posts, setPosts] = useState<any[]>([]);
     const { id } = useParams();
-    const refs = useRef<(HTMLDivElement | null)[]>([]);
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -56,8 +55,7 @@ const ProfilePage: React.FC = () => {
             )}
             <div className="post-list">
                 {posts.map((post, index) => (
-                    <div key={index} ref={(el) => (refs.current[index] = el)} className='hidden'>
-                        <Link className={`post-list-link`} to={`/posts/${post.id}`} key={post.id.toString()} id={post.id.toString()}>
+                        <Link className={`post-list-link`} to={`/posts/${post.id}`} key={index} id={post.id.toString()}>
                             {post.imageFile && (
                                 <>
                                     {post.videoFile && (
@@ -79,7 +77,7 @@ const ProfilePage: React.FC = () => {
                                 <h2 className="post-title">{post.title}</h2>
                                 <span className="post-username">{post.user.userName}</span>
                             </div>
-                        </Link></div>
+                        </Link>
                 ))}
             </div>
         </main>

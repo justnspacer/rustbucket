@@ -23,11 +23,18 @@
     --citrine: #EAD94C; /*yellow*/
     --trans-black: rgba(0, 0, 0, 0.5);
     --trans-white: rgba(255, 255, 255, 0.5);
+
+    /* CSS HEX */
+    --celadon: #a5d0a8ff;
+    --cambridge-blue: #8cada7ff;
+    --licorice: #110b11ff;
+    --satin-sheen-gold: #b7990dff;
+    --cream: #f2f4cbff
 }
 
 body {
     box-sizing: border-box;
-    background: linear-gradient(to bottom, var(--charcoal), var(--timberwolf)) no-repeat fixed center;
+    background: linear-gradient(to bottom, var(--cream), var(--cream)) no-repeat fixed center;
 }
 
 html, body {
@@ -56,11 +63,11 @@ p {
 }
 
 main {
-    padding: 6rem 2rem 0rem 2rem;
-    color: var(--timberwolf);
-    display: flex;
-    flex-direction: column;
-    min-height: 89.7vh;
+    padding: 6rem 0rem 0rem 0rem;
+    color: var(--licorice);
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* five equal columns */
+    gap: 20px;
 }
 
 ul, ol {
@@ -153,25 +160,36 @@ a {
 
 nav {
     display: grid;
-    grid-template-columns: repeat(5, 1fr); /* five equal columns */
-    gap: 5px; /* Space between grid items */
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
     position: fixed;
     z-index: 100;
     width: 100%;
-    background-color: var(--trans-black);
-    backdrop-filter: blur( 4px );
+/*    background-color: var(--trans-black);
+*/    backdrop-filter: blur( 4px );
     -webkit-backdrop-filter: blur( 4px );
+    border: 1px solid var(--licorice);
 }
 
 .nav-item {
-    padding: 1rem 2rem;
+    padding: 1rem 0rem;
+    border: 1px solid var(--licorice);
+    border-bottom: none;
+    border-top: none;
 }
 
-
+.searchBar {
+    width: 100%;
+    height: 20px;
+    background-color: var(--cambridge-blue);
+    grid-column: 3;
+    border-radius: 35px;
+    box-shadow: 4px 7px 2px rgba(0, 0, 0, 0.3);
+}
 
     nav .fa-solid.fa-ellipsis-vertical {
         font-size: 1.6rem;
-        color: var(--white-color);
+        color: var(--licorice);
         display: flex;
         justify-content: center;
         align-items: center;
@@ -188,12 +206,25 @@ nav {
     justify-content: right;
 }
 
+.homepage-header, .homepage-description {
+    grid-column: 2;
+}
+
+.homepage-description {
+    grid-row: 2;
+}
+
+.homepage-accordion {
+    grid-column: 2 / span 3;
+    grid-row: 3;
+}
+
 footer {
     display: grid;
     grid-template-columns: repeat(5, 1fr); /* five equal columns */
     margin-top: 20px;
     gap: 5px; /* Space between grid items */
-    background-color: var(--rich-black);
+    background-color: var(--licorice);
 /*    box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );*/    
 backdrop-filter: blur( 4px );
     -webkit-backdrop-filter: blur( 4px );
@@ -219,14 +250,6 @@ backdrop-filter: blur( 4px );
 }
 
 @media (max-width: 768px) {
-    nav, footer {
-        grid-template-columns: repeat(3, 1fr); /* Two equal columns */
-    }
-
-    .login-link, .drop-container {
-        grid-column: 3 !important;
-    }
-
 
     footer .footer-item {
         grid-column: 2 !important;
@@ -239,16 +262,17 @@ backdrop-filter: blur( 4px );
 }*/
 
 .logo {
-    font-size: 2rem;
+    font-size: 1.2rem;
     font-weight: 700;
-    color: var(--white-color);
+    text-transform: uppercase;
+    color: var(--licorice);
     font-style: normal;
     white-space: nowrap;
-    letter-spacing: 2px;
+    grid-column: 2;
 }
 
     .logo:link, .logo:visited {
-        color: var(--white-color);
+        color: var(--licorice);
     }
 
     .logo:hover {
@@ -262,7 +286,7 @@ backdrop-filter: blur( 4px );
 }
 
     .username a:link, .username a:visited {
-        color: var(--white-color);
+        color: var(--licorice);
         text-decoration: none;
     }
 
@@ -386,13 +410,14 @@ label {
     justify-content: flex-end;
     gap: 8px;
     text-transform: capitalize;
-    letter-spacing: 2px;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
     font-weight: 700;
-    grid-column: 5; /* Place it in the last column */
+    grid-column: 4; /* Place it in the last column */
 }
 
 a.login-link:link, a.login-link:visited {
-    color: var(--white-color);
+    color: var(--licorice);
 }
 
 @keyframes spin {
@@ -477,10 +502,11 @@ a.login-link:link, a.login-link:visited {
 .post-list {
     display: flex;
     gap: 20px;
-    flex-wrap: wrap;
     width: 100%;
     align-items: center;
-    justify-content: center;
+    grid-row: 2;
+    grid-column: 2 / span 3;
+    flex-wrap: wrap;
 }
 
 .post-list-link {
@@ -490,8 +516,10 @@ a.login-link:link, a.login-link:visited {
     color: inherit;
     position: relative;
     height: 300px;
-    width: 400px;
+    width: 300px;
     border-radius: 20px;
+    box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.6);
+    transition: box-shadow ease-in-out 0.3s;
 }
 
 /*.hidden {
@@ -557,13 +585,13 @@ a.login-link:link, a.login-link:visited {
     object-fit: cover;
 }
 .post-title {
-    font-size: 1.8rem;
+    font-size: 1.3rem;
     margin: 0;
     line-height: 1.0;
     font-family: "Titillium Web", sans-serif;
     font-weight: 900;
     font-style: normal;
-    letter-spacing: 0.1rem;
+    letter-spacing: 0.12rem;
 }
 
 .post-main-title {
@@ -591,6 +619,10 @@ a.login-link:link, a.login-link:visited {
 
 .post-list-link:hover .play-button {
     color: red;
+}
+
+.post-list-link:hover {
+    box-shadow: none;
 }
 
 .play-button {
@@ -654,21 +686,25 @@ a.login-link:link, a.login-link:visited {
 }
 
 .pic-text {
-    text-align: center;
-    margin-bottom: 30px;
+    grid-column: 2;
+    grid-row: 1;
 }
 
+.user-list {
+    display: grid;
+}
+.user {
+    border: 1px solid var(--licorice);
+    margin: 10px;
+}
 
 .profile-picture {
-    width: 200px;
     height: 200px;
-    object-fit: cover;
-    border-radius: 50%;
     position: relative;
 }
 
 .picture-username {
-    color: var(--white-color);
+    color: var(--licorice);
     text-transform: capitalize;
     font-size: 1.5rem;
     font-weight: 700;
@@ -715,7 +751,6 @@ a.login-link:link, a.login-link:visited {
 
 .accordion {
     max-width: 100%;
-    padding: 2rem 0rem;
 }
 
 .accordion-item {
@@ -748,7 +783,6 @@ a.login-link:link, a.login-link:visited {
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.5s ease, padding 0.5s ease;
-    padding: 0 15px;
 }
     .accordion-content a:link, .accordion-content a:visited {
         color: var(--black-color);

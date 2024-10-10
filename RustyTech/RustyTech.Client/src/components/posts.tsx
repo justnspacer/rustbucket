@@ -62,34 +62,32 @@ const Posts: React.FC = () => {
     }
 
     return (
-        <div className="post-list">
-            {posts.map((post, index) => (
-                <div key={index} ref={(el) => (refs.current[index] = el)} className='hidden'>
-                    <Link className={`post-list-link`} to={`/posts/${post.id}`} key={post.id.toString()} id={post.id.toString()}>
-                        {post.imageFile && (
-                            <>
-                                {post.videoFile && (
-                                    <i className="fa-solid fa-play play-button"></i>
-                                )}
-                                <img className='post-main-image' src={`${BASE_API_URL}${post.imageFile}`} alt={post.title} />
-                            </>
-                        )}
+        <>
+            {posts.map((post: GetPostRequest, index: number) => (
+                <Link className={`post-list-link`} to={`/posts/${post.id}`} key={index} id={post.id.toString()}>
+                    {post.imageFile && (
+                        <>
+                            {post.videoFile && (
+                                <i className="fa-solid fa-play play-button"></i>
+                            )}
+                            <img className='post-main-image' src={`${BASE_API_URL}${post.imageFile}`} alt={post.title} />
+                        </>
+                    )}
 
-                        {post?.imageFiles && (
-                            <>
-                                {post?.imageFiles && (
-                                    <img className='post-image' src={`${BASE_API_URL}${post.imageFiles[0]}`} alt={post?.title} />
-                                )}
-                            </>
-                        )}
-                        <div className='post-info'>
-                            <span className='post-date'>{formatDate(post.createdAt)}</span>
-                            <h2 className="post-title">{post.title}</h2>
-                            <span className="post-username">{post.user.userName}</span>
-                        </div>
-                    </Link></div>
-            ))}
-        </div>
+                    {post?.imageFiles && (
+                        <>
+                            {post?.imageFiles && (
+                                <img className='post-image' src={`${BASE_API_URL}${post.imageFiles[0]}`} alt={post?.title} />
+                            )}
+                        </>
+                    )}
+                    <div className='post-info'>
+                        <span className='post-date'>{formatDate(post.createdAt)}</span>
+                        <h2 className="post-title">{post.title}</h2>
+                        <span className="post-username">{post.user.userName}</span>
+                    </div>
+                </Link>
+            ))}</>
     );
 };
 

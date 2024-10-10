@@ -43,9 +43,9 @@ const HomePage: React.FC = () => {
 
     return (
         <><main>
-            <h1>Welcome to Rust Bucket</h1>
-            <p>Let's work together to bring your vision to life on the web!</p>
-            <div className="accordion">
+            <h1 className="homepage-header">Welcome to Rust Bucket</h1>
+            <p className="homepage-description">Let's work together to bring your vision to life on the web!</p>
+            <div className="accordion homepage-accordion">
                 <div className="accordion-item">
                     <AccordionItem
                         title="About"
