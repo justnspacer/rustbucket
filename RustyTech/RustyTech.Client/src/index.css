@@ -23,7 +23,6 @@
     --citrine: #EAD94C; /*yellow*/
     --trans-black: rgba(0, 0, 0, 0.5);
     --trans-white: rgba(255, 255, 255, 0.5);
-
     /* CSS HEX */
     --celadon: #a5d0a8ff;
     --cambridge-blue: #8cada7ff;
@@ -63,18 +62,17 @@ p {
 }
 
 main {
-    padding: 6rem 0rem 0rem 0rem;
+    padding: 3em 0rem 0rem 0rem;
     color: var(--licorice);
     display: grid;
-    grid-template-columns: repeat(5, 1fr); /* five equal columns */
+    grid-template-columns: repeat(5, 1fr);
     gap: 20px;
 }
 
 ul, ol {
-        list-style: none;
+    list-style: none;
     padding: 0;
     margin: 0;
-
 }
 
 main h1 {
@@ -165,8 +163,8 @@ nav {
     position: fixed;
     z-index: 100;
     width: 100%;
-/*    background-color: var(--trans-black);
-*/    backdrop-filter: blur( 4px );
+    /*    background-color: var(--trans-black);
+*/ backdrop-filter: blur( 4px );
     -webkit-backdrop-filter: blur( 4px );
     border: 1px solid var(--licorice);
 }
@@ -187,18 +185,18 @@ nav {
     box-shadow: 4px 7px 2px rgba(0, 0, 0, 0.3);
 }
 
-    nav .fa-solid.fa-ellipsis-vertical {
-        font-size: 1.6rem;
-        color: var(--licorice);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        transition: box-shadow 0.3s ease-in;
-    }
+nav .fa-solid.fa-ellipsis-vertical {
+    font-size: 1.6rem;
+    color: var(--licorice);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: box-shadow 0.3s ease-in;
+}
 
-        nav .fa-solid.fa-ellipsis-vertical:hover {
-            box-shadow: none;
-        }
+    nav .fa-solid.fa-ellipsis-vertical:hover {
+        box-shadow: none;
+    }
 
 .drop-container {
     grid-column: 5;
@@ -225,8 +223,8 @@ footer {
     margin-top: 20px;
     gap: 5px; /* Space between grid items */
     background-color: var(--licorice);
-/*    box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );*/    
-backdrop-filter: blur( 4px );
+    /*    box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );*/
+    backdrop-filter: blur( 4px );
     -webkit-backdrop-filter: blur( 4px );
 }
 
@@ -244,6 +242,7 @@ backdrop-filter: blur( 4px );
     color: var(--white-color);
     white-space: nowrap;
 }
+
 .mainlogo {
     width: 25px;
     height: 25px;
@@ -479,8 +478,13 @@ a.login-link:link, a.login-link:visited {
 .post-content {
     display: flex;
     flex-direction: column;
-    gap: 2px;
-    color: var(--black-color);
+    justify-content: center;
+    position: absolute;
+    color: white;
+    transition: background 0.3s;
+    margin: 0 10px 10px 10px;
+    padding: 7px;
+    background-color: var(--trans-black);
 }
 
 .post-username {
@@ -525,7 +529,7 @@ a.login-link:link, a.login-link:visited {
 /*.hidden {
     opacity: 0;
     transform: translateX(-100%);*/ /* Adjust this based on the desired direction */
-    /*transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+/*transition: opacity 0.5s ease-out, transform 0.5s ease-out;
 }*/
 
 .visible {
@@ -534,15 +538,17 @@ a.login-link:link, a.login-link:visited {
 }
 
 
-    img.post-image,
-    img.post-main-image {
-        width: 100%;
-        height: 100%;
-        flex-grow: 1;
-        object-fit: cover;
-        filter: brightness(70%);
-        transition: filter ease-in-out 0.3s;
-    }
+img.post-image,
+img.post-main-image {
+    width: 100%;
+    height: 100%;
+    flex-grow: 1;
+    object-fit: cover;
+    filter: brightness(70%);
+    transition: filter ease-in-out 0.3s;
+}
+
+
 
 .post-info {
     display: flex;
@@ -575,15 +581,18 @@ a.login-link:link, a.login-link:visited {
     display: flex;
     margin-top: 10px;
 }
+
 .imgFiles {
     display: flex;
     gap: 10px;
 }
-.imgFiles img {
-    width: 200px;
-    height: 500px;
-    object-fit: cover;
-}
+
+    .imgFiles img {
+        width: 200px;
+        height: 500px;
+        object-fit: cover;
+    }
+
 .post-title {
     font-size: 1.3rem;
     margin: 0;
@@ -693,6 +702,7 @@ a.login-link:link, a.login-link:visited {
 .user-list {
     display: grid;
 }
+
 .user {
     border: 1px solid var(--licorice);
     margin: 10px;
@@ -704,7 +714,6 @@ a.login-link:link, a.login-link:visited {
 }
 
 .picture-username {
-    color: var(--licorice);
     text-transform: capitalize;
     font-size: 1.5rem;
     font-weight: 700;
@@ -755,9 +764,10 @@ a.login-link:link, a.login-link:visited {
 
 .accordion-item {
     margin-bottom: 20px;
-/*    background-color: var(--timberwolf);
-*//*    box-shadow: 4px 7px 0px var(--timberwolf);
-*/}
+    /*    background-color: var(--timberwolf);
+*/ /*    box-shadow: 4px 7px 0px var(--timberwolf);
+*/
+}
 
 .accordion-header {
     background-color: var(--black-color);
@@ -784,6 +794,7 @@ a.login-link:link, a.login-link:visited {
     overflow: hidden;
     transition: max-height 0.5s ease, padding 0.5s ease;
 }
+
     .accordion-content a:link, .accordion-content a:visited {
         color: var(--black-color);
         font-weight: 700;
@@ -834,4 +845,112 @@ a.login-link:link, a.login-link:visited {
     p {
         font-size: 0.9rem;
     }
+}
+
+.profile-page-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    height: 100vh;
+    overflow-y: scroll;
+}
+
+/* Centering the profile picture */
+.profile-picture {
+    grid-column: 3;
+    width: 100%;
+    height: 300px;
+    border: 1px solid var(--licorice);
+    border-bottom: none;
+    border-top: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+    .profile-picture img {
+        height: 100%;
+    }
+
+/* Profile text next to the profile picture */
+.profile-text {
+    grid-column: 4;
+    border: 1px solid var(--licorice);
+    border-bottom: none;
+    border-top: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.profile-username {
+    grid-column: 2;
+    border: 1px solid var(--licorice);
+    border-bottom: none;
+    border-top: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+    .profile-text h2 {
+        margin: 0;
+    }
+
+    .profile-text p {
+        margin: 10px 0;
+    }
+
+.profile-info {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
+    position: fixed;
+    margin-top: 350px;
+    z-index: 2;
+    background-color: var(--trans-black);
+    background: linear-gradient(transparent, var(--cream), transparent);
+    color: var(--licorice);
+    width: 100%;
+    height: 300px;
+    border: 1px solid var(--licorice);
+}
+
+/* Post container holding the posts on both sides */
+.posts-container {
+    grid-column: 2 / span 3;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Post card styles */
+.post-card {
+    width: 100%;
+    height: 300px;
+    background-color: white;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    opacity: 1;
+    transition: opacity 0.5s ease;
+    position: relative;
+}
+
+    /* Scroll effect for fading posts */
+    .post-card.fade {
+        opacity: 0.2;
+    }
+
+/* Add some margin below */
+.posts-container {
+    margin-top: 20px;
 }
