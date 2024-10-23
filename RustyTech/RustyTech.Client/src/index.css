@@ -33,7 +33,7 @@
 
 body {
     box-sizing: border-box;
-    background: linear-gradient(to bottom, var(--cream), var(--cream)) no-repeat fixed center;
+    background: linear-gradient(to bottom, var(--prussian-blue), var(--licorice)) no-repeat fixed center;
 }
 
 html, body {
@@ -63,10 +63,20 @@ p {
 
 main {
     padding: 3em 0rem 0rem 0rem;
-    color: var(--licorice);
+    color: var(--white-color);
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 20px;
+    grid-template-areas: 'gridItem1'
+                         'gridItem2';
+}
+
+.accordion-item, .posts-container {
+    grid-area: gridItem1;
+}
+
+.profile-info {
+    grid-area: gridItem2;
 }
 
 ul, ol {
@@ -166,22 +176,18 @@ nav {
     /*    background-color: var(--trans-black);
 */ backdrop-filter: blur( 4px );
     -webkit-backdrop-filter: blur( 4px );
-    border: 1px solid var(--licorice);
 }
 
 .nav-item {
     padding: 1rem 0rem;
-    border: 1px solid var(--licorice);
-    border-bottom: none;
-    border-top: none;
 }
 
 .searchBar {
     width: 100%;
     height: 20px;
-    background-color: var(--cambridge-blue);
+    background-color: var(--citrine);
     grid-column: 3;
-    border-radius: 35px;
+    border-radius: 3px;
     box-shadow: 4px 7px 2px rgba(0, 0, 0, 0.3);
 }
 
@@ -220,12 +226,12 @@ nav .fa-solid.fa-ellipsis-vertical {
 footer {
     display: grid;
     grid-template-columns: repeat(5, 1fr); /* five equal columns */
-    margin-top: 20px;
-    gap: 5px; /* Space between grid items */
+    gap: 20px; /* Space between grid items */
     background-color: var(--licorice);
     /*    box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );*/
     backdrop-filter: blur( 4px );
     -webkit-backdrop-filter: blur( 4px );
+    border: 1px solid var(--licorice);
 }
 
     footer .footer-item {
@@ -233,14 +239,14 @@ footer {
         flex-direction: column;
         align-items: center;
         grid-column: 3;
-        padding: 2rem;
+        padding: 2rem 0rem;
+        border: 1px solid var(--licorice);
     }
 
 .footer-logo {
     letter-spacing: 2px;
     font-weight: 700;
     color: var(--white-color);
-    white-space: nowrap;
 }
 
 .mainlogo {
@@ -248,12 +254,6 @@ footer {
     height: 25px;
 }
 
-@media (max-width: 768px) {
-
-    footer .footer-item {
-        grid-column: 2 !important;
-    }
-}
 /*.logo {
     display: flex;
     align-items: center;
@@ -263,15 +263,15 @@ footer {
 .logo {
     font-size: 1.2rem;
     font-weight: 700;
-    text-transform: uppercase;
-    color: var(--licorice);
+    text-transform: capitalize;
+    color: var(--white-color);
     font-style: normal;
     white-space: nowrap;
     grid-column: 2;
 }
 
     .logo:link, .logo:visited {
-        color: var(--licorice);
+        color: var(--white-color);
     }
 
     .logo:hover {
@@ -410,13 +410,13 @@ label {
     gap: 8px;
     text-transform: capitalize;
     letter-spacing: 0.6px;
-    text-transform: uppercase;
+    text-transform: capitalize;
     font-weight: 700;
     grid-column: 4; /* Place it in the last column */
 }
 
 a.login-link:link, a.login-link:visited {
-    color: var(--licorice);
+    color: var(--white-color);
 }
 
 @keyframes spin {
@@ -485,6 +485,7 @@ a.login-link:link, a.login-link:visited {
     margin: 0 10px 10px 10px;
     padding: 7px;
     background-color: var(--trans-black);
+    max-width: 75%;
 }
 
 .post-username {
@@ -541,7 +542,6 @@ a.login-link:link, a.login-link:visited {
 img.post-image,
 img.post-main-image {
     width: 100%;
-    height: 100%;
     flex-grow: 1;
     object-fit: cover;
     filter: brightness(70%);
@@ -594,7 +594,7 @@ img.post-main-image {
     }
 
 .post-title {
-    font-size: 1.3rem;
+    font-size: 3rem;
     margin: 0;
     line-height: 1.0;
     font-family: "Titillium Web", sans-serif;
@@ -681,8 +681,12 @@ img.post-main-image {
         width: 100%;
     }
 
+    .post-date {
+        font-size: 0.7rem;
+    }
+
     .post-title {
-        font-size: 1.6rem;
+        font-size: 1.2rem;
     }
 }
 
@@ -700,7 +704,9 @@ img.post-main-image {
 }
 
 .user-list {
+    margin-top: 20px;
     display: grid;
+    grid-column: 2;
 }
 
 .user {
@@ -789,14 +795,14 @@ img.post-main-image {
     }
 
 .accordion-content {
-    color: var(--black-color);
+    color: var(--white-color);
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.5s ease, padding 0.5s ease;
 }
 
     .accordion-content a:link, .accordion-content a:visited {
-        color: var(--black-color);
+        color: var(--cambridge-blue);
         font-weight: 700;
         transition: color 0.5s ease;
     }
@@ -860,9 +866,7 @@ img.post-main-image {
 /* Centering the profile picture */
 .profile-picture {
     grid-column: 3;
-    width: 100%;
-    height: 300px;
-    border: 1px solid var(--licorice);
+    height: 210px;
     border-bottom: none;
     border-top: none;
     display: flex;
@@ -877,24 +881,21 @@ img.post-main-image {
 /* Profile text next to the profile picture */
 .profile-text {
     grid-column: 4;
-    border: 1px solid var(--licorice);
     border-bottom: none;
     border-top: none;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
+    align-items: end;
 }
 
 .profile-username {
     grid-column: 2;
-    border: 1px solid var(--licorice);
     border-bottom: none;
     border-top: none;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
 }
 
     .profile-text h2 {
@@ -910,14 +911,13 @@ img.post-main-image {
     grid-template-columns: repeat(5, 1fr);
     gap: 20px;
     position: fixed;
-    margin-top: 350px;
-    z-index: 2;
+    z-index: 10;
     background-color: var(--trans-black);
-    background: linear-gradient(transparent, var(--cream), transparent);
-    color: var(--licorice);
+    background: linear-gradient(transparent, var(--licorice), var(--licorice));
+    color: var(--white-color);
     width: 100%;
-    height: 300px;
-    border: 1px solid var(--licorice);
+    grid-column: 2 / span 3;
+    margin-top: 370px;
 }
 
 /* Post container holding the posts on both sides */
@@ -925,21 +925,44 @@ img.post-main-image {
     grid-column: 2 / span 3;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+    height: 59vh;
+    margin-bottom: 120px;
 }
+
+    .posts-container > *:last-child {
+    }
+
+    .posts-container::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .posts-container::-webkit-scrollbar-thumb {
+        background-color: white;
+        border-radius: 6px;
+    }
+
+    .posts-container::-webkit-scrollbar-track {
+        background-color: transparent;
+    }
+
+    .posts-container::-webkit-scrollbar-thumb:hover {
+        background-color: var(--white-color);
+    }
 
 /* Post card styles */
 .post-card {
+    scroll-snap-align: center;
     width: 100%;
-    height: 300px;
+    height: 600px;
     background-color: white;
-    border: 1px solid #ddd;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
-    text-align: center;
     opacity: 1;
     transition: opacity 0.5s ease;
     position: relative;
@@ -953,4 +976,17 @@ img.post-main-image {
 /* Add some margin below */
 .posts-container {
     margin-top: 20px;
+}
+
+.profile-page {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    height: 78.5vh;
+}
+
+@media (max-width: 768px) {
+
+    main, nav, footer, .profile-info {
+        grid-template-columns: 0.1fr 1fr 1fr 1fr 0.1fr;
+    }
 }

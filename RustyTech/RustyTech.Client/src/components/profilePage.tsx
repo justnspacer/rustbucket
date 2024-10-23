@@ -17,12 +17,6 @@ const ProfilePage: React.FC = () => {
     const [posts, setPosts] = useState<any[]>([]);
     const { id } = useParams();
 
-    const [scrollPosition, setScrollPosition] = useState(0);
-
-    const handleScroll = () => {
-        setScrollPosition(window.scrollY);
-    };
-
     useEffect(() => {
         const fetchUser = async () => {
             try {
@@ -49,25 +43,20 @@ const ProfilePage: React.FC = () => {
         fetchPosts();
     }, [id]);
 
-    useEffect(() => {
-        window.addEventListener("scroll", handleScroll);
-        return () => window.removeEventListener("scroll", handleScroll);
-    }, []);
 
     return (
         <main>
             {user ? (
                 <>
-                    <section className="profile-info">
+                    <section className={`profile-info`}>
                         <div className="profile-username">
-                            <h2 className="picture-username">{user.userName}</h2>
+                            <p className="picture-username">{user.userName}</p>
                         </div>
                         <div className="profile-picture">
                             <img className="" src={`${BASE_API_URL}${user.pictureUrl}`} />
                         </div>
                         <div className="profile-text">
-                            <h2>Spotify Stuff</h2>
-                            <p>You hope!</p>
+                            <p>Spotify Stuff</p>
                         </div>
                     </section>
                 </>
@@ -76,13 +65,7 @@ const ProfilePage: React.FC = () => {
             )}
             <div className="posts-container">
                 {posts.map((post, index) => (
-                    <div
-                        className={`post-card ${scrollPosition > 100 && scrollPosition < 400 ? "fade" : ""
-                            }`}
-                        key={index}
-                        id={post.id.toString()}
-                        style={{ transform: `rotate(${index * (360 / post.length)}deg) translate(150px)` }}
-                    >
+                    <div className={`post-card`} key={index} id={post.id.toString()}>
                         {post.imageFile && (
                             <>
                                 {post.videoFile && (
@@ -102,11 +85,10 @@ const ProfilePage: React.FC = () => {
                         <div className='post-content'>
                             <span className='post-date'>{formatDate(post.createdAt)}</span>
                             <h2 className="post-title">{post.title}</h2>
-                            <span className="post-username">{post.user.userName}</span>
                         </div>
                     </div>
                 ))}
-            </div>
+                </div>
         </main>
     );
 };

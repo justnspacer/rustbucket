@@ -61,7 +61,7 @@ const HomePage: React.FC = () => {
                     />
                     <AccordionItem
                         title="Projects"
-                        content="<ul><li><a href='/users'>User Posts Project (new name)</a></li></ul>"
+                        content="<p><ul><li><a href='/users'>User Posts Project (new name)</a></li></ul></p>"
                         index={1}
                         activeIndex={activeIndex}
                         handleClick={handleClick}
