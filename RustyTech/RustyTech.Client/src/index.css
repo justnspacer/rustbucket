@@ -33,8 +33,28 @@
 
 body {
     box-sizing: border-box;
-    background: linear-gradient(to bottom, var(--prussian-blue), var(--licorice)) no-repeat fixed center;
+    background: linear-gradient(to bottom, var(--licorice), var(--prussian-blue)) no-repeat fixed center;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
 }
+
+    body::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    body::-webkit-scrollbar-thumb {
+        background-color: var(--white-color);
+        border-radius: 6px;
+    }
+
+    body::-webkit-scrollbar-track {
+        background-color: var(--prussian-blue);
+    }
+
+    body::-webkit-scrollbar-thumb:hover {
+        background-color: var(--white-color);
+    }
 
 html, body {
     margin: 0;
@@ -71,13 +91,10 @@ main {
                          'gridItem2';
 }
 
-.accordion-item, .posts-container {
+.accordion-item {
     grid-area: gridItem1;
 }
 
-.profile-info {
-    grid-area: gridItem2;
-}
 
 ul, ol {
     list-style: none;
@@ -183,11 +200,15 @@ nav {
 }
 
 .searchBar {
+    font-family: "Titillium Web", sans-serif;
+    font-weight: 600;
+    padding: 3px 16px;
     width: 100%;
-    height: 20px;
-    background-color: var(--citrine);
+    background-color: var(--trans-black);
+    color: var(--white-color);
+    border: 2px solid var(--white-color);    
     grid-column: 3;
-    border-radius: 3px;
+    border-radius: 20px;
     box-shadow: 4px 7px 2px rgba(0, 0, 0, 0.3);
 }
 
@@ -237,8 +258,9 @@ footer {
     footer .footer-item {
         display: flex;
         flex-direction: column;
-        align-items: center;
-        grid-column: 3;
+        align-items: end;
+        white-space: nowrap;
+        grid-column: 4;
         padding: 2rem 0rem;
         border: 1px solid var(--licorice);
     }
@@ -682,11 +704,11 @@ img.post-main-image {
     }
 
     .post-date {
-        font-size: 0.7rem;
+        font-size: 1rem;
     }
 
     .post-title {
-        font-size: 1.2rem;
+        font-size: 1.9rem;
     }
 }
 
@@ -710,8 +732,12 @@ img.post-main-image {
 }
 
 .user {
-    border: 1px solid var(--licorice);
-    margin: 10px;
+    color: var(--white-color);
+    text-align: center;
+}
+
+.user:visited {
+    color: var(--white-color);
 }
 
 .profile-picture {
@@ -724,7 +750,6 @@ img.post-main-image {
     font-size: 1.5rem;
     font-weight: 700;
     margin: 0;
-    position: absolute;
     z-index: 1;
 }
 
@@ -866,16 +891,16 @@ img.post-main-image {
 /* Centering the profile picture */
 .profile-picture {
     grid-column: 3;
-    height: 210px;
+    width: 120px;
     border-bottom: none;
     border-top: none;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-self: center;
+    align-self: center;
 }
 
     .profile-picture img {
-        height: 100%;
+        width: 100%;
     }
 
 /* Profile text next to the profile picture */
@@ -887,6 +912,7 @@ img.post-main-image {
     flex-direction: column;
     justify-content: center;
     align-items: end;
+    height: 120px;
 }
 
 .profile-username {
@@ -896,6 +922,7 @@ img.post-main-image {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    height: 120px;
 }
 
     .profile-text h2 {
@@ -912,12 +939,14 @@ img.post-main-image {
     gap: 20px;
     position: fixed;
     z-index: 10;
-    background-color: var(--trans-black);
-    background: linear-gradient(transparent, var(--licorice), var(--licorice));
+    backdrop-filter: blur(4px);
     color: var(--white-color);
     width: 100%;
     grid-column: 2 / span 3;
-    margin-top: 370px;
+    margin-top: 470px;
+    height: 120px;
+    align-items: stretch;
+    justify-items: stretch;
 }
 
 /* Post container holding the posts on both sides */
@@ -925,66 +954,56 @@ img.post-main-image {
     grid-column: 2 / span 3;
     display: flex;
     flex-direction: column;
-    overflow-y: scroll;
-    scroll-snap-type: y mandatory;
-    scroll-behavior: smooth;
-    overflow-x: hidden;
-    height: 59vh;
-    margin-bottom: 120px;
+    margin-top: 40px;
+/*    background-color: var(--white-color);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 7px 4px 7px rgba(0, 0, 0, 0.9);*/
 }
 
     .posts-container > *:last-child {
     }
 
-    .posts-container::-webkit-scrollbar {
-        width: 6px;
-    }
-
-    .posts-container::-webkit-scrollbar-thumb {
-        background-color: white;
-        border-radius: 6px;
-    }
-
-    .posts-container::-webkit-scrollbar-track {
-        background-color: transparent;
-    }
-
-    .posts-container::-webkit-scrollbar-thumb:hover {
-        background-color: var(--white-color);
-    }
-
-/* Post card styles */
 .post-card {
     scroll-snap-align: center;
     width: 100%;
-    height: 600px;
-    background-color: white;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    height: 550px;
+    background-color: white;    
     display: flex;
     flex-direction: column;
     justify-content: center;
     opacity: 1;
-    transition: opacity 0.5s ease;
     position: relative;
+    overflow: hidden;
+    cursor: pointer;
 }
 
-    /* Scroll effect for fading posts */
-    .post-card.fade {
-        opacity: 0.2;
+    .post-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        box-shadow: inset 0px 0px 10px 2px rgba(0, 0, 0, 0.9), inset 0px 0px 15px 5px rgba(0, 0, 0, 0.4), inset 0px 0px 20px 10px rgba(0, 0, 0, 0.1);
+        pointer-events: none;
+        transition: box-shadow 0.5s ease;
+        z-index: 2;
     }
 
-/* Add some margin below */
-.posts-container {
-    margin-top: 20px;
-}
-
-.profile-page {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    height: 78.5vh;
-}
+    .post-card:hover .post-card::before {
+        box-shadow: none;
+    }
 
 @media (max-width: 768px) {
+
+
+    .profile-info {
+        margin-top: 460px;
+    }
+    .post-card {
+        height: 450px;
+    }
 
     main, nav, footer, .profile-info {
         grid-template-columns: 0.1fr 1fr 1fr 1fr 0.1fr;

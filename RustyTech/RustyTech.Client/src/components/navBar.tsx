@@ -38,7 +38,7 @@ const NavBar: React.FC = () => {
         <nav>
             <Link className="logo nav-item" to="/">Rust Bucket</Link>
             <div className="nav-item">
-                <div className="searchBar"></div>
+                <input className="searchBar" placeholder="Search"/>
             </div>
 
             {user ? (
