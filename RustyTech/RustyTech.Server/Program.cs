@@ -34,6 +34,12 @@ builder.Services.AddCors(options =>
               .AllowAnyMethod()
               .AllowCredentials();
     });
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
 });
 
 // Add services for controllers
@@ -106,6 +112,7 @@ builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<IVideoService, VideoService>();
 builder.Services.AddScoped<IKeywordService, KeywordService>();
+builder.Services.AddScoped<ISpotifyService, SpotifyService>();
 builder.Services.Configure<RequestLocalizationOptions>(options =>
 {
     var supportedCultures = new[]
@@ -134,6 +141,7 @@ var app = builder.Build();
 
 
 app.UseCors("RustyTechCors");
+app.UseCors("AllowAll");
 app.UseStaticFiles();
 
 

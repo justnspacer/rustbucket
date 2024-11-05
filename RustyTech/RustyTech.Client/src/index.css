@@ -88,7 +88,8 @@ main {
     grid-template-columns: repeat(5, 1fr);
     gap: 20px;
     grid-template-areas: 'gridItem1'
-                         'gridItem2';
+                         'gridItem2'
+                         'gridItem3';
 }
 
 .accordion-item {
@@ -103,8 +104,9 @@ ul, ol {
 }
 
 main h1 {
-    font-size: 2.5rem;
-    line-height: 0.9;
+    font-size: 8rem;
+    line-height: 0.8;
+    margin-top: 10px;
     margin-bottom: 1rem;
 }
 
@@ -231,8 +233,27 @@ nav .fa-solid.fa-ellipsis-vertical {
     justify-content: right;
 }
 
+.homepage-message {
+    grid-column: 2 / span 3;
+    text-align: center;
+}
+
+.homepage-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.homepage-image-container {
+    margin-top: 20px;
+    width: 300px;
+    height: 300px;
+    clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%);
+    grid-column: 3;
+}
+
 .homepage-header, .homepage-description {
-    grid-column: 2;
+    grid-column: 2 / span 4;
 }
 
 .homepage-description {
@@ -240,6 +261,7 @@ nav .fa-solid.fa-ellipsis-vertical {
 }
 
 .homepage-accordion {
+    margin-top: 20px;
     grid-column: 2 / span 3;
     grid-row: 3;
 }
@@ -688,6 +710,10 @@ img.post-main-image {
 
 @media (max-width: 600px) {
 
+    main h1 {
+        font-size: 5rem;
+    }
+
     .post-main-image,
     .post-main-video,
     .post-image {
@@ -743,6 +769,12 @@ img.post-main-image {
 .profile-picture {
     height: 200px;
     position: relative;
+}
+
+.circle {
+    border-radius: 50%;
+    overflow: hidden;
+    height: 160px;
 }
 
 .picture-username {
@@ -820,20 +852,26 @@ img.post-main-image {
     }
 
 .accordion-content {
-    color: var(--white-color);
+    color: var(--rich-black);
+    background-color: var(--white-color);
+    font-weight: 600;
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.5s ease, padding 0.5s ease;
 }
 
+    .accordion-content div {
+        padding: 0.5rem 2rem;
+    }
+
     .accordion-content a:link, .accordion-content a:visited {
-        color: var(--cambridge-blue);
+        color: var(--rich-black);
         font-weight: 700;
         transition: color 0.5s ease;
     }
 
     .accordion-content a:hover {
-        color: var(--citrine);
+        color: var(--jasper);
     }
 
     .accordion-content p {
@@ -891,7 +929,7 @@ img.post-main-image {
 /* Centering the profile picture */
 .profile-picture {
     grid-column: 3;
-    width: 120px;
+    width: 160px;
     border-bottom: none;
     border-top: none;
     display: flex;

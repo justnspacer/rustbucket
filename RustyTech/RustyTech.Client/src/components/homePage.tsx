@@ -43,8 +43,16 @@ const HomePage: React.FC = () => {
 
     return (
         <><main>
-            <h1 className="homepage-header">Welcome to Rust Bucket</h1>
-            <p className="homepage-description">Let's work together to bring your vision to life on the web!</p>
+
+            <div className="homepage-message">
+                <h1 className="homepage-header">Welcome to Rust Bucket</h1>
+                <p className="homepage-description">Let's work together to bring your vision to life on the web!</p>
+            </div>
+            {/*<div className="homepage-image-container">*/}
+            {/*    <img className="homepage-image" src="https://images.unsplash.com/photo-1728708018018-a9848e3835df?q=80&w=200&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" />*/}
+            {/*</div>*/}
+
+
             <div className="accordion homepage-accordion">
                 <div className="accordion-item">
                     <AccordionItem

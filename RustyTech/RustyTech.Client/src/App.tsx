@@ -10,7 +10,6 @@ import Navbar from './components/navBar';
 import Footer from './components/footer';
 import Post from './components/post';
 import UserList from './components/userList';
-import AboutPage from './components/aboutPage';
 import ProfilePage from './components/profilePage';
 import RequestPage from './components/requestPage';
 import ContactPage from './components/contactPage';
@@ -18,6 +17,8 @@ import ProjectsPage from './components/projectsPage';
 import NotFoundPage from './components/NotFoundPage';
 import VerifyEmailPage from './components/verifyEmailPage';
 import MessageDisplay from './components/messageDisplay';
+import SpotifyCallbackPage from './components/spotifyCallback';
+import Spotify from './components/spotify';
 
 function App() {
     return (
@@ -36,9 +37,10 @@ function App() {
                         <Route path="/users" Component={UserList} />
                         <Route path="/projects" Component={ProjectsPage} />
                         <Route path="/verify/email" Component={VerifyEmailPage} />
-                        <Route path="/about" Component={AboutPage} />
                         <Route path="/contact" Component={ContactPage} />
                         <Route path="/request" Component={RequestPage} />
+                        <Route path="/spotify/callback" Component={SpotifyCallbackPage} />
+                        <Route path="/spotify" Component={Spotify} />
                         <Route path="*" Component={NotFoundPage} />
                     </Routes>
                     <Footer />

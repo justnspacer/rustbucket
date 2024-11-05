@@ -12,6 +12,27 @@ const formatDate = (datetime: Date) => {
 };
 
 
+// Select the image element
+const image = document.querySelector('.profile-image') as HTMLImageElement | null;
+const container = document.querySelector('.profile-picture') as HTMLImageElement | null;
+
+// Function to check the shape of the image
+function checkImageShape(img: HTMLImageElement): void {
+    // Wait for the image to load to ensure width and height are available
+    console.log('is image loading');
+
+    if (img.naturalWidth !== img.naturalHeight) {
+        // Image is a rectangle
+        container?.classList.add('circle');
+    }
+    else {
+        console.log('image is not rectangle');
+    }
+}
+if (image) {
+    checkImageShape(image);
+}
+
 const ProfilePage: React.FC = () => {
     const [user, setUser] = useState<any>(null);
     const [posts, setPosts] = useState<any[]>([]);
@@ -43,7 +64,6 @@ const ProfilePage: React.FC = () => {
         fetchPosts();
     }, [id]);
 
-
     return (
         <main>
             {user ? (
@@ -53,7 +73,7 @@ const ProfilePage: React.FC = () => {
                             <p className="picture-username">{user.userName}</p>
                         </div>
                         <div className="profile-picture">
-                            <img className="" src={`${BASE_API_URL}${user.pictureUrl}`} />
+                            <img className="profile-image" src={`${BASE_API_URL}${user.pictureUrl}`} />
                         </div>
                         <div className="profile-text">
                             <p>Spotify Stuff</p>
