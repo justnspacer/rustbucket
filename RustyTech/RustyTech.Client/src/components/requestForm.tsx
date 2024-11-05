@@ -1,5 +1,5 @@
 
-const RequestPage: React.FC = () => {
+const RequestForm: React.FC = () => {
 
     return (
         <main>Request Form
@@ -8,4 +8,4 @@ const RequestPage: React.FC = () => {
 
 };
 
-export default RequestPage;
+export default RequestForm;

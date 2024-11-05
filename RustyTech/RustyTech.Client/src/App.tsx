@@ -11,9 +11,8 @@ import Footer from './components/footer';
 import Post from './components/post';
 import UserList from './components/userList';
 import ProfilePage from './components/profilePage';
-import RequestPage from './components/requestPage';
+import RequestForm from './components/requestForm';
 import ContactPage from './components/contactPage';
-import ProjectsPage from './components/projectsPage';
 import NotFoundPage from './components/NotFoundPage';
 import VerifyEmailPage from './components/verifyEmailPage';
 import MessageDisplay from './components/messageDisplay';
@@ -35,10 +34,8 @@ function App() {
                         <Route path="/profile/:id" Component={ProfilePage} />
                         <Route path="/posts/:id" Component={Post} />
                         <Route path="/users" Component={UserList} />
-                        <Route path="/projects" Component={ProjectsPage} />
-                        <Route path="/verify/email" Component={VerifyEmailPage} />
                         <Route path="/contact" Component={ContactPage} />
-                        <Route path="/request" Component={RequestPage} />
+                        <Route path="/request" Component={RequestForm} />
                         <Route path="/spotify/callback" Component={SpotifyCallbackPage} />
                         <Route path="/spotify" Component={Spotify} />
                         <Route path="*" Component={NotFoundPage} />
