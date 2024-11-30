@@ -5,9 +5,9 @@ namespace RustyTech.Server.Services.Interfaces
 {
     public interface ISpotifyService
     {
-        string AuthorizationUrl();
-        Task<SpotifyTokenResponse?> Callback(string code);
-        Task<string> RefreshAccessToken(string refreshToken);
+        string GetAuthorizationUrl(string userId);
+        Task<AccessTokenResponse?> Callback(string code, string userId);
+        Task<AccessTokenResponse?> RefreshAccessToken(string refreshToken, string userId);        
         Task<PrivateUser> GetUserProfile(string accessToken);
         Task<FullArtist?> GetArtist(string artistId);
     }

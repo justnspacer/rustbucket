@@ -2,7 +2,7 @@
 
 namespace RustyTech.Server.Models.Spotify
 {
-    public class SpotifyTokenResponse
+    public class AccessTokenResponse
     {
         [JsonProperty("access_token")]
         public string AccessToken { get; set; }
@@ -12,5 +12,11 @@ namespace RustyTech.Server.Models.Spotify
 
         [JsonProperty("expires_in")]
         public int ExpiresIn { get; set; }
+
+        [JsonProperty("refresh_token")]
+        public string RefreshToken { get; set; }
+
+        [JsonProperty("scope")]
+        public string Scope { get; set; }
     }
 }

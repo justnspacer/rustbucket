@@ -70,6 +70,7 @@ namespace RustyTech.Server.Data
         public DbSet<ImagePost> ImagePosts { get; set; }
         public DbSet<VideoPost> VideoPosts { get; set; }
         public DbSet<Keyword> Keywords { get; set; }
-        public DbSet<PostKeyword> PostKeywords { get; set; }       
+        public DbSet<PostKeyword> PostKeywords { get; set; }
+        public DbSet<OAuthTokens> OAuthTokens { get; set; }
     }
 }

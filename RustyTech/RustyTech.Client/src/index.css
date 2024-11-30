@@ -80,13 +80,11 @@ p {
     width: 100%;
     margin: 0 auto;
 }
-
 main {
-    padding: 3em 0rem 0rem 0rem;
+    padding: 4rem 0rem 0rem 0rem;
     color: var(--white-color);
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 20px;
     grid-template-areas: 'gridItem1'
                          'gridItem2'
                          'gridItem3';
@@ -104,7 +102,7 @@ ul, ol {
 }
 
 main h1 {
-    font-size: 8rem;
+    font-size: 4rem;
     line-height: 0.8;
     margin-top: 10px;
     margin-bottom: 1rem;
@@ -201,6 +199,10 @@ nav {
     padding: 1rem 0rem;
 }
 
+.login-link {
+    justify-self: end;
+}
+
 .searchBar {
     font-family: "Titillium Web", sans-serif;
     font-weight: 600;
@@ -258,10 +260,10 @@ nav .fa-solid.fa-ellipsis-vertical {
 
 .homepage-description {
     grid-row: 2;
+    margin: 30px 0px;
 }
 
 .homepage-accordion {
-    margin-top: 20px;
     grid-column: 2 / span 3;
     grid-row: 3;
 }
@@ -312,6 +314,7 @@ footer {
     font-style: normal;
     white-space: nowrap;
     grid-column: 2;
+    width: fit-content;
 }
 
     .logo:link, .logo:visited {
@@ -457,6 +460,7 @@ label {
     text-transform: capitalize;
     font-weight: 700;
     grid-column: 4; /* Place it in the last column */
+    width: fit-content;
 }
 
 a.login-link:link, a.login-link:visited {
@@ -711,7 +715,7 @@ img.post-main-image {
 @media (max-width: 600px) {
 
     main h1 {
-        font-size: 5rem;
+        font-size: 2rem;
     }
 
     .post-main-image,

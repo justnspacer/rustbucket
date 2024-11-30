@@ -30,24 +30,33 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const [userAuthenticated, setUserAuthenticated] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<any>(null);
-    const { register, login, isAuthenticated, logout } = useApiService();
+    const { register, login, logout, isAuthenticated } = useApiService();
     
     useEffect(() => {
         const isUserAuthenticated = async () => {
-            try {
-                const response = await isAuthenticated();
-                if (response?.data.data.isSuccess) {
-                    setUserAuthenticated(response.data.data.isAuthenticated);
-                    setUser(response.data.data.user);
-                    setLoading(false);
+            const storedUser = sessionStorage.getItem('user');
+            if (!storedUser) {
+                try {
+                    const response = await isAuthenticated();
+                    if (response?.data.data.isSuccess) {
+                        setUserAuthenticated(response.data.data.isAuthenticated);
+                        setUser(response.data.data.user);
+                        sessionStorage.setItem('user', JSON.parse(response.data.data.user.toString()));
+                        setLoading(false);
+                    }
+                } catch (e) {
+                    console.error('Error checking auth status:', e);
+                    sessionStorage.setItem('isAuthenicated', 'false');
+                    setError(e)
                 }
-            } catch (e) {
-                console.error('Error checking auth status:', e);
-                setError(e)
+            } else {
+                setUser(JSON.parse(storedUser));
+                setUserAuthenticated(true);
+
             }
         };
         isUserAuthenticated();
-    }, [isAuthenticated]);
+    });
 
     const registerUser = async (data: RegisterRequest): Promise<ApiResponse | undefined> => {
         try {

@@ -17,9 +17,9 @@ var builder = WebApplication.CreateBuilder(args); // Create a WebApplication bui
 
 // Add services to the container.
 builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-builder.Services.AddMemoryCache(); // Add in-memory caching services.
 
 // Rate limiting configuration.
+builder.Services.AddMemoryCache(); // Add in-memory caching services.
 builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimiting")); // Configure IP rate limit options from configuration.
 builder.Services.Configure<IpRateLimitPolicies>(builder.Configuration.GetSection("IpRateLimitPolicies")); // Configure IP rate limit policies from configuration.
 builder.Services.AddInMemoryRateLimiting();

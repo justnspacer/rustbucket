@@ -106,3 +106,12 @@ export interface BadRequeetResponse {
     };
     traceId: string;
 }
+
+
+export interface AccessTokenResponse {
+    accessToken: string;
+    tokenType: string;
+    expiresIn: number;
+    refreshToken: string;
+    scope: string;
+}

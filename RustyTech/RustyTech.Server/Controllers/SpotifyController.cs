@@ -1,8 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using RustyTech.Server.Models.Account;
+using RustyTech.Server.Models.Dtos;
+using RustyTech.Server.Models.Spotify;
 using RustyTech.Server.Services.Interfaces;
+using System.Security.Claims;
+using System.Text;
 
 namespace RustyTech.Server.Controllers
 {
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class SpotifyController : ControllerBase
@@ -15,23 +22,67 @@ namespace RustyTech.Server.Controllers
         }
 
         [HttpGet("authorization")]
-        public IActionResult Authorization()
+        public IActionResult GetAuthorizationUrl()
         {
-            var url = _spotifyService.AuthorizationUrl();
-            return Ok(url);
+            var response = new AuthResponse()
+            {
+                IsAuthenticated = false,
+                IsSuccess = false,
+                User = null
+            };
+
+            var url = string.Empty;
+
+            if (User.Identity.IsAuthenticated)
+            {
+                var user = new GetUserRequest()
+                {
+                    Id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value,
+                    Email = User.FindFirst(ClaimTypes.Email)?.Value,
+                    UserName = User.FindFirst(ClaimTypes.Name)?.Value
+                };
+
+                response.IsAuthenticated = true;
+                response.User = user;
+                response.IsSuccess = true;
+                url = _spotifyService.GetAuthorizationUrl(user.Id);
+            }
+            return Ok(new { url });
         }
 
-        [HttpPost("fetchToken")]
-        public async Task<IActionResult> FetchToken(string code)
+        [HttpPost("callback")]
+        public async Task<IActionResult> Callback([FromBody] Callback callback)
         {
-            var result = await _spotifyService.Callback(code);
+            var error = HttpContext.Request.Query["error"];
+            //var state = HttpContext.Request.Query["state"];
+            //var code = HttpContext.Request.Query["code"];
+
+            if (!string.IsNullOrEmpty(error))
+            {
+                return BadRequest(error);
+            }
+
+            if (string.IsNullOrEmpty(callback.Code))
+            {
+                return BadRequest("Invalid code");
+            }
+            if (string.IsNullOrEmpty(callback.State))
+            {
+                return BadRequest("state_mismatch");
+            }
+
+            var decodedUrl = Uri.UnescapeDataString(callback.State);
+            var decodedBytes = Convert.FromBase64String(decodedUrl);
+            var decodedState = Encoding.UTF8.GetString(decodedBytes);
+            var userId = decodedState.Split(':')[1];
+            var result = await _spotifyService.Callback(callback.Code, userId);
             return Ok(result);
         }
 
-        [HttpGet("refreshToken")]
-        public async Task<IActionResult> RefreshToken(string refreshToken)
+        [HttpPost("refreshToken")]
+        public async Task<IActionResult> RefreshToken(string refreshToken, string userId)
         {
-            var result = await _spotifyService.RefreshAccessToken(refreshToken);
+            var result = await _spotifyService.RefreshAccessToken(refreshToken, userId);
             return Ok(result);
         }
 
