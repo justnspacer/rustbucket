@@ -3,7 +3,6 @@ import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     signOut,
-    onAuthStateChanged,
     sendPasswordResetEmail,
     updateProfile,
     User,
@@ -35,17 +34,12 @@ export const signIn = async (email: string, password: string) => {
 export const logOut = async () => {
     try {
         await signOut(auth);
-        console.log("User signed out");
     } catch (error) {
         console.error("Error signing out:", error);
         throw error;
     }
 };
 
-// Listen to Auth State Changes
-export const authStateListener = (callback: (user: User | null) => void) => {
-    return onAuthStateChanged(auth, callback);
-};
 
 // Reset Password
 export const resetPassword = async (email: string) => {
