@@ -1,35 +1,36 @@
+"use client";
 import React, { useState } from 'react';
 
-export default function Login() {
+export default function Register() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
     setSuccess("");
 
     try {
       if (validatePasswords()) {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, password }),
-        });
-        
-        if (!response.ok) {
+        const response = await fetch("/api/auth/register", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ username, password }),
+          });
+          
+          if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.error || "Register failed");
+          }
           const data = await response.json();
-          console.log(data.error);
-          throw new Error("Login failed");
+          setSuccess(data.message);
+          console.log("User registered:", data.user);      
         }
-        const data = await response.json();
-        setSuccess(data.message);
-        console.log("Logged in user:", data.user);
-      }
     } catch (e) {
       if (e instanceof Error) {
         setError(e.message);
@@ -40,10 +41,13 @@ export default function Login() {
     }
   };
 
-  
   const validatePasswords = () => {
     if (password === "") {
       setError("Password required");
+      return false;
+    }
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
       return false;
     }
     if(password.length < 6) {
@@ -73,11 +77,10 @@ export default function Login() {
     return true;
   };
 
-
   return (
     <div>
-    <h1>Login</h1>
-    <form onSubmit={handleLogin}>
+    <h1>Register</h1>
+    <form onSubmit={handleRegister}>
       <input
         type="email"
         value={username}
@@ -90,7 +93,13 @@ export default function Login() {
         onChange={(e) => setPassword(e.target.value)}
         placeholder="Password"
       />
-      <button type="submit">Sign in</button>
+      <input
+        type="password"
+        value={confirmPassword}
+        onChange={(e) => setConfirmPassword(e.target.value)}
+        placeholder="Confirm Password"
+      />
+      <button type="submit">Sign Up</button>
     </form>
     {error && <p style={{ color: "red" }}>{error}</p>}
     {success && <p style={{ color: "green" }}>{success}</p>}
