@@ -1,7 +1,9 @@
 "use client";
 import React, { useState } from 'react';
+import { useAuth } from '@/app/context/AuthContext';
 
 export default function Login() {
+  const { login, loading } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -9,35 +11,14 @@ export default function Login() {
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError("");
-    setSuccess("");
 
     try {
       if (validatePasswords()) {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, password }),
-        });
-        
-        if (!response.ok) {
-          const data = await response.json();
-          console.log(data.error);
-          throw new Error("Login failed");
-        }
-        const data = await response.json();
-        setSuccess(data.message);
-        console.log("Logged in user:", data.user);
+        await login(username, password);
+        setSuccess("Logged in");
       }
     } catch (e) {
-      if (e instanceof Error) {
-        setError(e.message);
-      } else {
-        setError("An unknown error occurred");
-      }
-      console.error(e);
+      setError("Login failed");
     }
   };
 
