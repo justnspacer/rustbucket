@@ -4,20 +4,16 @@ import Image from 'next/image';
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/context/AuthContext";
 import { useEffect } from "react";
+import LogoutButton from "@/components/LogoutButton";
+import {parseCookies } from "nookies";
 
 export const NavBar = () => {
-
-  const {user, loading} = useAuth();
-  const router = useRouter(); 
-
-  if (loading) {
-    return <p>Loading...</p>;
-  }
+  const {user} = useAuth();
+  const router = useRouter();
 
   if (user) {
     return <p>Welcome, {user.displayName}</p>;
   }
-
   return (
     <>
       <a

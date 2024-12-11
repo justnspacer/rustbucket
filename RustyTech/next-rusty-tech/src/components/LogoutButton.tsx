@@ -16,4 +16,6 @@ const LogoutButton = () => {
       {loading ? "Logging out..." : "Logout"}
     </button>
   );
-}
+};
+
+export default LogoutButton;
