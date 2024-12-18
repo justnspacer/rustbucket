@@ -1,7 +1,10 @@
 "use client";
 import React, { useState } from 'react';
+import { useAuth } from '@/app/context/AuthContext';
+
 
 export default function Register() {
+  const { register, loading } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -15,29 +18,11 @@ export default function Register() {
 
     try {
       if (validatePasswords()) {
-        const response = await fetch("/api/auth/register", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ username, password }),
-          });
-          
-          if (!response.ok) {
-            const data = await response.json();
-            throw new Error(data.error || "Register failed");
-          }
-          const data = await response.json();
-          setSuccess(data.message);
-          console.log("User registered:", data.user);      
-        }
-    } catch (e) {
-      if (e instanceof Error) {
-        setError(e.message);
-      } else {
-        setError("An unknown error occurred");
+        await register(username, password);
+        setSuccess("User registered");
       }
-      console.error(e);
+    } catch (e) {
+      setError("Register failed");
     }
   };
 
