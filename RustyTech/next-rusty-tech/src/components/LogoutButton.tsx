@@ -1,14 +1,11 @@
 "use client";
 import { useAuth } from "@/app/context/AuthContext";
-import { useRouter } from "next/router";
 
 const LogoutButton = () => {
   const { logout, loading } = useAuth();
-  const router = useRouter();
 
   const handleLogout = async () => {
     await logout();
-    router.push("/");
   };
 
   return (

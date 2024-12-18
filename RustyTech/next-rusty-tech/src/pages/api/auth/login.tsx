@@ -1,5 +1,4 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { signIn } from '@/firebase/authService';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import {auth} from "@/firebase/firebaseConfig";
 
@@ -10,7 +9,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { username, password } = req.body;
     try {
       const userCredential  = await signInWithEmailAndPassword(auth, username, password);
-      res.status(200).json({ message: 'Logged in', user: userCredential.user });
+      if (!userCredential.user) {
+        throw new Error('User not found');
+      }
+      console.log('User logged in', userCredential.user);
+      res.status(200).json(userCredential.user);
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: 'An error occurred' });

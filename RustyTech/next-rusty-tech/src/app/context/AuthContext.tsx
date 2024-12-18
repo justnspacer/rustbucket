@@ -1,16 +1,17 @@
 "use client";
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import {auth} from "@/firebase/firebaseConfig";
-import { onAuthStateChanged, User, getAuth, getIdToken } from "firebase/auth";
-import {setCookie, destroyCookie, parseCookies } from "nookies";
+import { auth } from "@/firebase/firebaseConfig";
+import { onAuthStateChanged, User, signOut, getIdToken, UserCredential } from "@firebase/auth";
+import { setCookie, destroyCookie, parseCookies } from "nookies";
 import { useRouter } from "next/navigation";
-import { get } from "http";
+import { loginUser } from "@/services/authService";
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   login: (username: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  isLoggedIn: () => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -21,35 +22,46 @@ export const AuthProvider = ({ children }: {children: ReactNode}) => {
   const router = useRouter();
 
   useEffect(() => {
-    setLoading(false);
+    const cookies = parseCookies();
+    const token = cookies.token;
+    if (token) {
+      console.log('auth', auth);
+      onAuthStateChanged(auth, async (user) => {
+        if (user) {
+          const idToken = await user.getIdToken();
+          if (idToken === token) {
+            setUser(user);
+            console.log("User is logged in", user);
+          } else {
+            setUser(null);
+          }
+        } else {
+          setUser(null);
+        }
+        setLoading(false);
+      });
+    } else {
+      setLoading(false);
+    }
   }, []);
 
   // Login function
   const login = async (username: string, password: string) => {
     setLoading(true);
     try {
-      const response = await fetch("/api/auth/login", {
-          method: "POST",
-          headers: {
-              "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ username, password }),
-      });
-
-      if (!response.ok) {
-          throw new Error("Login failed");
-      }
-      const data = await response.json();
-      setCookie(null, "token", data.user.stsTokenManager.accessToken, {
-        maxAge: data.user.stsTokenManager.expirationTime, // 7 days
+      const userCredential = await loginUser(username, password);
+      const user = userCredential.user;
+      const token = await user.getIdToken();
+      
+      setCookie(null, "token", token, {
+        maxAge: 7 * 24 * 60 * 60, // 7 days
         path: "/",                // Accessible on all routes
         secure: true,             // Only send over HTTPS
         httpOnly: false,          // Set to true if setting from an API route
         sameSite: "lax",          // Protects against CSRF attacks
     });
-
     setUser(user);
-      router.push("/");
+    router.push("/");
   } catch (error) {
       console.error("Login error:", error);
   } finally {
@@ -76,8 +88,14 @@ export const AuthProvider = ({ children }: {children: ReactNode}) => {
   };
 };
 
+// Check if user is logged in
+const isLoggedIn = () => {
+  const cookies = parseCookies();
+  return !!cookies.token;
+};
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, isLoggedIn }}>
       {children}
     </AuthContext.Provider>
   );
