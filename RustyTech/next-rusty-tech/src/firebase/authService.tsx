@@ -9,7 +9,7 @@ import {
 } from "firebase/auth";
 
 // Sign Up with Email and Password
-export const signUp = async (email: string, password: string) => {
+export const handleSignUp = async (email: string, password: string) => {
     try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         return userCredential.user;
@@ -20,7 +20,7 @@ export const signUp = async (email: string, password: string) => {
 };
 
 // Sign In with email and password
-export const signIn = async (email: string, password: string) => {
+export const handleSignIn = async (email: string, password: string) => {
     try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         return userCredential.user;
@@ -31,7 +31,7 @@ export const signIn = async (email: string, password: string) => {
 };
 
 // Sign Out
-export const logOut = async () => {
+export const handleLogout = async () => {
     try {
         await signOut(auth);
     } catch (error) {
@@ -40,9 +40,8 @@ export const logOut = async () => {
     }
 };
 
-
 // Reset Password
-export const resetPassword = async (email: string) => {
+export const handleResetPassword = async (email: string) => {
     try {
         await sendPasswordResetEmail(auth, email);
         console.log("Password reset email sent");
@@ -53,9 +52,9 @@ export const resetPassword = async (email: string) => {
 };
 
 // Update User Profile
-export const updateUserProfile = async (user: User, displayName: string, photoURL: string) => {
+export const handleUpdateUserProfile = async (user: User, profile: { displayName?: string; photoURL?: string }) => {
     try {
-        await updateProfile(user, { displayName, photoURL });
+        await updateProfile(user, profile);
         console.log("User profile updated");
     } catch (error) {
         console.error("Error updating profile:", error);

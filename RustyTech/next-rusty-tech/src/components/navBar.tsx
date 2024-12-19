@@ -15,6 +15,7 @@ export const NavBar = () => {
         ) : user ? (
           <>
           <li>Welcome, { user.displayName || user.email }</li>
+          <li><a href="/profile">Profile</a></li>
           <li><LogoutButton /></li>
         </>):(
           <>

@@ -4,7 +4,7 @@ import { auth } from "@/firebase/firebaseConfig";
 import { onAuthStateChanged, User } from "@firebase/auth";
 import { setCookie, destroyCookie, parseCookies } from "nookies";
 import { useRouter } from "next/navigation";
-import { signIn, signUp, logOut } from "@/firebase/authService";
+import { handleSignIn, handleSignUp, handleLogout, handleResetPassword, handleUpdateUserProfile } from "@/firebase/authService";
 
 interface AuthContextType {
   user: User | null;
@@ -12,6 +12,8 @@ interface AuthContextType {
   login: (username: string, password: string) => Promise<void>;
   register: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
+  updateProfile: (profile: { displayName?: string; photoURL?: string }) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -47,7 +49,7 @@ export const AuthProvider = ({ children }: {children: ReactNode}) => {
   const register = async (email: string, password: string) => {
     setLoading(true);
     try {
-      await signUp(email, password);
+      await handleSignUp(email, password);
       router.push("/login");
     } catch (error) {
       console.error("Register error:", error);
@@ -60,7 +62,7 @@ export const AuthProvider = ({ children }: {children: ReactNode}) => {
   const login = async (username: string, password: string) => {
     setLoading(true);
     try {
-      const user = await signIn(username, password);
+      const user = await handleSignIn(username, password);
       const token = await user.getIdToken();
 
       setCookie(null, "token", token, {
@@ -82,7 +84,7 @@ export const AuthProvider = ({ children }: {children: ReactNode}) => {
   const logout = async () => {
     setLoading(true);
     try {
-      await logOut();
+      await handleLogout();
       setUser(null);
       destroyCookie(null, "token");
       router.push("/");
@@ -93,8 +95,35 @@ export const AuthProvider = ({ children }: {children: ReactNode}) => {
   };
 };
 
+ // Reset password function
+ const resetPassword = async (email: string) => {
+  setLoading(true);
+  try {
+    await handleResetPassword(email);
+  } catch (error) {
+    console.error("Reset password error:", error);
+  } finally {
+    setLoading(false);
+  }
+};
+
+// Update user profile function
+const updateProfile = async (profile: { displayName?: string; photoURL?: string }) => {
+  if (user) {
+    setLoading(true);
+    try {
+      await handleUpdateUserProfile(user, profile);
+      setUser({ ...user, ...profile });
+    } catch (error) {
+      console.error("Update profile error:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+};
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, resetPassword, updateProfile }}>
       {children}
     </AuthContext.Provider>
   );
