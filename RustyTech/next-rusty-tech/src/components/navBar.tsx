@@ -1,35 +1,61 @@
 "use client";
-import Image from 'next/image';
+import { useEffect, useRef, useState } from 'react';
 import { useAuth } from "@/app/context/AuthContext";
+import Image from 'next/image';
 import LogoutButton from "@/components/LogoutButton";
 
 export const NavBar = () => {
   const { user, loading } = useAuth();
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLUListElement>(null);
+
+  const handleDropdownClick = () => {
+    setShowDropdown(!showDropdown);
+};
+
+const handleMouseLeave = () => {
+    setShowDropdown(false);
+};
+
+const handleClickOutside = (event: MouseEvent) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+    }
+};
+
+useEffect(() => {
+  document.addEventListener('mousedown', handleClickOutside);
+  return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+  };
+}, []);
 
   return (
-    <nav>
-      <ul>
-        <li><a href="/">Home</a></li>
+    <nav className='main-nav'>
+        <h1><a href="/">Rust Bucket</a></h1>
         {loading ? (
-          <li>Loading...</li>
+          <span>Loading...</span>
         ) : user ? (
           <>
-          <li>Welcome, { user.displayName || user.email }</li>
-          <li><a href="/profile">Profile</a></li>
+          <div className='username' onClick={handleDropdownClick}>Welcome, { user.displayName || user.email }
+          <ul className='dropdown' ref={dropdownRef} onMouseLeave={handleMouseLeave}>
+          {showDropdown && (<>
+          <li><a href="/myprofile">Profile</a></li>
           <li><LogoutButton /></li>
+          </>
+          )}
+          </ul>
+          </div>
         </>):(
           <>
-          <li>
+          <div className='auth-links'>
             <a className="flex items-center gap-2 hover:underline hover:underline-offset-4" href="/login">
             <Image aria-hidden src="/window.svg" alt="Window icon" width={16} height={16}/>Login</a>
-          </li>
-          <li>
             <a className="flex items-center gap-2 hover:underline hover:underline-offset-4" href="/register">
             <Image aria-hidden src="/file.svg" alt="Window icon" width={16} height={16}/>Register</a>
-          </li>
+          </div>
           </>
         )}       
-      </ul>
     </nav>
   ); 
 };

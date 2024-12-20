@@ -108,7 +108,7 @@ export const AuthProvider = ({ children }: {children: ReactNode}) => {
 };
 
 // Update user profile function
-const updateProfile = async (profile: { displayName?: string; photoURL?: string }) => {
+const updateProfile = async (profile: { displayName?: string; photoURL?: string; }) => {
   if (user) {
     setLoading(true);
     try {

@@ -22,8 +22,7 @@ const PasswordResetForm = () => {
   return (
     <form onSubmit={handleSubmit}>
       <div>
-        <label htmlFor="email">Email:</label>
-        <input
+        <input placeholder="Email"
           type="email"
           id="email"
           value={email}

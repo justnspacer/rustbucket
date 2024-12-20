@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "@/app/context/AuthContext";
 
 const ProfileUpdateForm = () => {
@@ -7,22 +7,36 @@ const ProfileUpdateForm = () => {
   const [displayName, setDisplayName] = useState(user?.displayName || "");
   const [photoURL, setPhotoURL] = useState(user?.photoURL || "");
   const [error, setError] = useState<string | null>(null);
+  const [showForm, setShowForm] = useState(false);
+
+  useEffect(() => {
+    if (showForm) {
+      setDisplayName(user?.displayName || "");
+      setPhotoURL(user?.photoURL || "");
+    }
+  }, [showForm, user]);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     try {
       await updateProfile({ displayName, photoURL });
-      alert("Profile updated successfully!");
+      setShowForm(false);
     } catch (error) {
       setError("Failed to update profile. Please try again.");
     }
   };
 
   return (
+    <div>
+    {!showForm && (
+      <button onClick={() => setShowForm(true)}>Update Profile</button>
+    )}
+    {showForm && (
     <form onSubmit={handleSubmit}>
       <div>
-        <label htmlFor="displayName">Display Name:</label>
+        <label htmlFor="displayName">Change your display name:</label>
         <input
           type="text"
           id="displayName"
@@ -32,7 +46,7 @@ const ProfileUpdateForm = () => {
         />
       </div>
       <div>
-        <label htmlFor="photoURL">Photo URL:</label>
+        <label htmlFor="photoURL">Change your photo:</label>
         <input
           type="text"
           id="photoURL"
@@ -43,9 +57,11 @@ const ProfileUpdateForm = () => {
       </div>
       {error && <p>{error}</p>}
       <button type="submit" disabled={loading}>
-        {loading ? "Updating..." : "Update Profile"}
+        {loading ? "Updating..." : "Save Changes"}
       </button>
     </form>
+      )}
+      </div>
   );
 };
 
