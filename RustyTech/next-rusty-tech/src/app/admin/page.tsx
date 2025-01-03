@@ -1,3 +1,4 @@
+import AssignRole from "@/components/AssignRole";
 
 const AdminPage = () => {
   return (

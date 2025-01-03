@@ -1,10 +1,9 @@
 "use client";
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { auth } from "@/firebase/firebaseConfig";
-import { onAuthStateChanged, User } from "@firebase/auth";
-import { setCookie, destroyCookie, parseCookies } from "nookies";
+import { setCookie, destroyCookie } from "nookies";
+import { User } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
-import { handleSignIn, handleSignUp, handleLogout, handleResetPassword, handleUpdateUserProfile } from "@/firebase/authService";
+import { supabase } from "@/app/utils/supabaseClient";
 
 interface AuthContextType {
   user: User | null;
@@ -24,32 +23,39 @@ export const AuthProvider = ({ children }: {children: ReactNode}) => {
   const router = useRouter();
 
   useEffect(() => {
-    const cookies = parseCookies();
-    const token = cookies.token;
-    if (token) {
-      onAuthStateChanged(auth, async (user) => {
-        if (user) {
-          const idToken = await user.getIdToken();
-          if (idToken === token) {
-            setUser(user);
-          } else {
-            setUser(null);
-          }
-        } else {
-          setUser(null);
-        }
-        setLoading(false);
-      });
-    } else {
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session) {
+        const token = session.access_token;
+  
+        setCookie(null, "token", token, {
+          maxAge: 7 * 24 * 60 * 60, // 7 days
+          path: "/",                // Accessible on all routes
+          secure: true,             // Only send over HTTPS
+          httpOnly: false,          // Set to true if setting from an API route
+          sameSite: "lax",          // Protects against CSRF attacks
+        });
+  
+        setUser(session.user);
+      } else {
+        setUser(null);
+        setCookie(null, "token", "", {
+          maxAge: -1, // Expire the cookie
+          path: "/",
+        });
+      }
       setLoading(false);
-    }
+    });
+  
+    return () => {
+      authListener?.subscription.unsubscribe();
+    };
   }, []);
 
   // Register function
   const register = async (email: string, password: string) => {
     setLoading(true);
     try {
-      await handleSignUp(email, password);
+      await supabase.auth.signUp({ email, password });
       router.push("/login");
     } catch (error) {
       console.error("Register error:", error);
@@ -62,8 +68,13 @@ export const AuthProvider = ({ children }: {children: ReactNode}) => {
   const login = async (username: string, password: string) => {
     setLoading(true);
     try {
-      const user = await handleSignIn(username, password);
-      const token = await user.getIdToken();
+      const { data, error } = await supabase.auth.signInWithPassword({ email: username, password });
+
+      if (error) {
+        throw error;
+      }
+
+      const token = data.session?.access_token;
 
       setCookie(null, "token", token, {
         maxAge: 7 * 24 * 60 * 60, // 7 days
@@ -84,7 +95,7 @@ export const AuthProvider = ({ children }: {children: ReactNode}) => {
   const logout = async () => {
     setLoading(true);
     try {
-      await handleLogout();
+      await supabase.auth.signOut();
       setUser(null);
       destroyCookie(null, "token");
       router.push("/");
@@ -99,7 +110,7 @@ export const AuthProvider = ({ children }: {children: ReactNode}) => {
  const resetPassword = async (email: string) => {
   setLoading(true);
   try {
-    await handleResetPassword(email);
+    await supabase.auth.resetPasswordForEmail(email);
   } catch (error) {
     console.error("Reset password error:", error);
   } finally {
@@ -108,12 +119,12 @@ export const AuthProvider = ({ children }: {children: ReactNode}) => {
 };
 
 // Update user profile function
-const updateProfile = async (profile: { displayName?: string; photoURL?: string; }) => {
+const updateProfile = async () => {
   if (user) {
     setLoading(true);
     try {
-      await handleUpdateUserProfile(user, profile);
-      setUser({ ...user, ...profile });
+      await supabase.auth.updateUser(user);
+      setUser({ ...user });
     } catch (error) {
       console.error("Update profile error:", error);
     } finally {
