@@ -1,58 +1,25 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
+import { useRouter } from 'next/navigation';
+
 
 export default function Login() {
-  const { login, loading } = useAuth();
+  const { user, login, success, error } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const router = useRouter();
+
+
+  useEffect(() => {
+    if (user) {
+      router.push('/');
+    }
+  }, [user, router]);
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    try {
-      if (validatePasswords()) {
-        await login(username, password);
-        setSuccess("Logged in");
-      }
-    } catch (e) {
-      setError("Login failed");
-    }
-  };
-
-  
-  const validatePasswords = () => {
-    if (password === "") {
-      setError("Password required");
-      return false;
-    }
-    if(password.length < 6) {
-      setError("Password must be at least 6 characters");
-      return false;
-    }
-    if(password.length > 4096) {
-      setError("Password must be less characters");
-      return false;
-    }
-    if (!/[A-Z]/.test(password)) {
-      setError("Password must contain at least one uppercase letter");
-      return false;
-    }
-    if (!/[a-z]/.test(password)) {
-      setError("Password must contain at least one lowercase letter");
-      return false;
-    }
-    if (!/[0-9]/.test(password)) {
-      setError("Password must contain at least one number");
-      return false;
-    }
-    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-      setError("Password must contain at least one special character");
-      return false;
-    }
-    return true;
+    await login(username, password);
   };
 
 

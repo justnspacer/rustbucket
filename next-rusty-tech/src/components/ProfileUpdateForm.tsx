@@ -4,15 +4,19 @@ import { useAuth } from "@/app/context/AuthContext";
 
 const ProfileUpdateForm = () => {
   const { user, updateProfile, loading } = useAuth();
-  const [displayName, setDisplayName] = useState(user?.displayName || "");
-  const [photoURL, setPhotoURL] = useState(user?.photoURL || "");
+  const [displayName, setDisplayName] = useState(user?.user_metadata.displayName || "");
+  const [photoURL, setPhotoURL] = useState(user?.user_metadata.photoURL || "");
+  const [email, setEmail] = useState(user?.email || "");
+  const [birthYear, setBirthYear] = useState(user?.user_metadata?.birthYear || 0);
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
     if (showForm) {
-      setDisplayName(user?.displayName || "");
-      setPhotoURL(user?.photoURL || "");
+      setDisplayName(user?.user_metadata.displayName || "");
+      setPhotoURL(user?.user_metadata.photoURL || "");
+      setEmail(user?.email || "");
+      setBirthYear(user?.user_metadata?.birthYear || 0);
     }
   }, [showForm, user]);
 
@@ -21,7 +25,7 @@ const ProfileUpdateForm = () => {
     e.preventDefault();
     setError(null);
     try {
-      await updateProfile({ displayName, photoURL });
+      await updateProfile({ displayName, photoURL, email, birthYear });
       setShowForm(false);
     } catch (error) {
       setError("Failed to update profile. Please try again.");
@@ -52,6 +56,27 @@ const ProfileUpdateForm = () => {
           id="photoURL"
           value={photoURL}
           onChange={(e) => setPhotoURL(e.target.value)}
+          disabled={loading}
+        />
+      </div>
+      <div>
+        <label htmlFor="email">Change your email:</label>
+        <input
+          type="email"
+          id="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          disabled={loading}
+        />
+      </div>
+      <div>
+        <label htmlFor="birthYear">Change your birth year:</label>
+        <input
+          type="number"
+          id="birthYear"
+          value={birthYear}
+          onChange={(e) => setBirthYear(Number(e.target.value))}
+          max={9999}
           disabled={loading}
         />
       </div>

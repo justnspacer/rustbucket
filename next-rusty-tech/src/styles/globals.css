@@ -80,7 +80,6 @@ nav .username:hover {
   background-color: inherit;
   font-family: "Titillium Web", sans-serif;
   font-size: 16px;
-  font-weight: 700;
   outline: none;
   border: none;
 }
@@ -123,4 +122,9 @@ form button, button {
 
 form button:hover, button:hover {
   background: lightgreen;
+}
+
+.button-logout {
+  font-weight: lighter;
+
 }

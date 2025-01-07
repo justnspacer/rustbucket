@@ -37,7 +37,7 @@ useEffect(() => {
           <span>Loading...</span>
         ) : user ? (
           <>
-          <div className='username' onClick={handleDropdownClick}>Welcome, { user.displayName || user.email }
+          <div className='username' onClick={handleDropdownClick}>Welcome, { user.user_metadata.displayName || user.email }!
           <ul className='dropdown' ref={dropdownRef} onMouseLeave={handleMouseLeave}>
           {showDropdown && (<>
           <li><a href="/myprofile">Profile</a></li>

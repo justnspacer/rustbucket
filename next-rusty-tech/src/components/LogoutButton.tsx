@@ -9,7 +9,7 @@ const LogoutButton = () => {
   };
 
   return (
-    <button onClick={handleLogout} disabled={loading}>
+    <button className="button-logout" onClick={handleLogout} disabled={loading}>
       {loading ? "Logging out..." : "Logout"}
     </button>
   );
