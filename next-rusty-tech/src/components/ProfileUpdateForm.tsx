@@ -33,11 +33,12 @@ const ProfileUpdateForm = () => {
   };
 
   return (
-    <div>
+    <div className="center">
     {!showForm && (
-      <button onClick={() => setShowForm(true)}>Update Profile</button>
+      <button className="button-update-profile" onClick={() => setShowForm(true)}>Update Profile</button>
     )}
     {showForm && (
+      <div className="form-container">
     <form onSubmit={handleSubmit}>
       <div>
         <label htmlFor="displayName">Change your display name:</label>
@@ -85,6 +86,7 @@ const ProfileUpdateForm = () => {
         {loading ? "Updating..." : "Save Changes"}
       </button>
     </form>
+    </div>
       )}
       </div>
   );

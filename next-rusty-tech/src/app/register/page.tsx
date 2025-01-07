@@ -63,8 +63,8 @@ export default function Register() {
   };
 
   return (
-    <div>
-    <h1>Register</h1>
+    <div className="form-container">
+    <h1 className="form-title">Register</h1>
     <form onSubmit={handleRegister}>
       <input
         type="email"

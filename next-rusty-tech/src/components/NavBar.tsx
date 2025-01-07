@@ -32,7 +32,7 @@ useEffect(() => {
 
   return (
     <nav className='main-nav'>
-        <h1><a href="/">Rust Bucket</a></h1>
+        <h1 className='logo-link'><a href="/">Rust Bucket</a></h1>
         {loading ? (
           <span>Loading...</span>
         ) : user ? (

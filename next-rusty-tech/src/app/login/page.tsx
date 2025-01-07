@@ -24,8 +24,8 @@ export default function Login() {
 
 
   return (
-    <div>
-    <h1>Login</h1>
+    <div className="form-container">
+    <h1 className="form-title">Login</h1>
     <form onSubmit={handleLogin}>
       <input
         type="email"

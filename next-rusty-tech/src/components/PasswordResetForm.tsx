@@ -20,22 +20,26 @@ const PasswordResetForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <input placeholder="Email"
-          type="email"
-          id="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          disabled={loading}
-        />
-      </div>
-      {error && <p>{error}</p>}
-      {success && <p>Password reset email sent!</p>}
-      <button type="submit" disabled={loading}>
-        {loading ? "Sending..." : "Send Password Reset Email"}
-      </button>
-    </form>
+    <div>
+      <h1 className="form-title">Reset Password</h1>
+      <form onSubmit={handleSubmit}>
+        <div>
+          <input placeholder="Email"
+            type="email"
+            id="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={loading}
+          />
+        </div>
+        {error && <p>{error}</p>}
+        {success && <p>Password reset email sent!</p>}
+        <button type="submit" disabled={loading}>
+          {loading ? "Sending..." : "Send Password Reset Email"}
+        </button>
+      </form>
+    </div>
+    
   );
 };
 
