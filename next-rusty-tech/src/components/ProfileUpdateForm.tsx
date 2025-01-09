@@ -41,7 +41,7 @@ const ProfileUpdateForm = () => {
       <div className="form-container">
     <form onSubmit={handleSubmit}>
       <div>
-        <label htmlFor="displayName">Change your display name:</label>
+        <label htmlFor="displayName">Change your display name</label>
         <input
           type="text"
           id="displayName"
@@ -51,7 +51,7 @@ const ProfileUpdateForm = () => {
         />
       </div>
       <div>
-        <label htmlFor="photoURL">Change your photo:</label>
+        <label htmlFor="photoURL">Change your photo</label>
         <input
           type="text"
           id="photoURL"
@@ -61,7 +61,7 @@ const ProfileUpdateForm = () => {
         />
       </div>
       <div>
-        <label htmlFor="email">Change your email:</label>
+        <label htmlFor="email">Change your email</label>
         <input
           type="email"
           id="email"
@@ -71,7 +71,7 @@ const ProfileUpdateForm = () => {
         />
       </div>
       <div>
-        <label htmlFor="birthYear">Change your birth year:</label>
+        <label htmlFor="birthYear">Change your birth year</label>
         <input
           type="number"
           id="birthYear"

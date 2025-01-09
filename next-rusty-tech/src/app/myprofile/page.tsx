@@ -10,7 +10,8 @@ const ProfilePage = () => {
       <div className="profile-header">
       {user?.email && <img className="profile-image" src={user?.user_metadata.photoURL} alt={user?.email ||
         'User profile picture'}/>}
-      {user?.email && <h2>{user.email}</h2> }
+      {user?.user_metadata.displayName && <h2 className="user-display-name">{user.user_metadata.displayName}</h2> || <h2 className="user-display-email">{user?.email}</h2>}
+
       </div>
 
       <ProfileUpdateForm />

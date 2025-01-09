@@ -14,11 +14,19 @@
   }
 }
 
-body {
+html, body {
+  height: 100%; /* Ensure the full height is respected */
+  margin: 0; /* Remove default margin */
+  display: flex;
+  flex-direction: column; /* Stack content vertically */
   color: var(--foreground);
   background: var(--background);
   font-family: var(--font-fredoka);
-  padding: 1rem;
+}
+
+.content {
+  flex: 1;
+  padding: 0rem 1rem;
 }
 
 input {
@@ -35,9 +43,10 @@ input {
 .main-nav {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   background: var(--background);
   color: var(--foreground);
-  margin-bottom: 3rem;
+  padding: 1rem;
 }
 
 .logo-link {
@@ -54,36 +63,24 @@ input {
 
 nav .username:hover {
   cursor: pointer;
-  text-decoration: underline;
-}
-
-.dropdown-backdrop {
-  position: absolute;
-  display: flex;
-  justify-content: right;
-  width: 100%;
-  height: 100vh;
-  background-color: var(--trans-black);
-  z-index: 2;
-  top: 0;
-  right: 0;
-  padding: 16px;
+  text-decoration: none;
 }
 
 .dropdown {
-  width: 100%;
+  top: 0;
+  right: 0;
+  margin-top: 3rem;
   position: absolute;
   display: flex;
   flex-direction: column;
-  margin-top: 10px;
-  background-color: var(--white-color);
+  background: var(--background);
   z-index: 2;
 }
 
 .dropdown a:link, .dropdown a:visited, .dropdown button {
   color: var(--black-color);
   text-decoration: none;
-  padding: 10px 10px 10px 5px;
+  font-weight: 400;
 }
 
 .dropdown button {
@@ -97,6 +94,21 @@ nav .username:hover {
 .dropdown a:hover, .dropdown button:hover {
   background-color: var(--prussian-blue);
   color: var(--white-color);
+}
+
+.dropdown-item {
+  padding: 5px;
+  color: white;
+}
+
+.dropdown-item:hover {
+  background-color: white;
+  color: black;
+}
+
+
+.button-logout {
+  padding: 0rem;
 }
 
 /* profile css */
@@ -113,6 +125,7 @@ nav .username:hover {
   flex-direction: column;
   align-items: center;
   margin-bottom: 1rem;
+  gap: 1rem;
 }
 
 .button-update-profile {
@@ -150,6 +163,10 @@ form div {
   flex-direction: column;
 }
 
+form button {
+  margin-top: 1rem;  
+}
+
 form button, button {
   padding: 0.5rem;
   border-radius: 5px;
@@ -157,14 +174,28 @@ form button, button {
   color: var(--background);
   cursor: pointer;
   width: 200px;
-
 }
 
 form button:hover, button:hover {
-  background: lightgreen;
+  background: greenyellow;
 }
 
 .button-logout {
   font-weight: lighter;
 
+}
+
+.user-display-name, .user-display-email {
+  font-size: 1.7rem;
+  font-weight: 500;
+}
+
+footer {
+  background: #333; /* Example styling */
+  color: white;
+  text-align: center;
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
