@@ -13,10 +13,6 @@ export const NavBar = () => {
     setShowDropdown(!showDropdown);
 };
 
-const handleMouseLeave = () => {
-    setShowDropdown(false);
-};
-
 const handleClickOutside = (event: MouseEvent) => {
     if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setShowDropdown(false);
@@ -38,7 +34,7 @@ useEffect(() => {
         ) : user ? (
           <>
           <div className='username' onClick={handleDropdownClick}>Welcome, { user.user_metadata.displayName || user.email }!
-          <ul className='dropdown' ref={dropdownRef} onMouseLeave={handleMouseLeave}>
+          <ul className='dropdown' ref={dropdownRef}>
           {showDropdown && (<>
           <li className='dropdown-item'><a href="/myprofile">Profile</a></li>
           <li className='dropdown-item'><LogoutButton /></li>

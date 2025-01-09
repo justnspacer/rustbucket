@@ -38,7 +38,7 @@ const ProfileUpdateForm = () => {
       <button className="button-update-profile" onClick={() => setShowForm(true)}>Update Profile</button>
     )}
     {showForm && (
-      <div className="form-container">
+      <div className="form-container center">
     <form onSubmit={handleSubmit}>
       <div>
         <label htmlFor="displayName">Change your display name</label>

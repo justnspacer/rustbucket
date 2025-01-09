@@ -26,7 +26,9 @@ html, body {
 
 .content {
   flex: 1;
-  padding: 0rem 1rem;
+  padding: 1rem;
+  background: var(--foreground);
+  color: var(--background);
 }
 
 input {
@@ -69,12 +71,13 @@ nav .username:hover {
 .dropdown {
   top: 0;
   right: 0;
-  margin-top: 3rem;
+  margin-top: 2.5rem;
+  padding: 1rem;
   position: absolute;
   display: flex;
   flex-direction: column;
-  background: var(--background);
   z-index: 2;
+  width: 140px;
 }
 
 .dropdown a:link, .dropdown a:visited, .dropdown button {
@@ -99,6 +102,7 @@ nav .username:hover {
 .dropdown-item {
   padding: 5px;
   color: white;
+  background: gray;
 }
 
 .dropdown-item:hover {
@@ -152,10 +156,16 @@ form {
   text-transform: capitalize;
 }
 
-form input {
+.link-container {
+  margin-top: 2rem;
+}
+
+form input, form textarea, form select {
+  width: 100%;
+  max-width: 300px;
   padding: 0.5rem;
-  border-radius: 5px;
-  border: 1px solid var(--foreground);
+  border-radius: 40px;
+  border: 2px solid var(--background);
 }
 
 form div {
@@ -167,22 +177,41 @@ form button {
   margin-top: 1rem;  
 }
 
-form button, button {
+form button, .button-update-profile {
   padding: 0.5rem;
-  border-radius: 5px;
-  background: var(--foreground);
-  color: var(--background);
+  border-radius: 40px;
+  background: var(--background);
+  color: var(--foreground);
   cursor: pointer;
   width: 200px;
+  transition: all 0.3s ease-in;
 }
 
 form button:hover, button:hover {
   background: greenyellow;
+  color: var(--background);
+
 }
 
 .button-logout {
   font-weight: lighter;
 
+}
+
+.reset-password-link {
+  padding: 0.5rem;
+  border-radius: 40px;
+  display: inline-block;
+  cursor: pointer;
+  transition: all 0.3s ease-in;
+  margin-top: 0.5rem;
+  width: 200px;
+  text-align: center;
+}
+
+.reset-password-link:hover {
+  color: greenyellow;
+  background: var(--background);
 }
 
 .user-display-name, .user-display-email {

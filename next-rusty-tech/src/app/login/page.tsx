@@ -41,7 +41,7 @@ export default function Login() {
       />
       <button type="submit">Sign in</button>
     </form>
-    <a href="/resetPassword">Reset Password</a>
+    <a className='reset-password-link' href="/resetPassword">Reset Password</a>
     {error && <p style={{ color: "red" }}>{error}</p>}
     {success && <p style={{ color: "green" }}>{success}</p>}
     </div>

@@ -94,7 +94,9 @@ export const AuthProvider = ({ children }: {children: ReactNode}) => {
     });
     setUser(user);
     setSuccess("Logged in");
-    router.push("/"); 
+    setTimeout(() => {
+      router.push("/"); 
+    }, 1000);
   } catch (error) {
       console.error("Login error:", error);
       setError("Login error");

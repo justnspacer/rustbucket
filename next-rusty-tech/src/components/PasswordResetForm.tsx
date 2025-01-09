@@ -22,6 +22,7 @@ const PasswordResetForm = () => {
   return (
     <div>
       <h1 className="form-title">Reset Password</h1>
+      <p>Please enter your email address to reset your password:</p>
       <form onSubmit={handleSubmit}>
         <div>
           <input placeholder="Email"
@@ -35,7 +36,7 @@ const PasswordResetForm = () => {
         {error && <p>{error}</p>}
         {success && <p>Password reset email sent!</p>}
         <button type="submit" disabled={loading}>
-          {loading ? "Sending..." : "Send Password Reset Email"}
+          {loading ? "Sending..." : "Send email"}
         </button>
       </form>
     </div>
