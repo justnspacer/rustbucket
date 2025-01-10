@@ -17,6 +17,10 @@ export const metadata = {
 export default function Layout({children,}: Readonly<{children: React.ReactNode;}>) {
   return (
     <html lang="en">
+      <head>
+      <script src="https://kit.fontawesome.com/8e13a44ce3.js" crossOrigin="anonymous"></script>
+
+      </head>
       <body className={`${fredoka.variable} antialiased`}>
         <AuthProvider>
           <NavBar />

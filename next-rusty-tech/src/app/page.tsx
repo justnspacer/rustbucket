@@ -1,11 +1,10 @@
 import HomePageImage from '@/components/HomePageImage';
 import HomePageMessage from '@/components/HomePageMessage';
+import SlideShow from '@/components/SlideShow';
 
 const HomePage = () => {  
   return <>
-  <HomePageImage />
-  <HomePageMessage />
-
+  <SlideShow/>
   </>
   ;
 };
