@@ -28,7 +28,8 @@ useEffect(() => {
 
   return (
     <nav className='main-nav'>
-        <h1 className='logo-link'><a href="/"><i className="fa-regular fa-face-smile"></i>Rust Bucket</a></h1>
+        <h1 className='logo-link'><a href="/">
+        Rust Bucket</a></h1>
         {loading ? (
           <span>Loading...</span>
         ) : user ? (
@@ -45,10 +46,8 @@ useEffect(() => {
         </>):(
           <>
           <div className='auth-links'>
-            <a className="flex items-center gap-2 hover:underline hover:underline-offset-4" href="/login">
-            <Image aria-hidden src="/window.svg" alt="Window icon" width={16} height={16}/>Login</a>
-            <a className="flex items-center gap-2 hover:underline hover:underline-offset-4" href="/register">
-            <Image aria-hidden src="/file.svg" alt="Window icon" width={16} height={16}/>Register</a>
+            <a className="login-link" href="/login">
+            Login<i className="fa-regular fa-circle-right"></i></a>
           </div>
           </>
         )}       

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 
 const SlideShow = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+
   useEffect(() => {
     
     const interval = setInterval(() => {
@@ -11,6 +12,11 @@ const SlideShow = () => {
 
     return () => clearInterval(interval);
   }, []);
+
+
+  const handleDotClick = (index: number) => {
+    setCurrentSlide(index);
+  };
 
   const slides = [
     {
@@ -45,7 +51,8 @@ const SlideShow = () => {
 
   return (
 <section className="slideshow">
-<button className='previous' onClick={prevSlide}><i className="fa-solid fa-angle-left"></i></button>
+  <div className='container'>
+    <button className='previous' onClick={prevSlide}><i className="fa-solid fa-angle-left"></i></button>
       <div className={`slide ${currentSlide % 2 === 0 ? 'left' : 'right'}`}>
         <div className="image-container">
           <img src={slides[currentSlide].image} alt="slide image" />
@@ -56,6 +63,16 @@ const SlideShow = () => {
         </div>
       </div>
       <button className='next' onClick={nextSlide}><i className="fa-solid fa-angle-right"></i></button>
+  </div>
+      <div className="dots-container">
+        {slides.map((_, index) => (
+          <span
+            key={index}
+            className={`dot ${index === currentSlide ? 'active' : ''}`}
+            onClick={() => handleDotClick(index)}
+          ></span>
+        ))}
+      </div>
     </section>
   );
 };

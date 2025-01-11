@@ -41,7 +41,13 @@ export default function Login() {
       />
       <button type="submit">Sign in</button>
     </form>
+    
+
     <a className='reset-password-link' href="/resetPassword">Reset Password</a>
+    <div className="mt-2">
+    <span className="register-text">Don't have an account? </span>
+    <a className="register-link" href="/register">Register<i className="fa-regular fa-circle-right"></i></a>
+    </div>
     {error && <p style={{ color: "red" }}>{error}</p>}
     {success && <p style={{ color: "green" }}>{success}</p>}
     </div>
