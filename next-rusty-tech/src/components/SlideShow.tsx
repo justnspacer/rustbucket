@@ -1,8 +1,16 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 const SlideShow = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  useEffect(() => {
+    
+    const interval = setInterval(() => {
+      setCurrentSlide((prevSlide) => (prevSlide + 1) % slides.length);
+    }, 8000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const slides = [
     {

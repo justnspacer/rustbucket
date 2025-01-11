@@ -202,7 +202,7 @@ form button:hover {
   color: var(--background);
   cursor: pointer;
   transition: all 0.3s ease-in;
-  width: 100px;
+  width: 60px;
   font-size: 2rem;
   font-weight: 100;
 }
@@ -255,24 +255,28 @@ footer {
 }
 .slide {
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   flex: 1;
+  width: 100%;
 }
 
 .slide.left .image-container {
   clip-path: polygon(100% 0%, 75% 50%, 100% 100%, 25% 100%, 0% 50%, 25% 0%);
+  margin-right: 200px;
 }
 
 .slide.right .image-container {
   order: 1;
   clip-path: polygon(75% 0%, 100% 50%, 75% 100%, 0% 100%, 25% 50%, 0% 0%);
+  margin-right: -200px;
+
 }
 
 .slide .image-container {
   width: 100%;
-  max-width: 400px;
-  height: 400px;
+  max-width: 500px;
+  height: 500px;
 }
 
 .slide .image-container img {
@@ -282,27 +286,32 @@ footer {
 }
 
 .message .header {
-  font-size: 3rem;
-  font-weight: 800;
-  text-transform: uppercase;
+  font-size: 3.5rem;
+  font-weight: 100;
+  text-transform: capitalize;
   line-height: 0.9;
-  letter-spacing: 0.2rem;
+  background: var(--foreground);
+  padding: 1rem;
 }
 
 .message {
-  max-width: 300px;
+  max-width: 400px;
   z-index: 1;
+  position: absolute;
 }
 
 .message .description {
+  margin-top: 1rem;
   font-size: 1rem;
   font-weight: 200;
+  background: var(--foreground);
+  padding: 0.5rem;
 }
 
 @media screen and (max-width: 800px) {
   .slide {
     flex-direction: column;
-    align-items: start;
+    justify-content: center;
     gap: 1rem;
   }
 
