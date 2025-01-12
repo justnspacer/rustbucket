@@ -13,11 +13,17 @@
       --vermilion: #f64740ff;
       --auburn: #a3333dff;
     }
+
+    *{
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
     body {
       font-family: 'Fredoka', sans-serif;
       margin: 0;
       padding: 0;
-      background: linear-gradient(to bottom, var(--vermilion), var(--auburn));
+      background: var(--cerulean);
       color: var(--tea-green);
       padding: 2rem;
     }
@@ -29,15 +35,19 @@
       flex-wrap: wrap;
       gap: 1rem;
       width: 100%;
+      margin-top: 1rem;
     }
-    ul li {
-      background: #291F1E;
+    .light-details {
+      background: var(--licorice);
       padding: 1rem;
-      border-radius: 1rem;
-      width: 200px;
+      width: 260px;
     }
     .fa-solid.fa-lightbulb{
       color: yellow;
+    }
+
+    .fa-lightbulb {
+      margin-bottom: 1rem;
     }
     .light-link {
       text-decoration: none;
@@ -48,23 +58,34 @@
     }
 
     h3{
-      font-size: 1.2rem;
-      font-weight: 400;
+      display: inline;
+      font-size: 1rem;
+      font-weight: 500;
+      text-transform: capitalize;
+      color: var(--licorice);
+      background: white;
+      padding: 0.2rem;
     }
 
-    .form-group {
+    form {
       display: flex;
-      flex-direction: column;
     }
 
     input {
-      border-radius: 2rem;
+      padding: 0.5rem;
+      font-weight: 700;
     }
 
-    .form-group button {
-      margin-top: 1rem;
-      border-radius: 2rem;
-      background-color: var(--tea-green);
+    button {
+      background-color: var(--auburn);
+      color: white;
+      outline: none;
+      padding: 0.5rem;
+      border: none;
+      cursor: pointer;
+      text-transform: capitalize;
+      font-weight: 700;
+      text-align: start;
     }
 
     @media (max-width: 600px) {
@@ -82,15 +103,14 @@
   <ul>
     {% for light_id, light in lights.items() %}
     <li>
-      <p><a class="light-link" href="/toggle/{{ light_id }}"><i class="{{ 'fa-solid' if light.state.on else 'fa-regular' }} fa-lightbulb"></i></a></p>
       <h3>{{ light.name }}</h3>
-      <form action="/brightness/{{ light_id }}" method="post">
-        <label for="brightness">Brightness (1-254)</label>
-        <div class="form-group">
+      <div class="light-details">
+        <p><a class="light-link" href="/toggle/{{ light_id }}"><i class="{{ 'fa-solid' if light.state.on else 'fa-regular' }} fa-lightbulb"></i></a></p>
+        <form action="/brightness/{{ light_id }}" method="post">
           <input type="number" name="brightness" id="brightness" min="1" max="254" value="{{ light.state.bri }}">
           <button type="submit">Set Brightness</button>
-        </div>
-      </form>
+        </form>
+      </div>
     </li>
     {% endfor %}
   </ul>
