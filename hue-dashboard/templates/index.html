@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hue Dashboard</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap');
+    :root {
+      --tea-green: #c4d6b0ff;
+      --cerulean: #477998ff;
+      --licorice: #291f1eff;
+      --vermilion: #f64740ff;
+      --auburn: #a3333dff;
+    }
+    body {
+      font-family: 'Fredoka', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to bottom, var(--vermilion), var(--auburn));
+      color: var(--tea-green);
+      padding: 2rem;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      width: 100%;
+    }
+    ul li {
+      background: #291F1E;
+      padding: 1rem;
+      border-radius: 1rem;
+      width: 200px;
+    }
+    .fa-solid.fa-lightbulb{
+      color: yellow;
+    }
+    .light-link {
+      text-decoration: none;
+      color: inherit;
+    }
+    i {
+      font-size: 1.7rem;
+    }
+
+    h3{
+      font-size: 1.2rem;
+      font-weight: 400;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    input {
+      border-radius: 2rem;
+    }
+
+    .form-group button {
+      margin-top: 1rem;
+      border-radius: 2rem;
+      background-color: var(--tea-green);
+    }
+
+    @media (max-width: 600px) {
+      ul li {
+        width: 100%;
+      }
+    }
+
+    </style>
+    <script src="https://kit.fontawesome.com/8e13a44ce3.js" crossorigin="anonymous"></script>
+
+</head>
+<body>
+  <h1>Philips Hue Dashboard</h1>
+  <ul>
+    {% for light_id, light in lights.items() %}
+    <li>
+      <p><a class="light-link" href="/toggle/{{ light_id }}"><i class="{{ 'fa-solid' if light.state.on else 'fa-regular' }} fa-lightbulb"></i></a></p>
+      <h3>{{ light.name }}</h3>
+      <form action="/brightness/{{ light_id }}" method="post">
+        <label for="brightness">Brightness (1-254)</label>
+        <div class="form-group">
+          <input type="number" name="brightness" id="brightness" min="1" max="254" value="{{ light.state.bri }}">
+          <button type="submit">Set Brightness</button>
+        </div>
+      </form>
+    </li>
+    {% endfor %}
+  </ul>
+</body>
+</html>
