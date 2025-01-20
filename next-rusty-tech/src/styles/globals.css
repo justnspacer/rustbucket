@@ -53,7 +53,14 @@ input {
 
 .logo-link {
   font-weight: 200;
-  font-size: 1.7rem;
+  font-size: 1.2rem;
+  white-space: nowrap;
+}
+
+.logo-link a {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .auth-links {
@@ -66,6 +73,14 @@ input {
 nav .username:hover {
   cursor: pointer;
   text-decoration: none;
+}
+
+.bg-gradient {
+  display: inline-block;
+  background: linear-gradient(90deg, #f12711 0%, #f5af19 100%);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
 }
 
 .dropdown {
@@ -276,8 +291,8 @@ footer {
 
 .slide .image-container {
   width: 100%;
-  max-width: 700px;
-  height: 700px;
+  max-width: 500px;
+  height: 500px;
 }
 
 .slide .image-container img {
@@ -326,7 +341,7 @@ footer {
   }
 
   .message .header { 
-    font-size: 2.3rem;
+    font-size: 2rem;
   }
   .previous, .next {
     width: 20px;
@@ -334,7 +349,7 @@ footer {
 
   .slide .image-container {
     max-width: 400px;
-    height: 500px;
+    height: 400px;
   }
 }
 
@@ -351,12 +366,12 @@ footer {
   }
 
   .message .header { 
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: 300;
   }
 
   .message .description { 
-    font-size: 0.8rem;
+    font-size: 0.5rem;
   }
   
 
@@ -395,7 +410,7 @@ footer {
   cursor: pointer;
 }
 .dot.active {
-  background-color: orange;
+  background: linear-gradient(90deg, #f12711 0%, #f5af19 100%);
   transition: background-color 0.3s ease-in-out;
 }
 

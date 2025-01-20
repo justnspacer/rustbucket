@@ -15,4 +15,3 @@ node_modules/
 # Ignore build output for React
 /build/
 /dist/
-.vscode/settings.json

@@ -28,7 +28,7 @@ useEffect(() => {
 
   return (
     <nav className='main-nav'>
-        <h1 className='logo-link'><a href="/">
+        <h1 className='logo-link'><a href="/"> <span className='bg-gradient'></span>
         Rust Bucket</a></h1>
         {loading ? (
           <span>Loading...</span>
