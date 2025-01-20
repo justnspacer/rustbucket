@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spotify Token Info</title>
+    <title>Spotify User Profile</title>
 </head>  <style>
   @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap');
   :root {
@@ -37,7 +37,7 @@
     height: 300px;
     object-fit: cover;
     margin-bottom: 1rem;
-    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+    /* clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%); */
 
   }
 
@@ -82,7 +82,7 @@
   </style>
   <script src="https://kit.fontawesome.com/8e13a44ce3.js" crossorigin="anonymous"></script>
 <body>
-    {% if token_info %}
+    {% if user %}
     <ul>
       <li>
         <img src="{{ user.images[0].url }}" alt="{{ user.display_name }}">
@@ -91,16 +91,47 @@
         <li><strong>Url:</strong> {{ user.external_urls.spotify }}</li>
         <li><strong>Followers:</strong> {{ user.followers.total }}</li>
     </ul>
-        <ul>
-            <li><strong>Access Token:</strong> {{ token_info.access_token }}</li>
-            <li><strong>Token Type:</strong> {{ token_info.token_type }}</li>
-            <li><strong>Expires In:</strong> {{ token_info.expires_in }}</li>
-            <li><strong>Scope:</strong> {{ token_info.scope }}</li>
-            <li><strong>Refresh Token:</strong> {{ token_info.refresh_token }}</li>
-        </ul>
+    <button id="togglePlay" class="button">Toggle Play</button>
+    <script src="https://sdk.scdn.co/spotify-player.js"></script>
 
+    <script>
+      window.onSpotifyWebPlaybackSDKReady = () => {
+  const token = '{{ token_info }}';
+  const player = new Spotify.Player({
+    name: 'Web Playback SDK Quick Start Player',
+    getOAuthToken: cb => { cb(token); },
+    volume: 0.5
+  });
+      // Error handling
+      player.addListener('initialization_error', ({ message }) => { console.error(message); });
+    player.addListener('authentication_error', ({ message }) => { console.error(message); });
+    player.addListener('account_error', ({ message }) => { console.error(message); });
+    player.addListener('playback_error', ({ message }) => { console.error(message); });
+
+    // Playback status updates
+    player.addListener('player_state_changed', state => { console.log(state); });
+
+    // Ready
+    player.addListener('ready', ({ device_id }) => {
+      console.log('Ready with Device ID', device_id);
+    });
+
+    // Not Ready
+    player.addListener('not_ready', ({ device_id }) => {
+      console.log('Device ID has gone offline', device_id);
+    });
+
+    // Connect to the player!
+    player.connect().then(success => {
+      if (success) {
+        console.log('The Web Playback SDK successfully connected to Spotify!');
+      }
+    });
+};
+    </script>
     {% else %}
         <p>No token information available. Please <a href="{{ url_for('login') }}">login</a>.</p>
     {% endif %}
+
 </body>
 </html>
