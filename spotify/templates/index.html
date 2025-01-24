@@ -3,96 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spotify User Profile</title>
-</head>  <style>
-  @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap');
-  :root {
-    --tufts-blue: #3c91e6ff;
-    --yellow-green: #9fd356ff;
-    --raisin-black: #342e37ff;
-    --baby-powder: #fafffdff;
-    --coral: #fa824cff;
-  }
+    <title>Spotify</title>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap');
+      :root {
+        --tufts-blue: #3c91e6ff;
+        --yellow-green: #9fd356ff;
+        --raisin-black: #342e37ff;
+        --baby-powder: #fafffdff;
+        --coral: #fa824cff;
+      }
+    
+      *{
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: 'Fredoka', sans-serif;
+        margin: 0;
+        padding: 0;
+        background: var(--yellow-green);
+        color: var(--raisin-black);
+        padding: 2rem;
+      }
+      ul {
+        list-style: none;
+      }
 
-  *{
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
-  body {
-    font-family: 'Fredoka', sans-serif;
-    margin: 0;
-    padding: 0;
-    background: var(--raisin-black);
-    color: var(--yellow-green);
-    padding: 2rem;
-  }
-  ul {
-    margin-top: 1rem;
-    list-style: none;
-  }
+      .user-image {
+        margin: 2rem 0;
+        display: flex;
+        justify-content: center;
+      }
+    
+      .user-image img {
+        width: 300px;
+        height: 300px;
+        object-fit: cover;
+        border-radius: 50%;
+        /* clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%); */
+    
+      }
+    
+      i {
+        font-size: 1.7rem;
+      }
+    
+      h3{
+        display: inline;
+        font-size: 1rem;
+        font-weight: 500;
+        text-transform: capitalize;
+        color: var(--licorice);
+        background: white;
+        padding: 0.2rem;
+      }
+    
+      form {
+        display: flex;
+      }
+    
+      input {
+        padding: 0.5rem;
+        font-weight: 700;
+      }
+    
+      button {
+        background-color: var(--auburn);
+        color: white;
+        outline: none;
+        padding: 0.5rem;
+        border: none;
+        cursor: pointer;
+        text-transform: capitalize;
+        font-weight: 700;
+        text-align: start;
+      }
 
-  img {
-    width: 300px;
-    height: 300px;
-    object-fit: cover;
-    margin-bottom: 1rem;
-    /* clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%); */
+      .spotify-album-image {
+        width: 120px;
+        height: auto;
+        border-radius: 5px;
+        object-fit: cover;
+      }
+    
+      @media (max-width: 600px) {
+        .currently-playing-container{
 
-  }
+        }
+      }
 
-  i {
-    font-size: 1.7rem;
-  }
+      .playlists {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2rem;
+      }
 
-  h3{
-    display: inline;
-    font-size: 1rem;
-    font-weight: 500;
-    text-transform: capitalize;
-    color: var(--licorice);
-    background: white;
-    padding: 0.2rem;
-  }
+      #user-playlists h2 {
+        margin-bottom: 1rem;
+      }
 
-  form {
-    display: flex;
-  }
+      .playlist-item a {
+        background: var(--baby-powder);
+        padding: 1rem;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        color: var(--raisin-black);
+        display: flex;
+        width: 100%;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background 0.3s;
+      }
 
-  input {
-    padding: 0.5rem;
-    font-weight: 700;
-  }
+      .playlist-item a:hover {
+        background: var(--tufts-blue);
+        color: var(--baby-powder);
+      }
 
-  button {
-    background-color: var(--auburn);
-    color: white;
-    outline: none;
-    padding: 0.5rem;
-    border: none;
-    cursor: pointer;
-    text-transform: capitalize;
-    font-weight: 700;
-    text-align: start;
-  }
+      .playlist-image {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 50%;
+      }
 
-  @media (max-width: 600px) {
-  }
+      
+      .currently-playing-container {
+      position: fixed;
+      right: 1rem;
+      bottom: 1rem;
+      color: var(--baby-powder);
+      z-index: 1000;
+      width: 400px;
+      }
 
-  </style>
-  <script src="https://kit.fontawesome.com/8e13a44ce3.js" crossorigin="anonymous"></script>
+      
+      .currently-playing-container div {
+      display: flex;
+      background: var(--coral);
+      padding: 1rem;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      gap: 1rem;
+      }
+
+      .currently-playing-container h2 {
+        color: var(--baby-powder);
+        text-align: end;
+        width: 100%;
+      }
+
+      .currently-playing-container ul li strong, ul li strong {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        margin-left: 0.2rem;
+      }
+
+      .track-name, .playlist-name {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+
+      .track-name, .currently-playing-container ul li strong {
+        color: var(--raisin-black);
+      }
+    
+      </style>
+      <script src="https://kit.fontawesome.com/8e13a44ce3.js" crossorigin="anonymous"></script>
+</head>  
+
 <body>
     {% if user %}
+    <h1>{{ user.display_name }}'s Spotify</h1>
+    <div class="user-image">    
+      <img src="{{ user.images[0].url }}" alt="{{ user.display_name }}" />
+    </div>
     <ul>
-      <li>
-        <img src="{{ user.images[0].url }}" alt="{{ user.display_name }}">
-    </li>
-        <li><strong>Display Name:</strong> {{ user.display_name }}</li>
-        <li><strong>Url:</strong> {{ user.external_urls.spotify }}</li>
-        <li><strong>Followers:</strong> {{ user.followers.total }}</li>
+        <li><strong>Url</strong> {{ user.external_urls.spotify }}</li>
+        <li><strong>Followers</strong> {{ user.followers.total }}</li>
+        <li><div id="user-playlists"></div></li>
     </ul>
-    <button id="togglePlay" class="button">Toggle Play</button>
-    <script src="https://sdk.scdn.co/spotify-player.js"></script>
+    <div id="currently-playing" class="currently-playing-container"></div>
 
     <script>
       window.onSpotifyWebPlaybackSDKReady = () => {
@@ -121,6 +218,11 @@
       console.log('Device ID has gone offline', device_id);
     });
 
+    document.getElementById('togglePlay').onclick = function() {
+              player.togglePlay();
+            };
+
+
     // Connect to the player!
     player.connect().then(success => {
       if (success) {
@@ -129,6 +231,74 @@
     });
 };
     </script>
+    <script>
+ async function fetchCurrentlyPlaying() {
+        try {
+          const response = await fetch('/currently-playing');
+          const data = await response.json();
+          const container = document.getElementById('currently-playing');
+          
+          if (data.error) {
+            container.innerText = data.error;
+          } else {
+            container.innerHTML = `
+            <h2>Currently Playing</h2>
+            <div>
+              <img class='spotify-album-image' src="${data.images[0].url}" alt="${data.album}"/>
+              <ul>
+              <li class="track-name">${data.name}</li>
+              <li>${data.artists.join(', ')}<strong>Artists</strong></li>
+              <li>${data.album}<strong>Album</strong></li>
+              </ul>
+              </div>
+            `;
+          }
+        } catch (error) {
+          console.error('Error fetching currently playing data:', error);
+        }
+      }
+
+      fetchCurrentlyPlaying();
+
+      async function fetchUserPlaylists() {
+        try {
+          const response = await fetch('/playlists');
+          const data = await response.json();
+          const container = document.getElementById('user-playlists');
+          container.innerHTML = '<h2>Playlists</h2>';
+          
+          if (data.error) {
+            container.innerText = data.error;
+          } else {
+            const ul = document.createElement('ul');
+            ul.classList.add('playlists');
+            data.items.forEach(playlist => {
+              const li = document.createElement('li');
+              li.classList.add('playlist-item');
+              li.innerHTML = `
+              <a href="${playlist.external_urls.spotify}" target="_blank">
+                <img class="playlist-image" src="${playlist.images[0].url}" alt="${playlist.name}" />
+                <ul>
+                <li class="playlist-name">${playlist.name}</li>
+                <li>${playlist.tracks.total}<strong>Tracks</strong></li>
+                  </ul>
+                  </a>
+              `;
+              ul.appendChild(li);
+            });
+            container.appendChild(ul);
+          }
+          
+          document.body.appendChild(container);
+        } catch (error) {
+          console.error('Error fetching user playlists:', error);
+        }
+      }
+
+      fetchUserPlaylists();
+    </script>
+        <button id="togglePlay" class="button">Toggle Play</button>
+        <script src="https://sdk.scdn.co/spotify-player.js"></script>
     {% else %}
         <p>No token information available. Please <a href="{{ url_for('login') }}">login</a>.</p>
     {% endif %}

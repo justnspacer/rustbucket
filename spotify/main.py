@@ -16,7 +16,7 @@ CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 REDIRECT_URI = "http://127.0.0.1:5000/callback"
 TOKEN_URL = "https://accounts.spotify.com/api/token"
-SCOPE = "user-top-read user-read-recently-played user-read-currently-playing user-library-read ugc-image-upload streaming playlist-read-private streaming"
+SCOPE = "user-top-read user-read-recently-played user-read-currently-playing user-library-read ugc-image-upload streaming playlist-read-private streaming user-read-private user-read-email"
 
 cache_handler = CacheFileHandler(cache_path=".cache")
 oauth = SpotifyOAuth(client_id=CLIENT_ID,
@@ -84,8 +84,29 @@ def callback():
 @app.route("/currently-playing")
 def currently_playing():
     sp, token_info = get_spotify()
-    current_track = sp.currently_playing()
-    return jsonify(current_track)
+    current_playback = sp.current_playback()
+    if current_playback and current_playback['is_playing']:
+        item = current_playback['item']
+        if current_playback['currently_playing_type'] == 'track':
+            track_info = {
+                'type': 'track',
+                'name': item['name'],
+                'album': item['album']['name'],
+                'artists': [artist['name'] for artist in item['artists']],
+                'images': item['album']['images']
+            }
+            return jsonify(track_info)
+        elif current_playback['currently_playing_type'] == 'episode':
+            episode_info = {
+                'type': 'episode',
+                'name': 'Listening to a podcast',
+                'album': 'New episode',
+                'artists': ['cool podcasters'],
+                'images': [ {'url':'https://images.unsplash.com/photo-1737071371043-761e02b1ef95?q=80&w=1319&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'}]
+            }
+            return jsonify(episode_info)
+    else:
+        return jsonify({'error': 'No track or episode currently playing'}), 404
 
 # Get user's top tracks
 @app.route("/top-tracks")
