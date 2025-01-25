@@ -82,10 +82,11 @@
       }
 
       .spotify-album-image {
-        width: 120px;
+        width: 100px;
         height: auto;
-        border-radius: 5px;
+        border-radius: 50%;
         object-fit: cover;
+        transition: all 0.3s;
       }
     
       @media (max-width: 600px) {
@@ -121,44 +122,90 @@
       }
 
       .playlist-item a:hover {
-        background: var(--tufts-blue);
+        background: var(--raisin-black);
         color: var(--baby-powder);
+
+        .playlist-image{
+          transform: scale(1.1);
+          border-radius: 5px;
+        }
       }
 
       .playlist-image {
-        width: 100px;
-        height: 100px;
+        width: 160px;
+        height: 160px;
         object-fit: cover;
         border-radius: 50%;
+        transition: all 0.3s;
       }
 
       
       .currently-playing-container {
       position: fixed;
       right: 1rem;
-      bottom: 1rem;
+      top: 1rem;
       color: var(--baby-powder);
       z-index: 1000;
-      width: 400px;
+      transition: all 0.3s;
+      }
+
+      .currently-playing-container:hover {
+        width: 200px;
+
+        div {
+          background: #e14f0032;
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        ul {
+          display: block;
+        }
+
+        h2 {
+          display: block;
+        }
+
+        img {
+          transform: scale(1.1);
+          border-radius: 5px;
+        }
+
       }
 
       
       .currently-playing-container div {
       display: flex;
-      background: var(--coral);
-      padding: 1rem;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1rem 0rem 1rem 1rem;
       border-radius: 5px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       gap: 1rem;
+      transition: all 0.3s;
+      border-bottom-left-radius: -1rem;
       }
 
       .currently-playing-container h2 {
+        display: none;
         color: var(--baby-powder);
-        text-align: end;
         width: 100%;
+        transition: all 0.3s;
+        font-weight: 800;
+        font-size: 1rem;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+      }
+
+      .currently-playing-container ul {
+        display: none;
       }
 
       .currently-playing-container ul li strong, ul li strong {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        margin-right: 0.2rem;
+      }
+
+      ul li strong {
         font-size: 0.7rem;
         text-transform: uppercase;
         margin-left: 0.2rem;
@@ -180,7 +227,7 @@
 
 <body>
     {% if user %}
-    <h1>{{ user.display_name }}'s Spotify</h1>
+    <h1>{{ user.display_name }}'s Spotify<i className="fa-regular fa-circle-right"></i></h1>
     <div class="user-image">    
       <img src="{{ user.images[0].url }}" alt="{{ user.display_name }}" />
     </div>
@@ -190,7 +237,6 @@
         <li><div id="user-playlists"></div></li>
     </ul>
     <div id="currently-playing" class="currently-playing-container"></div>
-
     <script>
       window.onSpotifyWebPlaybackSDKReady = () => {
   const token = '{{ token_info }}';
@@ -237,18 +283,17 @@
           const response = await fetch('/currently-playing');
           const data = await response.json();
           const container = document.getElementById('currently-playing');
-          
           if (data.error) {
             container.innerText = data.error;
           } else {
             container.innerHTML = `
-            <h2>Currently Playing</h2>
             <div>
+                <h2>Currently Playing</h2>
               <img class='spotify-album-image' src="${data.images[0].url}" alt="${data.album}"/>
               <ul>
               <li class="track-name">${data.name}</li>
-              <li>${data.artists.join(', ')}<strong>Artists</strong></li>
-              <li>${data.album}<strong>Album</strong></li>
+              <li><strong>Artists</strong>${data.artists.join(', ')}</li>
+              <li><strong>Album</strong>${data.album}</li>
               </ul>
               </div>
             `;
