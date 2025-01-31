@@ -4,6 +4,8 @@ import spotipy
 from spotipy.oauth2 import SpotifyOAuth, CacheFileHandler
 from dotenv import load_dotenv
 import os
+import requests
+
 
 load_dotenv()
 
@@ -16,7 +18,8 @@ CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 REDIRECT_URI = "http://127.0.0.1:5000/callback"
 TOKEN_URL = "https://accounts.spotify.com/api/token"
-SCOPE = "user-top-read user-read-recently-played user-read-currently-playing user-library-read ugc-image-upload streaming playlist-read-private streaming user-read-private user-read-email"
+SCOPE = "user-top-read user-read-recently-played user-read-currently-playing user-library-read ugc-image-upload streaming playlist-read-private streaming user-read-private user-read-email user-modify-playback-state user-read-playback-state"
+DEVICE_ID = "your_device_id"
 
 cache_handler = CacheFileHandler(cache_path=".cache")
 oauth = SpotifyOAuth(client_id=CLIENT_ID,
@@ -93,7 +96,8 @@ def currently_playing():
                 'name': item['name'],
                 'album': item['album']['name'],
                 'artists': [artist['name'] for artist in item['artists']],
-                'images': item['album']['images']
+                'images': item['album']['images'],
+                'spotify_uri': item['uri']
             }
             return jsonify(track_info)
         elif current_playback['currently_playing_type'] == 'episode':
@@ -106,7 +110,7 @@ def currently_playing():
             }
             return jsonify(episode_info)
     else:
-        return jsonify({'error': 'No track or episode currently playing'}), 404
+        return jsonify({'message': '🛑🎵'})
 
 # Get user's top tracks
 @app.route("/top-tracks")
@@ -135,6 +139,50 @@ def playlists():
     sp, token_info = get_spotify()
     playlists = sp.current_user_playlists()
     return jsonify(playlists)
+
+def play_track(track_uri):
+    sp, access_token = get_spotify()
+    url = "https://api.spotify.com/v1/me/player/play"
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json"
+    }
+    data = {
+        "uris": [track_uri],
+        "device_id": DEVICE_ID
+    }
+    response = requests.put(url, headers=headers, json=data)
+    return response.json()
+
+@app.route("/devices")
+def get_devices():
+    sp, access_token = get_spotify()
+    url = "https://api.spotify.com/v1/me/player/devices"
+    headers = {
+        "Authorization": f"Bearer {access_token}"
+    }
+
+    response = requests.get(url, headers=headers)
+    data = response.json()
+
+    if "devices" in data:
+        for device in data["devices"]:
+            print(f"Device Name: {device['name']}, ID: {device['id']}, Type: {device['type']}")
+            return jsonify(data["devices"])
+    else:
+        print("No devices found. Make sure Spotify is open on a device.")
+        return jsonify({"error": "No devices found"}), 404
+
+@app.route('/play', methods=['POST'])
+def play():
+    data = request.json
+    track_uri = data.get("track_uri")
+
+    if not track_uri:
+        return jsonify({"error": "No track URI provided"}), 400
+    
+    response = play_track(track_uri)
+    return jsonify(response)
 
 if __name__ == "__main__":
     app.run(debug=True)

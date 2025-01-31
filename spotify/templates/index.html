@@ -23,27 +23,37 @@
         font-family: 'Fredoka', sans-serif;
         margin: 0;
         padding: 0;
-        background: var(--yellow-green);
-        color: var(--raisin-black);
+        background: linear-gradient(45deg, var(--tufts-blue), var(--yellow-green));
+        color: var(--baby-powder);
         padding: 2rem;
       }
       ul {
         list-style: none;
       }
 
+      h1 {
+        font-weight: 600;
+        text-transform: capitalize;
+        font-size: 1.8rem;
+        color: var(--baby-powder);
+        position: absolute;
+        margin-left: 1rem;
+        background: rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(7px);
+        padding: 1rem;
+        border-radius: 1rem;
+        top: 16rem;
+      }
+
       .user-image {
-        margin: 2rem 0;
         display: flex;
-        justify-content: center;
       }
     
       .user-image img {
-        width: 300px;
+        width: 50%;
         height: 300px;
-        object-fit: cover;
-        border-radius: 50%;
-        /* clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%); */
-    
+        border-radius: 1rem;
+        object-fit: cover;    
       }
     
       i {
@@ -83,22 +93,20 @@
 
       .spotify-album-image {
         width: 100px;
-        height: auto;
+        height: 100px;
         border-radius: 50%;
         object-fit: cover;
         transition: all 0.3s;
       }
-    
-      @media (max-width: 600px) {
-        .currently-playing-container{
-
-        }
-      }
-
+  
       .playlists {
         display: flex;
         flex-wrap: wrap;
         gap: 2rem;
+      }
+
+      #user-playlists {
+        margin-top: 4rem;
       }
 
       #user-playlists h2 {
@@ -106,11 +114,11 @@
       }
 
       .playlist-item a {
-        background: var(--baby-powder);
+        background: var(--raisin-black);
         padding: 1rem;
         border-radius: 5px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        color: var(--raisin-black);
+        color: var(--baby-powder);
         display: flex;
         width: 100%;
         justify-content: center;
@@ -122,7 +130,7 @@
       }
 
       .playlist-item a:hover {
-        background: var(--raisin-black);
+        background: var(--coral);
         color: var(--baby-powder);
 
         .playlist-image{
@@ -132,8 +140,8 @@
       }
 
       .playlist-image {
-        width: 160px;
-        height: 160px;
+        width: 100px;
+        height: 100px;
         object-fit: cover;
         border-radius: 50%;
         transition: all 0.3s;
@@ -142,18 +150,21 @@
       
       .currently-playing-container {
       position: fixed;
-      right: 1rem;
-      top: 1rem;
+      right: 3rem;
+      top: 2rem;
       color: var(--baby-powder);
       z-index: 1000;
       transition: all 0.3s;
+      overflow: hidden;
       }
 
       .currently-playing-container:hover {
-        width: 200px;
+        width: 40%;
+        height: auto;
 
         div {
-          background: #e14f0032;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(7px);
           box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
@@ -171,17 +182,42 @@
         }
 
       }
+      #playback {
+        margin-top: 4rem;
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+      }
+    
+      @media (max-width: 600px) {
+        .currently-playing-container:hover {
+          width: 75%;
+
+        }
+
+        .user-image img {
+          width: 100%;
+        }
+
+        #user-playlists {
+        margin-top: 2rem;
+      }
+      #playback {
+        margin-top: 2rem;
+      }
+      }
 
       
       .currently-playing-container div {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
       padding: 1rem 0rem 1rem 1rem;
       border-radius: 5px;
       gap: 1rem;
       transition: all 0.3s;
       border-bottom-left-radius: -1rem;
+
+      span {
+        display: flex;
+        gap: 1rem;}
       }
 
       .currently-playing-container h2 {
@@ -193,6 +229,7 @@
         font-size: 1rem;
         letter-spacing: 1px;
         text-transform: uppercase;
+        margin-bottom: 0.5rem;
       }
 
       .currently-playing-container ul {
@@ -218,9 +255,20 @@
       }
 
       .track-name, .currently-playing-container ul li strong {
-        color: var(--raisin-black);
+        color: var(--coral);
       }
-    
+
+      .cp-message {
+        background-color: rgba(227, 230, 60, 0.836);
+        padding: 1rem;
+        color: var(--baby-powder);
+        font-size: 1rem;
+        border-radius: 50%;
+      }
+
+      .artist-line, .album-line {
+        margin-bottom: 0.2rem;
+      }
       </style>
       <script src="https://kit.fontawesome.com/8e13a44ce3.js" crossorigin="anonymous"></script>
 </head>  
@@ -231,12 +279,19 @@
     <div class="user-image">    
       <img src="{{ user.images[0].url }}" alt="{{ user.display_name }}" />
     </div>
+    <div id="currently-playing" class="currently-playing-container"></div>
     <ul>
-        <li><strong>Url</strong> {{ user.external_urls.spotify }}</li>
         <li><strong>Followers</strong> {{ user.followers.total }}</li>
         <li><div id="user-playlists"></div></li>
     </ul>
-    <div id="currently-playing" class="currently-playing-container"></div>
+    <section id="playback">
+      <input type="text" id="trackUriInput" placeholder="Enter Spotify Track URI">
+      <button onclick="playTrack()">Play</button>
+      <p id="responseMessage"></p>
+      <button id="togglePlay" class="button">Toggle Play</button>
+      <script src="https://sdk.scdn.co/spotify-player.js"></script>
+    </section>
+
     <script>
       window.onSpotifyWebPlaybackSDKReady = () => {
   const token = '{{ token_info }}';
@@ -283,18 +338,21 @@
           const response = await fetch('/currently-playing');
           const data = await response.json();
           const container = document.getElementById('currently-playing');
-          if (data.error) {
-            container.innerText = data.error;
+          if (data.message) {
+            container.innerHTML = `<span class="cp-message">${data.message}</span>`;
           } else {
             container.innerHTML = `
             <div>
                 <h2>Currently Playing</h2>
+                <span>
               <img class='spotify-album-image' src="${data.images[0].url}" alt="${data.album}"/>
               <ul>
               <li class="track-name">${data.name}</li>
-              <li><strong>Artists</strong>${data.artists.join(', ')}</li>
-              <li><strong>Album</strong>${data.album}</li>
+              <li class="artist-line"><strong>Artists</strong>${data.artists.join(', ')}</li>
+              <li class="album-line"><strong>Album</strong>${data.album}</li>
+              
               </ul>
+              </span>
               </div>
             `;
           }
@@ -342,8 +400,35 @@
 
       fetchUserPlaylists();
     </script>
-        <button id="togglePlay" class="button">Toggle Play</button>
-        <script src="https://sdk.scdn.co/spotify-player.js"></script>
+    <script>
+      function playTrack() {
+          const trackUri = document.getElementById("trackUriInput").value;
+          if (!trackUri) {
+              document.getElementById("responseMessage").innerText = "Please enter a Spotify Track URI!";
+              return;
+          }
+
+          fetch("http://127.0.0.1:5000/play", {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/json"
+              },
+              body: JSON.stringify({ track_uri: trackUri })
+          })
+          .then(response => response.json())
+          .then(data => {
+              if (data.error) {
+                  document.getElementById("responseMessage").innerText = "Error: " + data.error;
+              } else {
+                  document.getElementById("responseMessage").innerText = "Track playing!";
+              }
+          })
+          .catch(error => {
+              console.error("Error:", error);
+              document.getElementById("responseMessage").innerText = "Failed to play the track.";
+          });
+      }
+  </script>
     {% else %}
         <p>No token information available. Please <a href="{{ url_for('login') }}">login</a>.</p>
     {% endif %}
