@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spotify</title>
+    <title>Spotify UI</title>
+    <script src="https://kit.fontawesome.com/8e13a44ce3.js" crossorigin="anonymous"></script>
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap');
       :root {
@@ -23,16 +24,15 @@
         font-family: 'Fredoka', sans-serif;
         margin: 0;
         padding: 0;
-        background: linear-gradient(45deg, var(--tufts-blue), var(--yellow-green));
-        color: var(--baby-powder);
-        padding: 2rem;
+        background: linear-gradient(45deg, var(--tufts-blue), var(--baby-powder));
+        color: var(--raisin-black);
       }
       ul {
         list-style: none;
       }
 
       h1 {
-        font-weight: 600;
+        font-weight: 200;
         text-transform: capitalize;
         font-size: 1.8rem;
         color: var(--baby-powder);
@@ -42,7 +42,7 @@
         backdrop-filter: blur(7px);
         padding: 1rem;
         border-radius: 1rem;
-        top: 16rem;
+        top: 14rem;
       }
 
       .user-image {
@@ -50,9 +50,8 @@
       }
     
       .user-image img {
-        width: 50%;
-        height: 300px;
-        border-radius: 1rem;
+        width: 100%;
+        height: 320px;
         object-fit: cover;    
       }
     
@@ -63,7 +62,7 @@
       h3{
         display: inline;
         font-size: 1rem;
-        font-weight: 500;
+        font-weight: 200;
         text-transform: capitalize;
         color: var(--licorice);
         background: white;
@@ -76,18 +75,18 @@
     
       input {
         padding: 0.5rem;
-        font-weight: 700;
+        font-weight: 200;
       }
     
       button {
         background-color: var(--auburn);
-        color: white;
+        color: var(--raisin-black);
         outline: none;
         padding: 0.5rem;
         border: none;
         cursor: pointer;
         text-transform: capitalize;
-        font-weight: 700;
+        font-weight: 200;
         text-align: start;
       }
 
@@ -106,18 +105,20 @@
       }
 
       #user-playlists {
-        margin-top: 4rem;
+        margin-top: 20rem;
       }
 
       #user-playlists h2 {
         margin-bottom: 1rem;
+        font-weight: 200;
+        font-size: 3rem;
       }
 
       .playlist-item a {
         background: var(--raisin-black);
-        padding: 1rem;
+        padding: 5px;
         border-radius: 5px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
         color: var(--baby-powder);
         display: flex;
         width: 100%;
@@ -130,7 +131,7 @@
       }
 
       .playlist-item a:hover {
-        background: var(--coral);
+        background: var(--tufts-blue);
         color: var(--baby-powder);
 
         .playlist-image{
@@ -140,8 +141,8 @@
       }
 
       .playlist-image {
-        width: 100px;
-        height: 100px;
+        width: 50px;
+        height: 50px;
         object-fit: cover;
         border-radius: 50%;
         transition: all 0.3s;
@@ -155,21 +156,18 @@
       color: var(--baby-powder);
       z-index: 1000;
       transition: all 0.3s;
-      overflow: hidden;
       }
 
       .currently-playing-container:hover {
-        width: 40%;
+        width: 220px;
         height: auto;
 
-        div {
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(7px);
-          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        ul {
-          display: block;
+        .track-info {
+          display: flex;
+          flex-direction: column;
+          gap: 1rem; 
+          width: 100%;
+          margin-top: 0.5rem;
         }
 
         h2 {
@@ -177,16 +175,10 @@
         }
 
         img {
-          transform: scale(1.1);
-          border-radius: 5px;
+          border-radius: 1rem;
+          width: 100%;
+          height: 220px;
         }
-
-      }
-      #playback {
-        margin-top: 4rem;
-        display: flex;
-        justify-content: center;
-        gap: 1rem;
       }
     
       @media (max-width: 600px) {
@@ -209,15 +201,8 @@
 
       
       .currently-playing-container div {
-      padding: 1rem 0rem 1rem 1rem;
-      border-radius: 5px;
-      gap: 1rem;
-      transition: all 0.3s;
-      border-bottom-left-radius: -1rem;
-
-      span {
-        display: flex;
-        gap: 1rem;}
+      position: relative;
+      text-align: center;
       }
 
       .currently-playing-container h2 {
@@ -225,37 +210,44 @@
         color: var(--baby-powder);
         width: 100%;
         transition: all 0.3s;
-        font-weight: 800;
-        font-size: 1rem;
+        font-weight: 600;
+        font-size: 0.8rem;
         letter-spacing: 1px;
         text-transform: uppercase;
         margin-bottom: 0.5rem;
+        padding: 0.5rem;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(7px);
+        border-radius: 1.2rem;
+        
       }
 
-      .currently-playing-container ul {
+      .currently-playing-container .track-info {
         display: none;
       }
 
-      .currently-playing-container ul li strong, ul li strong {
-        font-size: 0.7rem;
-        text-transform: uppercase;
-        margin-right: 0.2rem;
+      ul li {
+        font-size: 0.8rem;
+        text-transform: capitalize;
       }
 
-      ul li strong {
-        font-size: 0.7rem;
-        text-transform: uppercase;
-        margin-left: 0.2rem;
-      }
-
-      .track-name, .playlist-name {
-        font-size: 1.2rem;
-        font-weight: 600;
+      .playlist-name {
+        font-size: 1rem;
+        font-weight: 200;
         margin-bottom: 0.5rem;
       }
 
-      .track-name, .currently-playing-container ul li strong {
+
+      .currently-playing-container ul li {
         color: var(--coral);
+      }
+
+      
+      .track-name {
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: var(--baby-powder) !important;
+        text-transform: uppercase;
       }
 
       .cp-message {
@@ -268,9 +260,35 @@
 
       .artist-line, .album-line {
         margin-bottom: 0.2rem;
+        font-size: 0.6rem;
+        font-weight: 600;
+      }
+
+      #playback {
+        margin-top: 4rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        width: 400px;
+      }
+
+      .label {
+        color: white;
+        margin-right: 4px;
+      }
+
+      .artist-line, .album-line {        
+        text-transform: uppercase;
+        color: var(--yellow-green);
+      }
+
+      .track-name, .artist-line, .album-line {        
+        padding: 0.5rem;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(7px);
+        border-radius: 1.2rem;
       }
       </style>
-      <script src="https://kit.fontawesome.com/8e13a44ce3.js" crossorigin="anonymous"></script>
 </head>  
 
 <body>
@@ -286,10 +304,16 @@
     </ul>
     <section id="playback">
       <input type="text" id="trackUriInput" placeholder="Enter Spotify Track URI">
-      <button onclick="playTrack()">Play</button>
       <p id="responseMessage"></p>
-      <button id="togglePlay" class="button">Toggle Play</button>
-      <script src="https://sdk.scdn.co/spotify-player.js"></script>
+      <div id="playback-controls">
+        <button id="toggleBackward" onclick="previousTrack()"><i class="fa-solid fa-backward"></i></button>
+        <button id="togglePlay" onclick="playTrack()"><i class="fa-solid fa-play"></i></button>
+        <button id="togglePause" onclick="pauseTrack()"><i class="fa-solid fa-pause"></i></button>
+        <button id="toggleStop" onclick="stopTrack()"><i class="fa-solid fa-stop"></i></button>
+        <button id="toggleForward" onclick="nextTrack()"><i class="fa-solid fa-forward"></i></button>
+        <button id="toggleRepeat" onclick="repeatTrack()"><i class="fa-solid fa-repeat"></i></button>
+        <button id="toggleShuffle" onclick="shuffleTrack()"><i class="fa-solid fa-shuffle"></i></button>
+      </div>
     </section>
 
     <script>
@@ -343,17 +367,19 @@
           } else {
             container.innerHTML = `
             <div>
-                <h2>Currently Playing</h2>
-                <span>
-              <img class='spotify-album-image' src="${data.images[0].url}" alt="${data.album}"/>
-              <ul>
-              <li class="track-name">${data.name}</li>
-              <li class="artist-line"><strong>Artists</strong>${data.artists.join(', ')}</li>
-              <li class="album-line"><strong>Album</strong>${data.album}</li>
-              
+              <h2>Currently Playing</h2>
+              <img class='spotify-album-image' src="${data.currently_playing_type === 'episode' ? data.item.show.images[0].url : data.item.album.images[0].url}" alt="${data.currently_playing_type === 'episode' ? data.item.show.name : data.item.album.name}"/>
+              <ul class="track-info">
+              <li class="track-name">${data.item.name}</li>
+              ${data.currently_playing_type === 'episode' ? `
+              <li class="artist-line"><span class="label">Show</span> ${data.item.show.name}</li>
+              <li class="album-line"><span class="label">Publisher</span> ${data.item.show.publisher}</li>
+              ` : `
+              <li class="artist-line"><span class="label">Artists</span> ${data.item.artists.map(artist => artist.name).join(', ')}</li>
+              <li class="album-line"><span class="label">Album</span> ${data.item.album.name}</li>
+              `}
               </ul>
-              </span>
-              </div>
+            </div>
             `;
           }
         } catch (error) {
@@ -383,7 +409,7 @@
                 <img class="playlist-image" src="${playlist.images[0].url}" alt="${playlist.name}" />
                 <ul>
                 <li class="playlist-name">${playlist.name}</li>
-                <li>${playlist.tracks.total}<strong>Tracks</strong></li>
+                <li>${playlist.tracks.total} Tracks</li>
                   </ul>
                   </a>
               `;
@@ -427,6 +453,115 @@
               console.error("Error:", error);
               document.getElementById("responseMessage").innerText = "Failed to play the track.";
           });
+      }
+      function nextTrack() {
+        fetch("http://127.0.0.1:5000/next", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ track_uri: document.getElementById("trackUriInput").value })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.error) {
+            document.getElementById("responseMessage").innerText = "Error: " + data.error;
+          } else {
+            document.getElementById("responseMessage").innerText = "Playing next track!";
+          }
+        })
+        .catch(error => {
+          console.error("Error:", error);
+          document.getElementById("responseMessage").innerText = "Failed to play the next track.";
+        });
+      }
+
+      function previousTrack() {
+        fetch("http://127.0.0.1:5000/previous", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ track_uri: document.getElementById("trackUriInput").value })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.error) {
+            document.getElementById("responseMessage").innerText = "Error: " + data.error;
+          } else {
+            document.getElementById("responseMessage").innerText = "Playing previous track!";
+          }
+        })
+        .catch(error => {
+          console.error("Error:", error);
+          document.getElementById("responseMessage").innerText = "Failed to play the previous track.";
+        });
+      }
+
+      function pauseTrack() {
+        fetch("http://127.0.0.1:5000/pause", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ track_uri: document.getElementById("trackUriInput").value })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.error) {
+            document.getElementById("responseMessage").innerText = "Error: " + data.error;
+          } else {
+            document.getElementById("responseMessage").innerText = "Track paused!";
+          }
+        })
+        .catch(error => {
+          console.error("Error:", error);
+          document.getElementById("responseMessage").innerText = "Failed to pause the track.";
+        });
+      }
+
+      function repeatTrack() {
+        fetch("http://127.0.0.1:5000/repeat", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ track_uri: document.getElementById("trackUriInput").value, state: "track" })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.error) {
+            document.getElementById("responseMessage").innerText = "Error: " + data.error;
+          } else {
+            document.getElementById("responseMessage").innerText = "Track set to repeat!";
+          }
+        })
+        .catch(error => {
+          console.error("Error:", error);
+          document.getElementById("responseMessage").innerText = "Failed to set repeat.";
+        });
+      }
+
+      function shuffleTrack() {
+        fetch("http://127.0.0.1:5000/shuffle", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ track_uri: document.getElementById("trackUriInput").value, state: true })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.error) {
+            document.getElementById("responseMessage").innerText = "Error: " + data.error;
+          } else {
+            document.getElementById("responseMessage").innerText = "Shuffle enabled!";
+          }
+        })
+        .catch(error => {
+          console.error("Error:", error);
+          document.getElementById("responseMessage").innerText = "Failed to enable shuffle.";
+        });
       }
   </script>
     {% else %}

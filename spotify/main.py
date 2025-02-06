@@ -5,6 +5,8 @@ from spotipy.oauth2 import SpotifyOAuth, CacheFileHandler
 from dotenv import load_dotenv
 import os
 import requests
+import time
+
 
 
 load_dotenv()
@@ -87,28 +89,9 @@ def callback():
 @app.route("/currently-playing")
 def currently_playing():
     sp, token_info = get_spotify()
-    current_playback = sp.current_playback()
+    current_playback = sp.current_playback(market="US", additional_types=['episode'])
     if current_playback and current_playback['is_playing']:
-        item = current_playback['item']
-        if current_playback['currently_playing_type'] == 'track':
-            track_info = {
-                'type': 'track',
-                'name': item['name'],
-                'album': item['album']['name'],
-                'artists': [artist['name'] for artist in item['artists']],
-                'images': item['album']['images'],
-                'spotify_uri': item['uri']
-            }
-            return jsonify(track_info)
-        elif current_playback['currently_playing_type'] == 'episode':
-            episode_info = {
-                'type': 'episode',
-                'name': 'Listening to a podcast',
-                'album': 'New episode',
-                'artists': ['cool podcasters'],
-                'images': [ {'url':'https://images.unsplash.com/photo-1737071371043-761e02b1ef95?q=80&w=1319&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'}]
-            }
-            return jsonify(episode_info)
+        return jsonify(current_playback)
     else:
         return jsonify({'message': '🛑🎵'})
 
@@ -154,6 +137,137 @@ def play_track(track_uri):
     response = requests.put(url, headers=headers, json=data)
     return response.json()
 
+def pause_track(track_uri):
+    sp, access_token = get_spotify()
+    url = "https://api.spotify.com/v1/me/player/pause"
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json"
+    }
+    data = {
+        "uris": [track_uri],
+        "device_id": DEVICE_ID
+    }
+    response = requests.put(url, headers=headers, json=data)
+    return response.json()
+
+
+def next_track(track_uri):
+    sp, access_token = get_spotify()
+    url = "https://api.spotify.com/v1/me/player/next"
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json"
+    }
+    data = {
+        "uris": [track_uri],
+        "device_id": DEVICE_ID
+    }
+    response = requests.post(url, headers=headers, json=data)
+    return response.json()
+
+def previous_track(track_uri):
+    sp, access_token = get_spotify()
+    url = "https://api.spotify.com/v1/me/player/previous"
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json"
+    }
+    data = {
+        "uris": [track_uri],
+        "device_id": DEVICE_ID
+    }
+    response = requests.post(url, headers=headers, json=data)
+    return response.json()
+
+def seek(track_uri, position_in_milliseconds):
+    sp, access_token = get_spotify()
+    url = f"https://api.spotify.com/v1/me/player/seek?position_ms={position_in_milliseconds}"
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json"
+    }
+    response = requests.put(url, headers=headers)
+    return response.json()
+
+def volume(track_uri, control):
+    sp, access_token = get_spotify()
+    url = f"https://api.spotify.com/v1/me/player/volume?volume_percent={control}"
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json"
+    }
+    data = {
+        "uris": [track_uri],
+        "device_id": DEVICE_ID
+    }
+    response = requests.put(url, headers=headers, json=data)
+    return response.json()
+
+def repeat(track_uri, state):
+    sp, access_token = get_spotify()
+    url = f"https://api.spotify.com/v1/me/player/repeat?state={state}"
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json"
+    }
+    data = {
+        "uris": [track_uri],
+        "device_id": DEVICE_ID
+    }
+    response = requests.put(url, headers=headers, json=data)
+    return response.json()
+
+def shuffle(track_uri, state):
+    sp, access_token = get_spotify()
+    url = f"https://api.spotify.com/v1/me/player/shuffle?state={state}"
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json"
+    }
+    data = {
+        "uris": [track_uri],
+        "device_id": DEVICE_ID
+    }
+    response = requests.put(url, headers=headers, json=data)
+    return response.json()
+
+def get_audio_features(track_id):
+    sp, access_token = get_spotify()
+    return sp.audio_features([track_id])[0]
+
+def get_audio_analysis(track_id):
+    sp, access_token = get_spotify()
+    return sp._get(f"audio-analysis/{track_id}")
+
+def control_visual_effects(playback_position, audio_analysis):
+    # Example: Trigger an effect if the current time matches a beat timestamp
+    beats = audio_analysis.get('beats', [])
+    for beat in beats:
+        beat_time = beat['start'] * 1000  # converting seconds to milliseconds
+        if abs(beat_time - playback_position) < 50:  # 50ms tolerance
+            trigger_visual_effect()
+
+def trigger_visual_effect():
+    # Implement your visual effect logic here
+    print("Visual effect triggered!")
+    while True:
+        # Get current playback info
+        sp, access_token = get_spotify()
+        current_playback = sp.current_playback()
+        if current_playback and current_playback['item']:
+            track_id = current_playback['item']['id']
+            playback_position = current_playback['progress_ms']
+            
+            # Retrieve analysis data if not already fetched or if track changed
+            audio_analysis = get_audio_analysis(track_id)
+            
+            # Call your function to control visuals based on playback position
+            control_visual_effects(playback_position, audio_analysis)
+            
+        time.sleep(0.05)  # Check 20 times per second for near real-time updates
+
+
 @app.route("/devices")
 def get_devices():
     sp, access_token = get_spotify()
@@ -183,6 +297,91 @@ def play():
     
     response = play_track(track_uri)
     return jsonify(response)
+
+
+@app.route('/next', methods=['POST'])
+def next():
+    data = request.json
+    track_uri = data.get("track_uri")
+
+    if not track_uri:
+        return jsonify({"error": "No track URI provided"}), 400
+    
+    response = next_track(track_uri)
+    return jsonify(response)
+
+@app.route('/previous', methods=['POST'])
+def previous():
+    data = request.json
+    track_uri = data.get("track_uri")
+
+    if not track_uri:
+        return jsonify({"error": "No track URI provided"}), 400
+    
+    response = previous_track(track_uri)
+    return jsonify(response)
+
+@app.route('/seek', methods=['PUT'])
+def seek_position():
+    data = request.json
+    track_uri = data.get("track_uri")
+    position_ms = data.get("position_ms")
+
+    if not track_uri or position_ms is None:
+        return jsonify({"error": "Track URI and position in milliseconds must be provided"}), 400
+
+    response = seek(track_uri, position_ms)
+    return jsonify(response)
+
+@app.route('/volume', methods=['PUT'])
+def set_volume():
+    data = request.json
+    track_uri = data.get("track_uri")
+    volume_percent = data.get("volume_percent")
+
+    if not track_uri or volume_percent is None:
+        return jsonify({"error": "Track URI and volume percent must be provided"}), 400
+
+    response = volume(track_uri, volume_percent)
+    return jsonify(response)
+
+@app.route('/repeat', methods=['PUT'])
+def set_repeat():
+    data = request.json
+    track_uri = data.get("track_uri")
+    state = data.get("state")
+
+    if not track_uri or state is None:
+        return jsonify({"error": "Track URI and repeat state must be provided"}), 400
+
+    response = repeat(track_uri, state)
+    return jsonify(response)
+
+@app.route('/shuffle', methods=['PUT'])
+def set_shuffle():
+    data = request.json
+    track_uri = data.get("track_uri")
+    state = data.get("state")
+
+    if not track_uri or state is None:
+        return jsonify({"error": "Track URI and shuffle state must be provided"}), 400
+
+    response = shuffle(track_uri, state)
+    return jsonify(response)
+
+
+@app.route('/pause', methods=['PUT'])
+def pause():
+    data = request.json
+    track_uri = data.get("track_uri")
+
+    if not track_uri:
+        return jsonify({"error": "No track URI provided"}), 400
+    
+    response = pause_track(track_uri)
+    return jsonify(response)
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)
