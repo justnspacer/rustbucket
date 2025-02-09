@@ -13,6 +13,8 @@
         --raisin-black: #342e37ff;
         --baby-powder: #fafffdff;
         --coral: #fa824cff;
+        --font-weight: 200;
+        --font-weight-bold: 700;
       }
     
       *{
@@ -24,35 +26,50 @@
         font-family: 'Fredoka', sans-serif;
         margin: 0;
         padding: 0;
-        background: linear-gradient(45deg, var(--tufts-blue), var(--baby-powder));
-        color: var(--raisin-black);
+        background: var(--baby-powder);
+        transition: background 0.3s ease-in;
       }
       ul {
         list-style: none;
       }
-
+nav{
+    display: flex;
+    background: var(--raisin-black);
+    color: var(--baby-powder);
+    padding: 0.5rem;
+    justify-content: center;
+}
       h1 {
-        font-weight: 200;
+        font-weight: var(--font-weight-bold);
         text-transform: capitalize;
-        font-size: 1.8rem;
-        color: var(--baby-powder);
+        font-size: 1.5rem;
+      }
+
+      .user-info {
         position: absolute;
-        margin-left: 1rem;
-        background: rgba(0, 0, 0, 0.3);
-        backdrop-filter: blur(7px);
-        padding: 1rem;
-        border-radius: 1rem;
-        top: 14rem;
+        margin-left: 35px;
+        top: 17rem;
+        color: var(--baby-powder);
+
+        span {
+          font-size: 0.9rem;
+        }
       }
 
       .user-image {
-        display: flex;
+        padding: 1rem;
       }
     
       .user-image img {
-        width: 100%;
+        width: 300px;
         height: 320px;
-        object-fit: cover;    
+        object-fit: cover;
+        border-radius: 2rem;    
+      }
+
+      .follower-count {
+        font-size: 1.2rem !important;
+        font-weight: var(--font-weight-bold);
       }
     
       i {
@@ -62,7 +79,7 @@
       h3{
         display: inline;
         font-size: 1rem;
-        font-weight: 200;
+        font-weight: var(--font-weight-bold);
         text-transform: capitalize;
         color: var(--licorice);
         background: white;
@@ -75,18 +92,17 @@
     
       input {
         padding: 0.5rem;
-        font-weight: 200;
+        font-weight: var(--font-weight-bold);
       }
     
       button {
         background-color: var(--auburn);
-        color: var(--raisin-black);
         outline: none;
         padding: 0.5rem;
         border: none;
         cursor: pointer;
         text-transform: capitalize;
-        font-weight: 200;
+        font-weight: var(--font-weight);
         text-align: start;
       }
 
@@ -100,29 +116,26 @@
   
       .playlists {
         display: flex;
-        flex-wrap: wrap;
+        flex-direction: column;
         gap: 2rem;
-      }
-
-      #user-playlists {
-        margin-top: 20rem;
+        padding: 1rem;
       }
 
       #user-playlists h2 {
         margin-bottom: 1rem;
-        font-weight: 200;
+        font-weight: var(--font-weight-bold);
         font-size: 3rem;
+        margin-left: 1rem;
       }
 
       .playlist-item a {
-        background: var(--raisin-black);
+        background: var(--coral);
         padding: 5px;
         border-radius: 5px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-        color: var(--baby-powder);
+        color: var(--raisin-black);
         display: flex;
-        width: 100%;
-        justify-content: center;
+        max-width: 400px;
         align-items: center;
         gap: 1rem;
         text-decoration: none;
@@ -152,7 +165,7 @@
       .currently-playing-container {
       position: fixed;
       right: 3rem;
-      top: 2rem;
+      top: 4rem;
       color: var(--baby-powder);
       z-index: 1000;
       transition: all 0.3s;
@@ -202,7 +215,6 @@
       
       .currently-playing-container div {
       position: relative;
-      text-align: center;
       }
 
       .currently-playing-container h2 {
@@ -210,7 +222,7 @@
         color: var(--baby-powder);
         width: 100%;
         transition: all 0.3s;
-        font-weight: 600;
+        font-weight: var(--font-weight-bold);
         font-size: 0.8rem;
         letter-spacing: 1px;
         text-transform: uppercase;
@@ -219,7 +231,7 @@
         background: rgba(0, 0, 0, 0.5);
         backdrop-filter: blur(7px);
         border-radius: 1.2rem;
-        
+        text-align: center;
       }
 
       .currently-playing-container .track-info {
@@ -232,22 +244,23 @@
       }
 
       .playlist-name {
-        font-size: 1rem;
-        font-weight: 200;
-        margin-bottom: 0.5rem;
+        font-size: 1.4rem;
+        font-weight: var(--font-weight-bold);
       }
 
 
       .currently-playing-container ul li {
         color: var(--coral);
+        font-size: 0.9rem;
       }
 
       
       .track-name {
-        font-weight: 600;
+        font-weight: var(--font-weight-bold);
         font-size: 0.9rem;
         color: var(--baby-powder) !important;
         text-transform: uppercase;
+        text-align: center;
       }
 
       .cp-message {
@@ -261,11 +274,11 @@
       .artist-line, .album-line {
         margin-bottom: 0.2rem;
         font-size: 0.6rem;
-        font-weight: 600;
+        font-weight: var(--font-weight-bold);
       }
 
       #playback {
-        margin-top: 4rem;
+        margin-top: 2rem;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -275,6 +288,7 @@
       .label {
         color: white;
         margin-right: 4px;
+        font-size: 0.7rem;
       }
 
       .artist-line, .album-line {        
@@ -288,18 +302,26 @@
         backdrop-filter: blur(7px);
         border-radius: 1.2rem;
       }
+
+      .no-hover {
+  pointer-events: none;
+}
       </style>
 </head>  
 
 <body>
+  <nav>Spotify Ui</nav>
     {% if user %}
-    <h1>{{ user.display_name }}'s Spotify<i className="fa-regular fa-circle-right"></i></h1>
+    <div class="user-info">
+      <h1>{{ user.display_name }}'s Spotify<i className="fa-regular fa-circle-right"></i></h1>
+      <span>followers <span class="follower-count">{{ user.followers.total }}</span></span>
+    </div>
+
     <div class="user-image">    
-      <img src="{{ user.images[0].url }}" alt="{{ user.display_name }}" />
+      <img id="user-profile-picture" src="{{ user.images[0].url }}" crossOrigin="anonymous" alt="{{ user.display_name }}" />
     </div>
     <div id="currently-playing" class="currently-playing-container"></div>
     <ul>
-        <li><strong>Followers</strong> {{ user.followers.total }}</li>
         <li><div id="user-playlists"></div></li>
     </ul>
     <section id="playback">
@@ -315,7 +337,6 @@
         <button id="toggleShuffle" onclick="shuffleTrack()"><i class="fa-solid fa-shuffle"></i></button>
       </div>
     </section>
-
     <script>
       window.onSpotifyWebPlaybackSDKReady = () => {
   const token = '{{ token_info }}';
@@ -363,6 +384,7 @@
           const data = await response.json();
           const container = document.getElementById('currently-playing');
           if (data.message) {
+            container.classList.add('no-hover');
             container.innerHTML = `<span class="cp-message">${data.message}</span>`;
           } else {
             container.innerHTML = `
@@ -564,6 +586,76 @@
         });
       }
   </script>
+      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          const profilePicture = document.getElementById('user-profile-picture');
+          const nav = document.querySelector('nav');
+          const playbackControls = document.querySelector('#playback-controls');
+          const icons = playbackControls.querySelectorAll('.fa-solid');
+        
+          function getAverageColor(imageElement) {
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.width = imageElement.width;
+            canvas.height = imageElement.height;
+            context.drawImage(imageElement, 0, 0, canvas.width, canvas.height);
+        
+            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+            let r = 0, g = 0, b = 0;
+        
+            for (let i = 0; i < data.length; i += 4) {
+              r += data[i];
+              g += data[i + 1];
+              b += data[i + 2];
+            }
+        
+            r = Math.floor(r / (data.length / 4));
+            g = Math.floor(g / (data.length / 4));
+            b = Math.floor(b / (data.length / 4));
+        
+            return { r, g, b };
+          }
+        
+          function rgbToHex({ r, g, b }) {
+            return `rgb(${r}, ${g}, ${b})`;
+          }
+        
+          function getLuminance({ r, g, b }) {
+            const a = [r, g, b].map(function(v) {
+              v /= 255;
+              return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+            });
+            return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
+          }
+        
+          function getContrastColor(rgb) {
+            const luminance = getLuminance(rgb);
+            return luminance > 0.5 ? 'black' : 'white';
+          }
+        
+          function applyGradientBackground() {
+            const averageColor = getAverageColor(profilePicture);
+            const color1 = rgbToHex(averageColor);
+            const color2 = 'var(--raisin-black)'; // Example second color for gradient
+            const contrastColor = getContrastColor(averageColor);
+        
+            document.body.style.background = `linear-gradient(${color1}, ${color2})`;
+            document.body.style.color = contrastColor; // Example usage of contrast color
+            nav.style.background = contrastColor;
+            nav.style.color = color1;
+
+            icons.forEach(icon => {
+              icon.style.color = contrastColor;
+            });
+          }
+        
+          profilePicture.onload = applyGradientBackground;
+          if (profilePicture.complete) {
+            applyGradientBackground();
+          }
+        });
+            </script>
     {% else %}
         <p>No token information available. Please <a href="{{ url_for('login') }}">login</a>.</p>
     {% endif %}
