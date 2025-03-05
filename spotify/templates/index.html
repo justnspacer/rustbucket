@@ -38,33 +38,30 @@ nav{
     color: var(--baby-powder);
     padding: 0.5rem;
     justify-content: center;
+    text-transform: uppercase;
+    font-weight: var(--font-weight-bold);
 }
       h1 {
         font-weight: var(--font-weight-bold);
         text-transform: capitalize;
-        font-size: 1.5rem;
+        font-size: 3rem;
+        z-index: 1;
       }
 
       .user-info {
-        position: absolute;
-        margin-left: 35px;
-        top: 17rem;
         color: var(--baby-powder);
+        text-align: center;
 
         span {
           font-size: 0.9rem;
         }
       }
-
-      .user-image {
-        padding: 1rem;
-      }
-    
       .user-image img {
         width: 300px;
         height: 320px;
         object-fit: cover;
-        border-radius: 2rem;    
+        border-radius: 2rem;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
       }
 
       .follower-count {
@@ -129,7 +126,7 @@ nav{
       }
 
       .playlist-item a {
-        background: var(--coral);
+        background: var(--baby-powder);
         padding: 5px;
         border-radius: 5px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
@@ -144,7 +141,7 @@ nav{
       }
 
       .playlist-item a:hover {
-        background: var(--tufts-blue);
+        background: var(--raisin-black);
         color: var(--baby-powder);
 
         .playlist-image{
@@ -196,7 +193,7 @@ nav{
     
       @media (max-width: 600px) {
         .currently-playing-container:hover {
-          width: 75%;
+          width: 220px;
 
         }
 
@@ -264,11 +261,11 @@ nav{
       }
 
       .cp-message {
-        background-color: rgba(227, 230, 60, 0.836);
-        padding: 1rem;
+        background-color: var(--baby-powder);
+        padding: 0.2rem;
         color: var(--baby-powder);
         font-size: 1rem;
-        border-radius: 50%;
+        border-radius: 0.2rem;
       }
 
       .artist-line, .album-line {
@@ -278,11 +275,12 @@ nav{
       }
 
       #playback {
-        margin-top: 2rem;
         display: flex;
         flex-direction: column;
         justify-content: center;
         width: 400px;
+        text-align: center;
+        margin: 0 auto;
       }
 
       .label {
@@ -306,24 +304,46 @@ nav{
       .no-hover {
   pointer-events: none;
 }
+.user-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 2rem;
+  margin-bottom: 4rem;
+}
+#user-playlists {
+display: flex;
+flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 4rem;
+  margin-bottom: 2rem;
+}
       </style>
 </head>  
 
 <body>
   <nav>Spotify Ui</nav>
     {% if user %}
-    <div class="user-info">
-      <h1>{{ user.display_name }}'s Spotify<i className="fa-regular fa-circle-right"></i></h1>
-      <span>followers <span class="follower-count">{{ user.followers.total }}</span></span>
+    <div class="user-container">
+
+  
+      <div class="user-image">    
+        <img id="user-profile-picture" src="{{ user.images[0].url }}" crossOrigin="anonymous" alt="{{ user.display_name }}" />
+      </div>
+      <div class="user-info">
+        <h1>{{ user.display_name }}'s Spotify<i className="fa-regular fa-circle-right"></i></h1>
+        <span><span class="follower-count">{{ user.followers.total }}</span> followers</span>
+      </div>
+      <ul>
+          <li><div id="user-playlists">
+            <h2>Playlists</h2>
+          </div></li>
+      </ul>
     </div>
 
-    <div class="user-image">    
-      <img id="user-profile-picture" src="{{ user.images[0].url }}" crossOrigin="anonymous" alt="{{ user.display_name }}" />
-    </div>
     <div id="currently-playing" class="currently-playing-container"></div>
-    <ul>
-        <li><div id="user-playlists"></div></li>
-    </ul>
     <section id="playback">
       <input type="text" id="trackUriInput" placeholder="Enter Spotify Track URI">
       <p id="responseMessage"></p>
@@ -416,7 +436,6 @@ nav{
           const response = await fetch('/playlists');
           const data = await response.json();
           const container = document.getElementById('user-playlists');
-          container.innerHTML = '<h2>Playlists</h2>';
           
           if (data.error) {
             container.innerText = data.error;
@@ -592,6 +611,7 @@ nav{
           const nav = document.querySelector('nav');
           const playbackControls = document.querySelector('#playback-controls');
           const icons = playbackControls.querySelectorAll('.fa-solid');
+          const userInfo = document.querySelector('.user-info');
         
           function getAverageColor(imageElement) {
             const canvas = document.createElement('canvas');
@@ -644,6 +664,7 @@ nav{
             document.body.style.color = contrastColor; // Example usage of contrast color
             nav.style.background = contrastColor;
             nav.style.color = color1;
+            userInfo.style.color = contrastColor;
 
             icons.forEach(icon => {
               icon.style.color = contrastColor;
