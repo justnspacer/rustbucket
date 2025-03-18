@@ -113,7 +113,8 @@ nav{
   
       .playlists {
         display: flex;
-        flex-direction: column;
+        justify-content: center;
+        flex-wrap: wrap;
         gap: 2rem;
         padding: 1rem;
       }
@@ -125,14 +126,20 @@ nav{
         margin-left: 1rem;
       }
 
+      .playlist-item {
+        border-radius: 5px;
+        background-repeat: no-repeat;
+        background-size: cover;
+      }
+
       .playlist-item a {
-        background: var(--baby-powder);
         padding: 5px;
         border-radius: 5px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
         color: var(--raisin-black);
         display: flex;
-        max-width: 400px;
+        width: 200px;
+        height: 200px;
         align-items: center;
         gap: 1rem;
         text-decoration: none;
@@ -141,13 +148,21 @@ nav{
       }
 
       .playlist-item a:hover {
-        background: var(--raisin-black);
+        background: #00000086;
         color: var(--baby-powder);
 
         .playlist-image{
           transform: scale(1.1);
           border-radius: 5px;
         }
+
+        ul{
+          display: block;
+        }
+      }
+
+      .playlist-item ul {
+        display: none;
       }
 
       .playlist-image {
@@ -310,14 +325,14 @@ nav{
   justify-content: center;
   align-items: center;
   margin-top: 2rem;
-  margin-bottom: 4rem;
+  margin-bottom: 1rem;
 }
 #user-playlists {
 display: flex;
 flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin-top: 4rem;
+  margin-top: 2rem;
   margin-bottom: 2rem;
 }
       </style>
@@ -445,9 +460,9 @@ flex-direction: column;
             data.items.forEach(playlist => {
               const li = document.createElement('li');
               li.classList.add('playlist-item');
+              li.style.backgroundImage = `url(${playlist.images[0].url})`;
               li.innerHTML = `
               <a href="${playlist.external_urls.spotify}" target="_blank">
-                <img class="playlist-image" src="${playlist.images[0].url}" alt="${playlist.name}" />
                 <ul>
                 <li class="playlist-name">${playlist.name}</li>
                 <li>${playlist.tracks.total} Tracks</li>
@@ -657,7 +672,7 @@ flex-direction: column;
           function applyGradientBackground() {
             const averageColor = getAverageColor(profilePicture);
             const color1 = rgbToHex(averageColor);
-            const color2 = 'var(--raisin-black)'; // Example second color for gradient
+            const color2 = rgbToHex(averageColor); // Example second color for gradient
             const contrastColor = getContrastColor(averageColor);
         
             document.body.style.background = `linear-gradient(${color1}, ${color2})`;
