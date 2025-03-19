@@ -33,13 +33,14 @@
         list-style: none;
       }
 nav{
+  font-size: 2rem;
     display: flex;
     background: var(--raisin-black);
     color: var(--baby-powder);
     padding: 0.5rem;
     justify-content: center;
-    text-transform: uppercase;
-    font-weight: var(--font-weight-bold);
+    text-transform: capitalize;
+    font-weight: var(--font-weight);
 }
       h1 {
         font-weight: var(--font-weight-bold);
@@ -49,6 +50,8 @@ nav{
       }
 
       .user-info {
+        position: absolute;
+        margin-top: 310px;
         color: var(--baby-powder);
         text-align: center;
 
@@ -115,15 +118,13 @@ nav{
         display: flex;
         justify-content: center;
         flex-wrap: wrap;
-        gap: 2rem;
+        gap: 4rem;
         padding: 1rem;
       }
 
       #user-playlists h2 {
-        margin-bottom: 1rem;
-        font-weight: var(--font-weight-bold);
-        font-size: 3rem;
-        margin-left: 1rem;
+        font-weight: var(--font-weight);
+        font-size: 2rem;
       }
 
       .playlist-item {
@@ -141,6 +142,7 @@ nav{
         width: 200px;
         height: 200px;
         align-items: center;
+        justify-content: center;
         gap: 1rem;
         text-decoration: none;
         cursor: pointer;
@@ -149,7 +151,10 @@ nav{
 
       .playlist-item a:hover {
         background: #00000086;
+        backdrop-filter: blur(7px);
         color: var(--baby-powder);
+        box-shadow: none;
+
 
         .playlist-image{
           transform: scale(1.1);
@@ -163,6 +168,7 @@ nav{
 
       .playlist-item ul {
         display: none;
+        text-align: center;
       }
 
       .playlist-image {
@@ -235,9 +241,9 @@ nav{
         width: 100%;
         transition: all 0.3s;
         font-weight: var(--font-weight-bold);
-        font-size: 0.8rem;
+        font-size: 1rem;
         letter-spacing: 1px;
-        text-transform: uppercase;
+        text-transform: capitalize;
         margin-bottom: 0.5rem;
         padding: 0.5rem;
         background: rgba(0, 0, 0, 0.5);
@@ -256,7 +262,7 @@ nav{
       }
 
       .playlist-name {
-        font-size: 1.4rem;
+        font-size: 1rem;
         font-weight: var(--font-weight-bold);
       }
 
@@ -268,10 +274,10 @@ nav{
 
       
       .track-name {
-        font-weight: var(--font-weight-bold);
+        font-weight: var(--font-weight);
         font-size: 0.9rem;
         color: var(--baby-powder) !important;
-        text-transform: uppercase;
+        text-transform: capitalize;
         text-align: center;
       }
 
@@ -325,7 +331,7 @@ nav{
   justify-content: center;
   align-items: center;
   margin-top: 2rem;
-  margin-bottom: 1rem;
+  margin-bottom: 6rem;
 }
 #user-playlists {
 display: flex;
@@ -418,10 +424,16 @@ flex-direction: column;
           const response = await fetch('/currently-playing');
           const data = await response.json();
           const container = document.getElementById('currently-playing');
+          const trackUriInput = document.getElementById('trackUriInput');
+
           if (data.message) {
             container.classList.add('no-hover');
             container.innerHTML = `<span class="cp-message">${data.message}</span>`;
           } else {
+            // Populate the input field with the track URI if a track is playing
+        if (data.item && data.item.uri) {
+          trackUriInput.value = data.item.uri;
+        }
             container.innerHTML = `
             <div>
               <h2>Currently Playing</h2>
@@ -483,12 +495,17 @@ flex-direction: column;
       fetchUserPlaylists();
     </script>
     <script>
+        function validateTrackUriInput() {
+    const trackUri = document.getElementById("trackUriInput").value.trim();
+    if (!trackUri) {
+      document.getElementById("responseMessage").innerText = "Please enter a Spotify Track URI!";
+      return false;
+    }
+    return trackUri;
+  }
       function playTrack() {
-          const trackUri = document.getElementById("trackUriInput").value;
-          if (!trackUri) {
-              document.getElementById("responseMessage").innerText = "Please enter a Spotify Track URI!";
-              return;
-          }
+        const trackUri = validateTrackUriInput();
+        if (!trackUri) return;
 
           fetch("http://127.0.0.1:5000/play", {
               method: "POST",
@@ -511,6 +528,8 @@ flex-direction: column;
           });
       }
       function nextTrack() {
+        const trackUri = validateTrackUriInput();
+    if (!trackUri) return;
         fetch("http://127.0.0.1:5000/next", {
           method: "POST",
           headers: {
@@ -533,6 +552,8 @@ flex-direction: column;
       }
 
       function previousTrack() {
+        const trackUri = validateTrackUriInput();
+    if (!trackUri) return;
         fetch("http://127.0.0.1:5000/previous", {
           method: "POST",
           headers: {
@@ -555,6 +576,8 @@ flex-direction: column;
       }
 
       function pauseTrack() {
+        const trackUri = validateTrackUriInput();
+    if (!trackUri) return;
         fetch("http://127.0.0.1:5000/pause", {
           method: "PUT",
           headers: {
@@ -577,6 +600,8 @@ flex-direction: column;
       }
 
       function repeatTrack() {
+        const trackUri = validateTrackUriInput();
+    if (!trackUri) return;
         fetch("http://127.0.0.1:5000/repeat", {
           method: "PUT",
           headers: {
@@ -599,6 +624,8 @@ flex-direction: column;
       }
 
       function shuffleTrack() {
+        const trackUri = validateTrackUriInput();
+    if (!trackUri) return;
         fetch("http://127.0.0.1:5000/shuffle", {
           method: "PUT",
           headers: {
