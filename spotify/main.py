@@ -135,7 +135,9 @@ def play_track(track_uri):
         "device_id": DEVICE_ID
     }
     response = requests.put(url, headers=headers, json=data)
-    return response.json()
+    if response.status_code != 204:  # Spotify returns 204 No Content for success
+        return jsonify(response.json()), response.status_code
+    return jsonify({"message": "Track is playing!"}), 200
 
 def pause_track(track_uri):
     sp, access_token = get_spotify()
@@ -149,7 +151,9 @@ def pause_track(track_uri):
         "device_id": DEVICE_ID
     }
     response = requests.put(url, headers=headers, json=data)
-    return response.json()
+    if response.status_code != 204:  # Spotify returns 204 No Content for success
+        return jsonify(response.json()), response.status_code
+    return jsonify({"message": "Track paused!"}), 200
 
 
 def next_track(track_uri):
@@ -164,7 +168,9 @@ def next_track(track_uri):
         "device_id": DEVICE_ID
     }
     response = requests.post(url, headers=headers, json=data)
-    return response.json()
+    if response.status_code != 204:  # Spotify returns 204 No Content for success
+        return jsonify(response.json()), response.status_code
+    return jsonify({"message": "Next track!"}), 200
 
 def previous_track(track_uri):
     sp, access_token = get_spotify()
@@ -178,7 +184,9 @@ def previous_track(track_uri):
         "device_id": DEVICE_ID
     }
     response = requests.post(url, headers=headers, json=data)
-    return response.json()
+    if response.status_code != 204:  # Spotify returns 204 No Content for success
+        return jsonify(response.json()), response.status_code
+    return jsonify({"message": "Previous track!"}), 200
 
 def seek(track_uri, position_in_milliseconds):
     sp, access_token = get_spotify()
@@ -188,7 +196,9 @@ def seek(track_uri, position_in_milliseconds):
         "Content-Type": "application/json"
     }
     response = requests.put(url, headers=headers)
-    return response.json()
+    if response.status_code != 204:  # Spotify returns 204 No Content for success
+        return jsonify(response.json()), response.status_code
+    return jsonify({"message": "Seeking!"}), 200
 
 def volume(track_uri, control):
     sp, access_token = get_spotify()
@@ -202,7 +212,9 @@ def volume(track_uri, control):
         "device_id": DEVICE_ID
     }
     response = requests.put(url, headers=headers, json=data)
-    return response.json()
+    if response.status_code != 204:  # Spotify returns 204 No Content for success
+        return jsonify(response.json()), response.status_code
+    return jsonify({"message": f"Volume to {control}!"}), 200
 
 def repeat(track_uri, state):
     sp, access_token = get_spotify()
@@ -216,7 +228,9 @@ def repeat(track_uri, state):
         "device_id": DEVICE_ID
     }
     response = requests.put(url, headers=headers, json=data)
-    return response.json()
+    if response.status_code != 204:  # Spotify returns 204 No Content for success
+        return jsonify(response.json()), response.status_code
+    return jsonify({"message": f"Repeat {state}!"}), 200
 
 def shuffle(track_uri, state):
     sp, access_token = get_spotify()
@@ -230,7 +244,9 @@ def shuffle(track_uri, state):
         "device_id": DEVICE_ID
     }
     response = requests.put(url, headers=headers, json=data)
-    return response.json()
+    if response.status_code != 204:  # Spotify returns 204 No Content for success
+        return jsonify(response.json()), response.status_code
+    return jsonify({"message": f"Shuffle {state}!"}), 200
 
 def get_audio_features(track_id):
     sp, access_token = get_spotify()
@@ -291,12 +307,11 @@ def get_devices():
 def play():
     data = request.json
     track_uri = data.get("track_uri")
-
     if not track_uri:
         return jsonify({"error": "No track URI provided"}), 400
     
     response = play_track(track_uri)
-    return jsonify(response)
+    return response
 
 
 @app.route('/next', methods=['POST'])
@@ -308,7 +323,7 @@ def next():
         return jsonify({"error": "No track URI provided"}), 400
     
     response = next_track(track_uri)
-    return jsonify(response)
+    return response
 
 @app.route('/previous', methods=['POST'])
 def previous():
@@ -319,7 +334,7 @@ def previous():
         return jsonify({"error": "No track URI provided"}), 400
     
     response = previous_track(track_uri)
-    return jsonify(response)
+    return response
 
 @app.route('/seek', methods=['PUT'])
 def seek_position():
@@ -331,7 +346,7 @@ def seek_position():
         return jsonify({"error": "Track URI and position in milliseconds must be provided"}), 400
 
     response = seek(track_uri, position_ms)
-    return jsonify(response)
+    return response
 
 @app.route('/volume', methods=['PUT'])
 def set_volume():
@@ -343,7 +358,7 @@ def set_volume():
         return jsonify({"error": "Track URI and volume percent must be provided"}), 400
 
     response = volume(track_uri, volume_percent)
-    return jsonify(response)
+    return response
 
 @app.route('/repeat', methods=['PUT'])
 def set_repeat():
@@ -355,7 +370,7 @@ def set_repeat():
         return jsonify({"error": "Track URI and repeat state must be provided"}), 400
 
     response = repeat(track_uri, state)
-    return jsonify(response)
+    return response
 
 @app.route('/shuffle', methods=['PUT'])
 def set_shuffle():
@@ -367,7 +382,7 @@ def set_shuffle():
         return jsonify({"error": "Track URI and shuffle state must be provided"}), 400
 
     response = shuffle(track_uri, state)
-    return jsonify(response)
+    return response
 
 
 @app.route('/pause', methods=['PUT'])
@@ -379,7 +394,7 @@ def pause():
         return jsonify({"error": "No track URI provided"}), 400
     
     response = pause_track(track_uri)
-    return jsonify(response)
+    return response
 
 
 
