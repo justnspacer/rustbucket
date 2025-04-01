@@ -29,8 +29,7 @@ font-size: 2rem;
 display: flex;
 background: var(--raisin-black);
 color: var(--baby-powder);
-padding: 0.5rem;
-justify-content: center;
+padding: 1rem;
 text-transform: capitalize;
 font-weight: var(--font-weight);
 }
@@ -109,13 +108,12 @@ button {
 .playlists {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
   gap: 2rem;
   padding: 1rem;
 }
 
 #user-playlists h2 {
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--font-weight);
   font-size: 2rem;
   padding: 0 1rem;
 }
@@ -221,6 +219,11 @@ transition: all 0.3s;
 #playback {
   margin-top: 2rem;
 }
+
+.playlist-item a{
+  width: 200px;
+  height: 200px;;
+}
 }
 
 
@@ -277,7 +280,7 @@ ul li {
 .cp-message {
   background-color: var(--baby-powder);
   padding: 0.2rem;
-  color: var(--baby-powder);
+  color: var(--raisin-black);
   font-size: 1rem;
   border-radius: 0.2rem;
 }
@@ -333,5 +336,4 @@ display: flex;
 flex-direction: column;
 margin-top: 2rem;
 margin-bottom: 2rem;
-align-items: center;
 }

@@ -29,19 +29,7 @@
     </div>
 
     <div id="currently-playing" class="currently-playing-container"></div>
-    <section id="playback">
-      <input type="text" id="trackUriInput" placeholder="Enter Spotify Track URI">
-      <p id="responseMessage"></p>
-      <div id="playback-controls">
-        <button id="toggleBackward" onclick="previousTrack()"><i class="fa-solid fa-backward"></i></button>
-        <button id="togglePlay" onclick="playTrack()"><i class="fa-solid fa-play"></i></button>
-        <button id="togglePause" onclick="pauseTrack()"><i class="fa-solid fa-pause"></i></button>
-        <button id="toggleStop" onclick="stopTrack()"><i class="fa-solid fa-stop"></i></button>
-        <button id="toggleForward" onclick="nextTrack()"><i class="fa-solid fa-forward"></i></button>
-        <button id="toggleRepeat" onclick="repeatTrack()"><i class="fa-solid fa-repeat"></i></button>
-        <button id="toggleShuffle" onclick="shuffleTrack()"><i class="fa-solid fa-shuffle"></i></button>
-      </div>
-    </section>
+  
   <script src="{{ url_for('static', filename='js/script.js') }}" type="text/javascript"></script>
     {% else %}
         <p>No token information available. Please <a href="{{ url_for('login') }}">login</a>.</p>
