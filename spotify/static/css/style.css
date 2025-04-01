@@ -30,7 +30,6 @@ display: flex;
 background: var(--raisin-black);
 color: var(--baby-powder);
 padding: 1rem;
-text-transform: capitalize;
 font-weight: var(--font-weight);
 }
 h1 {

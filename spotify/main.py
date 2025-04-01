@@ -93,7 +93,7 @@ def currently_playing():
     if current_playback and current_playback['is_playing']:
         return jsonify(current_playback)
     else:
-        return jsonify({'message': '🎵 Nothing playing'})
+        return jsonify({'message': '🎵 nothing playing'})
 
 # Get user's top tracks
 @app.route("/top-tracks")
@@ -141,101 +141,6 @@ def get_devices():
     else:
         print("No devices found. Make sure Spotify is open on a device.")
         return jsonify({"error": "No devices found"}), 404
-
-@app.route('/play', methods=['POST'])
-def play():
-    data = request.json
-    track_uri = data.get("track_uri")
-    if not track_uri:
-        return jsonify({"error": "No track URI provided"}), 400
-    
-    response = play_track(track_uri)
-    return response
-
-
-@app.route('/next', methods=['POST'])
-def next():
-    data = request.json
-    track_uri = data.get("track_uri")
-
-    if not track_uri:
-        return jsonify({"error": "No track URI provided"}), 400
-    
-    response = next_track(track_uri)
-    return response
-
-@app.route('/previous', methods=['POST'])
-def previous():
-    data = request.json
-    track_uri = data.get("track_uri")
-
-    if not track_uri:
-        return jsonify({"error": "No track URI provided"}), 400
-    
-    response = previous_track(track_uri)
-    return response
-
-@app.route('/seek', methods=['PUT'])
-def seek_position():
-    data = request.json
-    track_uri = data.get("track_uri")
-    position_ms = data.get("position_ms")
-
-    if not track_uri or position_ms is None:
-        return jsonify({"error": "Track URI and position in milliseconds must be provided"}), 400
-
-    response = seek(track_uri, position_ms)
-    return response
-
-@app.route('/volume', methods=['PUT'])
-def set_volume():
-    data = request.json
-    track_uri = data.get("track_uri")
-    volume_percent = data.get("volume_percent")
-
-    if not track_uri or volume_percent is None:
-        return jsonify({"error": "Track URI and volume percent must be provided"}), 400
-
-    response = volume(track_uri, volume_percent)
-    return response
-
-@app.route('/repeat', methods=['PUT'])
-def set_repeat():
-    data = request.json
-    track_uri = data.get("track_uri")
-    state = data.get("state")
-
-    if not track_uri or state is None:
-        return jsonify({"error": "Track URI and repeat state must be provided"}), 400
-
-    response = repeat(track_uri, state)
-    return response
-
-@app.route('/shuffle', methods=['PUT'])
-def set_shuffle():
-    data = request.json
-    track_uri = data.get("track_uri")
-    state = data.get("state")
-
-    if not track_uri or state is None:
-        return jsonify({"error": "Track URI and shuffle state must be provided"}), 400
-
-    response = shuffle(track_uri, state)
-    return response
-
-
-@app.route('/pause', methods=['PUT'])
-def pause():
-    data = request.json
-    track_uri = data.get("track_uri")
-
-    if not track_uri:
-        return jsonify({"error": "No track URI provided"}), 400
-    
-    response = pause_track(track_uri)
-    return response
-
-
 
 if __name__ == "__main__":
     app.run(debug=True)
