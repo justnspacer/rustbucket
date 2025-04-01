@@ -84,6 +84,16 @@ def callback():
     session["token_info"] = token_info
     return jsonify(token_info)
 
+# Get user's top artists and tracks
+@app.route("/top-artists-and-tracks")
+def top_artists_and_tracks():
+    sp, token_info = get_spotify()
+    top_artists = sp.current_user_top_artists(limit=10)
+    top_tracks = sp.current_user_top_tracks(limit=10)
+    return jsonify({
+        "top_artists": top_artists['items'],
+        "top_tracks": top_tracks['items']
+    })
 
 # get current user currently playing track
 @app.route("/currently-playing")

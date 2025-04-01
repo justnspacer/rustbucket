@@ -1,52 +1,3 @@
-window.onSpotifyWebPlaybackSDKReady = () => {
-  const token = '{{ token_info }}';
-  const player = new Spotify.Player({
-    name: 'Web Playback SDK Quick Start Player',
-    getOAuthToken: (cb) => {
-      cb(token);
-    },
-    volume: 0.5,
-  });
-  // Error handling
-  player.addListener('initialization_error', ({ message }) => {
-    console.error(message);
-  });
-  player.addListener('authentication_error', ({ message }) => {
-    console.error(message);
-  });
-  player.addListener('account_error', ({ message }) => {
-    console.error(message);
-  });
-  player.addListener('playback_error', ({ message }) => {
-    console.error(message);
-  });
-
-  // Playback status updates
-  player.addListener('player_state_changed', (state) => {
-    console.log(state);
-  });
-
-  // Ready
-  player.addListener('ready', ({ device_id }) => {
-    console.log('Ready with Device ID', device_id);
-  });
-
-  // Not Ready
-  player.addListener('not_ready', ({ device_id }) => {
-    console.log('Device ID has gone offline', device_id);
-  });
-
-  document.getElementById('togglePlay').onclick = function () {
-    player.togglePlay();
-  };
-
-  // Connect to the player!
-  player.connect().then((success) => {
-    if (success) {
-      console.log('The Web Playback SDK successfully connected to Spotify!');
-    }
-  });
-};
 async function fetchCurrentlyPlaying() {
   try {
     const response = await fetch('/currently-playing');
@@ -138,6 +89,55 @@ async function fetchUserPlaylists() {
 
 fetchUserPlaylists();
 
+async function fetchUserTopItems() {
+  try {
+    const response = await fetch('/top-artists-and-tracks');
+    const data = await response.json();
+    const topArtistsContainer = document.getElementById('user-top-artists');
+    const topTracksContainer = document.getElementById('user-top-tracks');
+
+    if (data.error) {
+      topArtistsContainer.innerText = data.error;
+      topTracksContainer.innerText = data.error;
+    } else {
+      // Display top artists
+      const artistsList = document.createElement('ul');
+      artistsList.classList.add('top-artists-list');
+      data.top_artists.forEach((artist) => {
+        const li = document.createElement('li');
+        li.classList.add('user-top-artist-item');
+        li.innerHTML = `
+          <img src="${artist.images[0]?.url || ''}" alt="${artist.name}" />
+          <ul>
+          <li class="artist-name">${artist.name}</li>
+            </ul>
+        `;
+        artistsList.appendChild(li);
+      });
+      topArtistsContainer.appendChild(artistsList);
+
+      // Display top tracks
+      const tracksList = document.createElement('ul');
+      tracksList.classList.add('top-tracks-list');
+      data.top_tracks.forEach((track) => {
+        const li = document.createElement('li');
+        li.classList.add('user-top-track-item');
+        li.innerHTML = `
+          <span>${track.name} - ${track.artists
+          .map((artist) => artist.name)
+          .join(', ')}</span>
+        `;
+        tracksList.appendChild(li);
+      });
+      topTracksContainer.appendChild(tracksList);
+    }
+  } catch (error) {
+    console.error('Error fetching user top items:', error);
+  }
+}
+
+fetchUserTopItems();
+
 document.addEventListener('DOMContentLoaded', function () {
   const profilePicture = document.getElementById('user-profile-picture');
   const nav = document.querySelector('nav');
@@ -197,10 +197,6 @@ document.addEventListener('DOMContentLoaded', function () {
     nav.style.background = contrastColor;
     nav.style.color = color1;
     userInfo.style.color = contrastColor;
-
-    icons.forEach((icon) => {
-      icon.style.color = contrastColor;
-    });
   }
 
   profilePicture.onload = applyGradientBackground;
