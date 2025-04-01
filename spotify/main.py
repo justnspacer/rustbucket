@@ -95,6 +95,13 @@ def top_artists_and_tracks():
         "top_tracks": top_tracks['items']
     })
 
+@app.route("/user-saved-tracks")
+def user_saved_tracks():
+    sp, token_info = get_spotify()
+    saved_tracks = sp.current_user_saved_tracks(limit=20)
+    tracks = [{"name": item["track"]["name"], "artist": item["track"]["artists"][0]["name"]} for item in saved_tracks["items"]]
+    return jsonify(tracks)
+
 # get current user currently playing track
 @app.route("/currently-playing")
 def currently_playing():

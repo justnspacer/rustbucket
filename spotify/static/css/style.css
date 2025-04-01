@@ -109,7 +109,7 @@ button {
   padding: 1rem;
 }
 
-#user-playlists h2, #user-top-artists h2, #user-top-tracks h2  {
+#user-playlists h2, #user-top-artists h2, #user-top-tracks h2, #user-saved-tracks h2  {
   font-weight: var(--font-weight);
   font-size: 2rem;
   padding: 0 1rem;
@@ -123,6 +123,13 @@ button {
 }
 
 .top-tracks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.user-saved-tracks {
   display: flex;
   flex-direction: column;
   gap: 1rem;

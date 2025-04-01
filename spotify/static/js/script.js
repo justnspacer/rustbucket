@@ -138,6 +138,35 @@ async function fetchUserTopItems() {
 
 fetchUserTopItems();
 
+async function fetchUserSavedTracks() {
+  try {
+    const response = await fetch('/user-saved-tracks');
+    const data = await response.json();
+    const savedTracksContainer = document.getElementById('user-saved-tracks');
+
+    if (data.error) {
+      savedTracksContainer.innerText = data.error;
+    } else {
+      const tracksList = document.createElement('ul');
+      tracksList.classList.add('user-saved-tracks');
+      data.forEach((item) => {
+        const track = item;
+        const li = document.createElement('li');
+        li.classList.add('saved-track-item');
+        li.innerHTML = `
+          <span>${track.name} - ${track.artist}</span>
+        `;
+        tracksList.appendChild(li);
+      });
+      savedTracksContainer.appendChild(tracksList);
+    }
+  } catch (error) {
+    console.error('Error fetching user saved tracks:', error);
+  }
+}
+
+fetchUserSavedTracks();
+
 document.addEventListener('DOMContentLoaded', function () {
   const profilePicture = document.getElementById('user-profile-picture');
   const nav = document.querySelector('nav');
