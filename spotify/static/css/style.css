@@ -104,6 +104,7 @@ button {
 
 .playlists {
   display: flex;
+  justify-content: center;
   flex-wrap: wrap;
   gap: 2rem;
   padding: 1rem;
@@ -115,25 +116,37 @@ button {
   padding: 0 1rem;
 }
 
+.user-top-track-item, 
+.user-top-track-item .item-name, 
+.saved-track-item, 
+.saved-track-item .item-name {
+  color: var(--baby-powder);
+}
+
+.user-top-track-item .item-artist, 
+.saved-track-item .item-artist {
+  color: var(--yellow-green);
+}
+
 .top-artists-list {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
-  padding: 1rem;
+  padding: 1rem 4rem;
 }
 
 .top-tracks-list {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  padding: 1rem;
+  padding: 1rem 4rem;
 }
 
 .user-saved-tracks {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  padding: 1rem;
+  padding: 1rem 4rem;
 }
 
 .user-top-artist-item img {
@@ -248,8 +261,11 @@ transition: all 0.3s;
 }
 
 .playlist-item a{
-  width: 200px;
-  height: 200px;;
+  width: 260px;
+  height: 260px;;
+}
+.top-artists-list, .playlists {
+  justify-content: center;
 }
 }
 

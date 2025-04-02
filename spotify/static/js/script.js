@@ -3,16 +3,11 @@ async function fetchCurrentlyPlaying() {
     const response = await fetch('/currently-playing');
     const data = await response.json();
     const container = document.getElementById('currently-playing');
-    const trackUriInput = document.getElementById('trackUriInput');
 
     if (data.message) {
       container.classList.add('no-hover');
       container.innerHTML = `<span class="cp-message">${data.message}</span>`;
     } else {
-      // Populate the input field with the track URI if a track is playing
-      if (data.item && data.item.uri) {
-        trackUriInput.value = data.item.uri;
-      }
       container.innerHTML = `
       <div>
         <h2>Currently Playing</h2>
@@ -123,9 +118,11 @@ async function fetchUserTopItems() {
         const li = document.createElement('li');
         li.classList.add('user-top-track-item');
         li.innerHTML = `
-          <span>${track.name} - ${track.artists
+          <span><span class="item-name">${
+            track.name
+          }</span> - <span class="item-artist">${track.artists
           .map((artist) => artist.name)
-          .join(', ')}</span>
+          .join(', ')}</span></span>
         `;
         tracksList.appendChild(li);
       });
@@ -154,7 +151,7 @@ async function fetchUserSavedTracks() {
         const li = document.createElement('li');
         li.classList.add('saved-track-item');
         li.innerHTML = `
-          <span>${track.name} - ${track.artist}</span>
+          <span><span class="item-name">${track.name}</span> - <span class="item-artist">${track.artist}</span></span>
         `;
         tracksList.appendChild(li);
       });

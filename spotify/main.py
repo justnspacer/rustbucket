@@ -88,8 +88,8 @@ def callback():
 @app.route("/top-artists-and-tracks")
 def top_artists_and_tracks():
     sp, token_info = get_spotify()
-    top_artists = sp.current_user_top_artists(limit=10)
-    top_tracks = sp.current_user_top_tracks(limit=10)
+    top_artists = sp.current_user_top_artists(limit=20)
+    top_tracks = sp.current_user_top_tracks(limit=20)
     return jsonify({
         "top_artists": top_artists['items'],
         "top_tracks": top_tracks['items']
@@ -98,7 +98,7 @@ def top_artists_and_tracks():
 @app.route("/user-saved-tracks")
 def user_saved_tracks():
     sp, token_info = get_spotify()
-    saved_tracks = sp.current_user_saved_tracks(limit=20)
+    saved_tracks = sp.current_user_saved_tracks(limit=40)
     tracks = [{"name": item["track"]["name"], "artist": item["track"]["artists"][0]["name"]} for item in saved_tracks["items"]]
     return jsonify(tracks)
 
