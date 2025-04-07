@@ -99,7 +99,10 @@ def top_artists_and_tracks():
 def user_saved_tracks():
     sp, token_info = get_spotify()
     saved_tracks = sp.current_user_saved_tracks(limit=40)
-    tracks = [{"name": item["track"]["name"], "artist": item["track"]["artists"][0]["name"]} for item in saved_tracks["items"]]
+    tracks = [{"name": item["track"]["name"], 
+               "artist": item["track"]["artists"][0]["name"], 
+               "added_at": datetime.datetime.strptime(item["added_at"], "%Y-%m-%dT%H:%M:%SZ").strftime("%m/%d/%Y")} 
+              for item in saved_tracks["items"]]
     return jsonify(tracks)
 
 # get current user currently playing track
@@ -110,7 +113,7 @@ def currently_playing():
     if current_playback and current_playback['is_playing']:
         return jsonify(current_playback)
     else:
-        return jsonify({'message': '🎵 nothing playing'})
+        return jsonify({'message': 'nothing playing 🎵'})
 
 # Get user's top tracks
 @app.route("/top-tracks")

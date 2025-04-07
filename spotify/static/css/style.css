@@ -137,14 +137,14 @@ button {
 
 .top-tracks-list {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   gap: 1rem;
   padding: 1rem 4rem;
 }
 
 .user-saved-tracks {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   gap: 1rem;
   padding: 1rem 4rem;
 }
@@ -168,14 +168,19 @@ button {
   background-size: cover;
 }
 
+.circle-image {
+  border-radius: 50%;
+  overflow: hidden;
+}
+
 .playlist-item a {
   padding: 5px;
   border-radius: 5px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   color: var(--raisin-black);
   display: flex;
-  width: 260px;
-  height: 260px;
+  width: 240px;
+  height: 240px;
   align-items: center;
   justify-content: center;
   gap: 1rem;
@@ -185,7 +190,7 @@ button {
 }
 
 .playlist-item a:hover {
-  background: #00000086;
+  background: #0000009c;
   backdrop-filter: blur(7px);
   color: var(--baby-powder);
   box-shadow: none;

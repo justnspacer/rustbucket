@@ -100,12 +100,17 @@ async function fetchUserTopItems() {
       artistsList.classList.add('top-artists-list');
       data.top_artists.forEach((artist) => {
         const li = document.createElement('li');
-        li.classList.add('user-top-artist-item');
+        li.classList.add('playlist-item');
+        li.classList.add('circle-image');
+        li.setAttribute('data-artist-id', artist.id);
+        li.setAttribute('data-artist-name', artist.id);
+        li.style.backgroundImage = `url(${artist.images[0]?.url})`;
         li.innerHTML = `
-          <img src="${artist.images[0]?.url || ''}" alt="${artist.name}" />
+        <a href="${artist.external_urls.spotify}" target="_blank">
           <ul>
-          <li class="artist-name">${artist.name}</li>
+          <li class="playlist-name">${artist.name}</li>
             </ul>
+                    </a>
         `;
         artistsList.appendChild(li);
       });
@@ -151,7 +156,8 @@ async function fetchUserSavedTracks() {
         const li = document.createElement('li');
         li.classList.add('saved-track-item');
         li.innerHTML = `
-          <span><span class="item-name">${track.name}</span> - <span class="item-artist">${track.artist}</span></span>
+          <p><span class="item-name">${track.name}</span> - <span class="item-artist">${track.artist}</span></p>
+          <p>Added: <span class="item-added">${track.added_at}</span></p>          
         `;
         tracksList.appendChild(li);
       });
