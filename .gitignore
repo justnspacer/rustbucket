@@ -17,3 +17,8 @@ node_modules/
 /dist/
 spotify/.cache
 spotify/.cache
+
+__pycache__/
+*.pyc
+.vscode/
+*env/
