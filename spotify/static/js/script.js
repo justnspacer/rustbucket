@@ -64,13 +64,63 @@ async function fetchUserPlaylists() {
         li.classList.add('playlist-item');
         li.style.backgroundImage = `url(${playlist.images[0].url})`;
         li.innerHTML = `
-        <a href="${playlist.external_urls.spotify}" target="_blank">
+        <div class="playlist-info">
           <ul>
-          <li class="playlist-name">${playlist.name}</li>
-          <li>${playlist.tracks.total} Tracks</li>
-            </ul>
-            </a>
+            <li class="playlist-name">${playlist.name}</li>
+            <li>${playlist.tracks.total} Tracks</li>
+          </ul>
+        </div>
         `;
+
+        li.addEventListener('click', async () => {
+          const playlistId = playlist.id;
+
+          try {
+            const response = await fetch(`/playlist-tracks/${playlistId}`);
+            const data = await response.json();
+
+            const modal = document.createElement('div');
+            modal.classList.add('modal');
+            modal.innerHTML = `
+              <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>${playlist.name} - Tracks</h2>
+            <ul class="playlist-tracks">
+            ${data.items
+              .map(
+                (track) => `
+              <li>
+              <p><strong><a href="${
+                track.track.external_urls.spotify
+              }" target="_blank">${
+                  track.track.name
+                }</a></strong> - ${track.track.artists
+                  .map((artist) => artist.name)
+                  .join(', ')}</p>
+              </li>
+            `
+              )
+              .join('')}
+            </ul>
+              </div>
+            `;
+
+            document.body.appendChild(modal);
+
+            const closeButton = modal.querySelector('.close-button');
+            closeButton.addEventListener('click', () => {
+              modal.remove();
+            });
+
+            modal.addEventListener('click', (e) => {
+              if (e.target === modal) {
+                modal.remove();
+              }
+            });
+          } catch (error) {
+            console.error('Error fetching playlist tracks:', error);
+          }
+        });
         ul.appendChild(li);
       });
       container.appendChild(ul);
@@ -104,7 +154,12 @@ async function fetchUserTopItems() {
         li.classList.add('circle-image');
         li.setAttribute('data-artist-id', artist.id);
         li.setAttribute('data-artist-name', artist.id);
-        li.style.backgroundImage = `url(${artist.images[0]?.url})`;
+        if (artist.images.length > 0) {
+          const randomIndex = Math.floor(Math.random() * artist.images.length);
+          li.style.backgroundImage = `url(${artist.images[randomIndex].url})`;
+        } else {
+          li.style.backgroundImage = `url(${artist.images[0].url})`;
+        }
         li.innerHTML = `
         <a href="${artist.external_urls.spotify}" target="_blank">
           <ul>
@@ -123,11 +178,16 @@ async function fetchUserTopItems() {
         const li = document.createElement('li');
         li.classList.add('user-top-track-item');
         li.innerHTML = `
-          <span><span class="item-name">${
-            track.name
-          }</span> - <span class="item-artist">${track.artists
+          <p><span><span class="item-name"><a href="${
+            track.external_urls.spotify
+          }" target="_blank">${
+          track.name
+        }</a></span> - <span class="item-artist">${track.artists
           .map((artist) => artist.name)
-          .join(', ')}</span></span>
+          .join(', ')}</span></span></p> 
+              <p>Popularity: <span class="popularity">${
+                track.popularity
+              }</span></p>          
         `;
         tracksList.appendChild(li);
       });
@@ -156,7 +216,7 @@ async function fetchUserSavedTracks() {
         const li = document.createElement('li');
         li.classList.add('saved-track-item');
         li.innerHTML = `
-          <p><span class="item-name">${track.name}</span> - <span class="item-artist">${track.artist}</span></p>
+          <p><span class="item-name"><a href="${track.url}" target="_blank">${track.name}</a></span> - <span class="item-artist">${track.artist}</span></p>
           <p>Added: <span class="item-added">${track.added_at}</span></p>          
         `;
         tracksList.appendChild(li);

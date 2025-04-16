@@ -101,7 +101,8 @@ def user_saved_tracks():
     saved_tracks = sp.current_user_saved_tracks(limit=40)
     tracks = [{"name": item["track"]["name"], 
                "artist": item["track"]["artists"][0]["name"], 
-               "added_at": datetime.datetime.strptime(item["added_at"], "%Y-%m-%dT%H:%M:%SZ").strftime("%m/%d/%Y")} 
+               "added_at": datetime.datetime.strptime(item["added_at"], "%Y-%m-%dT%H:%M:%SZ").strftime("%m/%d/%Y"),
+               "url": item["track"]["external_urls"]["spotify"]} 
               for item in saved_tracks["items"]]
     return jsonify(tracks)
 
@@ -142,6 +143,13 @@ def playlists():
     sp, token_info = get_spotify()
     playlists = sp.current_user_playlists()
     return jsonify(playlists)
+
+#Get playlist tracks
+@app.route("/playlist-tracks/<playlist_id>")
+def playlist_tracks(playlist_id):
+    sp, token_info = get_spotify()
+    playlist_tracks = sp.playlist_tracks(playlist_id)
+    return jsonify(playlist_tracks)
 
 @app.route("/devices")
 def get_devices():

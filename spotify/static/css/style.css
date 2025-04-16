@@ -173,7 +173,7 @@ button {
   overflow: hidden;
 }
 
-.playlist-item a {
+.playlist-item a, .playlist-item .playlist-info {
   padding: 5px;
   border-radius: 5px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
@@ -189,7 +189,7 @@ button {
   transition: background 0.3s;
 }
 
-.playlist-item a:hover {
+.playlist-item a:hover, .playlist-item .playlist-info:hover {
   background: #0000009c;
   backdrop-filter: blur(7px);
   color: var(--baby-powder);
@@ -266,8 +266,8 @@ transition: all 0.3s;
 }
 
 .playlist-item a{
-  width: 260px;
-  height: 260px;;
+  width: 200px;
+  height: 200px;
 }
 .top-artists-list, .playlists {
   justify-content: center;
@@ -383,4 +383,69 @@ gap: 1.5rem;
 display: flex;
 flex-direction: column;
 margin-bottom: 2rem;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: var(--baby-powder);
+  padding: 2rem;
+  border-radius: 1rem;
+  width: 90%;
+  max-width: 600px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+  position: relative;
+  overflow-y: auto;
+  max-height: 80%;
+}
+
+.modal-content h2 {
+  font-size: 1.5rem;
+  font-weight: var(--font-weight-bold);
+  margin-bottom: 1rem;
+  color: var(--raisin-black);
+  text-align: center;
+}
+
+.modal-content ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.modal-content ul li {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  color: var(--raisin-black);
+  background: var(--yellow-green);
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+}
+
+.modal-content ul li p {
+  margin: 0;
+}
+
+.close-button {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  font-size: 1.5rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--coral);
+  cursor: pointer;
+  background: none;
+  border: none;
+  outline: none;
 }
