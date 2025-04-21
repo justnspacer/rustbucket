@@ -14,14 +14,17 @@
     <div class="user-container">
 
   
-      <div class="user-image">    
-        <img id="user-profile-picture" src="{{ user.images[0].url }}" crossOrigin="anonymous" alt="{{ user.display_name }}" />
+      <div id="user-background">
+        <div class="user-image">    
+          <img id="user-profile-picture" src="{{ user.images[0].url }}" crossOrigin="anonymous" alt="{{ user.display_name }}" />
+        </div>
+        <div class="user-info">
+          <h1>{{ user.display_name }}'s Spotify<i className="fa-regular fa-circle-right"></i></h1>
+          <span><span class="follower-count">{{ user.followers.total }}</span> followers</span>
+        </div>
       </div>
-      <div class="user-info">
-        <h1>{{ user.display_name }}'s Spotify<i className="fa-regular fa-circle-right"></i></h1>
-        <span><span class="follower-count">{{ user.followers.total }}</span> followers</span>
-      </div>
-      <ul>
+
+      <ul id="user-menu">
         <li>
           <div id="user-playlists">
             <h2>Playlists</h2>

@@ -48,11 +48,46 @@ h1 {
   }
 }
 .user-image img {
-  width: 300px;
-  height: 320px;
+  width: 400px;
+  height: 400px;
   object-fit: cover;
-  border-radius: 2rem;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  mask-image:
+    linear-gradient(to top, transparent, black 20%, black 80%, transparent),   /* vertical fade */
+    linear-gradient(to right, transparent, black 20%, black 80%, transparent); /* horizontal fade */
+  -webkit-mask-image:
+    linear-gradient(to top, transparent, black 20%, black 80%, transparent),
+    linear-gradient(to right, transparent, black 20%, black 80%, transparent);
+  mask-composite: intersect;
+  -webkit-mask-composite: destination-in;
+  mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+}
+
+.image-radial-gradient {
+  mask-image: radial-gradient(farthest-side, black 60%, transparent 100%);
+  -webkit-mask-image: radial-gradient(farthest-side, black 60%, transparent 100%);
+  mask-mode: alpha;
+  -webkit-mask-mode: alpha;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: 100% 100%;
+}
+
+#user-background{
+  top: 80px;
+  left: 10px;
+  z-index: -1;
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+
 }
 
 .follower-count {
@@ -104,16 +139,13 @@ button {
 
 .playlists {
   display: flex;
-  justify-content: center;
   flex-wrap: wrap;
   gap: 2rem;
-  padding: 1rem;
 }
 
 #user-playlists h2, #user-top-artists h2, #user-top-tracks h2, #user-saved-tracks h2  {
   font-weight: var(--font-weight);
   font-size: 2rem;
-  padding: 0 1rem;
 }
 
 .user-top-track-item, 
@@ -131,22 +163,18 @@ button {
 .top-artists-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
-  padding: 1rem 4rem;
 }
 
 .top-tracks-list {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
-  padding: 1rem 4rem;
 }
 
 .user-saved-tracks {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
-  padding: 1rem 4rem;
 }
 
 .user-top-artist-item img {
@@ -179,8 +207,8 @@ button {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   color: var(--raisin-black);
   display: flex;
-  width: 240px;
-  height: 240px;
+  width: 180px;
+  height: 180px;
   align-items: center;
   justify-content: center;
   gap: 1rem;
@@ -374,7 +402,6 @@ pointer-events: none;
 display: flex;
 flex-direction: column;
 justify-content: center;
-align-items: center;
 margin-top: 2rem;
 gap: 1.5rem;
 }
@@ -408,6 +435,7 @@ margin-bottom: 2rem;
   position: relative;
   overflow-y: auto;
   max-height: 80%;
+  background-clip: padding-box;
 }
 
 .modal-content h2 {

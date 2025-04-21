@@ -78,13 +78,15 @@ async function fetchUserPlaylists() {
           try {
             const response = await fetch(`/playlist-tracks/${playlistId}`);
             const data = await response.json();
-
+            const body = document.querySelector('body');
             const modal = document.createElement('div');
             modal.classList.add('modal');
             modal.innerHTML = `
-              <div class="modal-content">
+              <div class="modal-content" style="background-image: url(${
+                playlist.images[0].url
+              }); background-size: cover;">
             <span class="close-button">&times;</span>
-            <h2>${playlist.name} - Tracks</h2>
+            <h2>${playlist.name}'s Tracks</h2>
             <ul class="playlist-tracks">
             ${data.items
               .map(
@@ -106,15 +108,18 @@ async function fetchUserPlaylists() {
             `;
 
             document.body.appendChild(modal);
+            body.style.overflow = 'hidden';
 
             const closeButton = modal.querySelector('.close-button');
             closeButton.addEventListener('click', () => {
               modal.remove();
+              body.style.overflow = 'auto';
             });
 
             modal.addEventListener('click', (e) => {
               if (e.target === modal) {
                 modal.remove();
+                body.style.overflow = 'auto';
               }
             });
           } catch (error) {
