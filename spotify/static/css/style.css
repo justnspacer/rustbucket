@@ -30,7 +30,7 @@ display: flex;
 background: var(--raisin-black);
 color: var(--baby-powder);
 padding: 1rem;
-font-weight: var(--font-weight);
+font-weight: var(--font-weight-bold);
 }
 h1 {
   font-weight: var(--font-weight-bold);
@@ -39,8 +39,11 @@ h1 {
   z-index: 1;
 }
 
+#content-list {
+  
+}
+
 .user-info {
-  color: var(--baby-powder);
   text-align: center;
 
   span {
@@ -48,21 +51,22 @@ h1 {
   }
 }
 .user-image img {
-  width: 400px;
-  height: 400px;
+  width: 360px;
+  height: 360px;
   object-fit: cover;
-  mask-image:
-    linear-gradient(to top, transparent, black 20%, black 80%, transparent),   /* vertical fade */
-    linear-gradient(to right, transparent, black 20%, black 80%, transparent); /* horizontal fade */
-  -webkit-mask-image:
+  border-radius: 50%;
+  /* mask-image:
     linear-gradient(to top, transparent, black 20%, black 80%, transparent),
-    linear-gradient(to right, transparent, black 20%, black 80%, transparent);
-  mask-composite: intersect;
+    linear-gradient(to right, transparent, black 20%, black 80%, transparent); */
+  /* -webkit-mask-image:
+    linear-gradient(to top, transparent, black 20%, black 80%, transparent),
+    linear-gradient(to right, transparent, black 20%, black 80%, transparent); */
+  /* mask-composite: intersect;
   -webkit-mask-composite: destination-in;
   mask-size: 100% 100%;
   mask-repeat: no-repeat;
   -webkit-mask-size: 100% 100%;
-  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat; */
 }
 
 .image-radial-gradient {
@@ -86,8 +90,15 @@ h1 {
   gap: 2rem;
   align-items: center;
   justify-content: center;
-  flex-direction: column;
+  padding: 1rem;
+}
 
+@media (max-width: 600px) {
+  #user-background {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
 }
 
 .follower-count {
@@ -132,18 +143,17 @@ button {
 .spotify-album-image {
   width: 100px;
   height: 100px;
-  border-radius: 50%;
   object-fit: cover;
   transition: all 0.3s;
 }
 
-.playlists {
+.lists {
   display: flex;
   flex-wrap: wrap;
   gap: 2rem;
 }
 
-#user-playlists h2, #user-top-artists h2, #user-top-tracks h2, #user-saved-tracks h2  {
+#user-lists h2, #user-top-artists h2, #user-top-tracks h2, #user-saved-tracks h2  {
   font-weight: var(--font-weight);
   font-size: 2rem;
 }
@@ -152,17 +162,21 @@ button {
 .user-top-track-item .item-name, 
 .saved-track-item, 
 .saved-track-item .item-name {
-  color: var(--baby-powder);
 }
 
 .user-top-track-item .item-artist, 
 .saved-track-item .item-artist {
-  color: var(--yellow-green);
 }
 
 .top-artists-list {
   display: flex;
   flex-wrap: wrap;
+  
+}
+
+.column-list {
+  display: flex;
+  flex-direction: column;
 }
 
 .top-tracks-list {
@@ -190,10 +204,11 @@ button {
   overflow: hidden;
 }
 
-.playlist-item {
+.list-item {
   border-radius: 5px;
   background-repeat: no-repeat;
   background-size: cover;
+  font-size: 0.8rem;
 }
 
 .circle-image {
@@ -201,14 +216,14 @@ button {
   overflow: hidden;
 }
 
-.playlist-item a, .playlist-item .playlist-info {
+.list-item a, .list-item .list-info {
   padding: 5px;
   border-radius: 5px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   color: var(--raisin-black);
   display: flex;
-  width: 180px;
-  height: 180px;
+  width: 120px;
+  height: 120px;
   align-items: center;
   justify-content: center;
   gap: 1rem;
@@ -217,14 +232,14 @@ button {
   transition: background 0.3s;
 }
 
-.playlist-item a:hover, .playlist-item .playlist-info:hover {
+.list-item a:hover, .list-item .list-info:hover {
   background: #0000009c;
   backdrop-filter: blur(7px);
   color: var(--baby-powder);
   box-shadow: none;
 
 
-  .playlist-image{
+  .list-image{
     transform: scale(1.1);
     border-radius: 5px;
   }
@@ -234,12 +249,12 @@ button {
   }
 }
 
-.playlist-item ul {
+.list-item ul {
   display: none;
   text-align: center;
 }
 
-.playlist-image {
+.list-image {
   width: 50px;
   height: 50px;
   object-fit: cover;
@@ -249,24 +264,27 @@ button {
 
 
 .currently-playing-container {
-position: fixed;
-right: 3rem;
-top: 4rem;
-color: var(--baby-powder);
-z-index: 1000;
-transition: all 0.3s;
+  position: fixed;
+  right: 3rem;
+  top: 4rem;
+  color: var(--baby-powder);
+  z-index: 1000;
+  transition: all 0.3s;
 }
 
 .currently-playing-container:hover {
   width: 220px;
   height: auto;
+  background: rgba(52, 46, 55, 0.822);
+  backdrop-filter: blur(7px);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  border-radius: 0.6rem;
+  padding: 1rem;
 
   .track-info {
     display: flex;
     flex-direction: column;
-    gap: 1rem; 
     width: 100%;
-    margin-top: 0.5rem;
   }
 
   h2 {
@@ -274,9 +292,8 @@ transition: all 0.3s;
   }
 
   img {
-    border-radius: 1rem;
     width: 100%;
-    height: 220px;
+    height: fit-content;
   }
 }
 
@@ -293,11 +310,11 @@ transition: all 0.3s;
   margin-top: 2rem;
 }
 
-.playlist-item a{
-  width: 200px;
-  height: 200px;
+.list-item a{
+  width: 120px;
+  height: 120px;
 }
-.top-artists-list, .playlists {
+.top-artists-list, .lists {
   justify-content: center;
 }
 }
@@ -316,12 +333,8 @@ position: relative;
   font-size: 1rem;
   letter-spacing: 1px;
   text-transform: capitalize;
-  margin-bottom: 0.5rem;
-  padding: 0.5rem;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(7px);
-  border-radius: 1.2rem;
   text-align: center;
+  margin-bottom: 0.5rem;
 }
 
 .currently-playing-container .track-info {
@@ -333,14 +346,15 @@ ul li {
   text-transform: capitalize;
 }
 
-.playlist-name {
-  font-size: 1rem;
+.list-name {
+  font-size: 0.8rem;
   font-weight: var(--font-weight-bold);
+  text-wrap: wrap;
 }
 
 
 .currently-playing-container ul li {
-  color: var(--coral);
+  color: var(--baby-powder);
   font-size: 0.9rem;
 }
 
@@ -351,6 +365,10 @@ ul li {
   color: var(--baby-powder) !important;
   text-transform: capitalize;
   text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 60ch;
 }
 
 .cp-message {
@@ -362,9 +380,7 @@ ul li {
 }
 
 .artist-line, .album-line {
-  margin-bottom: 0.2rem;
   font-size: 0.6rem;
-  font-weight: var(--font-weight-bold);
 }
 
 #playback {
@@ -380,33 +396,31 @@ ul li {
   color: white;
   margin-right: 4px;
   font-size: 0.7rem;
+  color: var(--tufts-blue);
 }
 
 .artist-line, .album-line {        
-  text-transform: uppercase;
-  color: var(--yellow-green);
+  display: flex;
+  flex-direction: column;
 }
 
-.track-name, .artist-line, .album-line {        
-  padding: 0.5rem;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(7px);
-  border-radius: 1.2rem;
+.track-name, .artist-line, .album-line {  
+  font-weight: var(--font-weight-bold);
+}
+
+.track-name {
+  padding: 1rem 0;
+}
+
+.artist-line {
+  margin-bottom: 0.3rem;
 }
 
 .no-hover {
 pointer-events: none;
 }
 
-.user-container {
-display: flex;
-flex-direction: column;
-justify-content: center;
-margin-top: 2rem;
-gap: 1.5rem;
-}
-
-#user-playlists {
+#user-lists {
 display: flex;
 flex-direction: column;
 margin-bottom: 2rem;

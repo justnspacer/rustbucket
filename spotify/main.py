@@ -7,10 +7,7 @@ import os
 import requests
 import time
 
-
-
 load_dotenv()
-
 
 app = Flask(__name__)
 
@@ -60,7 +57,6 @@ def get_spotify():
         cache_handler.save_token_to_cache(token_info)
     return sp, token_info["access_token"]
 
-
 @app.route("/")
 def home():
     sp, token_info = get_spotify()
@@ -84,7 +80,6 @@ def callback():
     session["token_info"] = token_info
     return jsonify(token_info)
 
-# Get user's top artists and tracks
 @app.route("/top-artists-and-tracks")
 def top_artists_and_tracks():
     sp, token_info = get_spotify()
