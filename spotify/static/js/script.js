@@ -158,16 +158,15 @@ async function fetchUserTopItems() {
         const li = document.createElement('li');
         li.classList.add('user-top-track-item');
         li.innerHTML = `
-          <p><span><span class="item-name"><a id="spotify_track_url_${
-            track.id
-          }" href="${track.external_urls.spotify}" target="_blank">${
+          <p><span><span class="item-name"><span class="popularity">${
+            track.popularity
+          }</span><a id="spotify_track_url_${track.id}" href="${
+          track.external_urls.spotify
+        }" target="_blank">${
           track.name
         }</a></span> - <span class="item-artist">${track.artists
           .map((artist) => artist.name)
-          .join(', ')}</span></span></p> 
-              <p>Popularity: <span class="popularity">${
-                track.popularity
-              }</span></p>          
+          .join(', ')}</span></span></p>     
         `;
         tracksList.appendChild(li);
       });
@@ -194,8 +193,7 @@ async function fetchUserSavedTracks() {
         const li = document.createElement('li');
         li.classList.add('saved-track-item');
         li.innerHTML = `
-          <p><span class="item-name"><a href="${track.url}" target="_blank">${track.name}</a></span> - <span class="item-artist">${track.artist}</span></p>
-          <p>Added: <span class="item-added">${track.added_at}</span></p>          
+          <p><span class="item-name"><span class="item-added">${track.added_at}</span><a href="${track.url}" target="_blank">${track.name}</a></span> - <span class="item-artist">${track.artist}</span></p>                 
         `;
         tracksList.appendChild(li);
       });

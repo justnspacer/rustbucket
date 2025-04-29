@@ -168,6 +168,11 @@ button {
 #user-lists h2, #user-top-artists h2, #user-top-tracks h2, #user-saved-tracks h2  {
   font-weight: var(--font-weight);
   font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+#user-top-tracks h2 span, #user-saved-tracks h2 span {
+  font-size: 0.8rem;
 }
 
 .user-top-track-item, 
@@ -189,6 +194,28 @@ button {
 .column-list {
   display: flex;
   flex-direction: column;
+}
+
+.popularity {
+  background-color: var(--yellow-green);
+  color: var(--raisin-black);
+  padding: 0.3rem;
+  border-radius: 50%;
+  font-size: 0.7rem;
+  font-weight: var(--font-weight-bold);
+  text-align: center;
+  margin-right: 1rem;
+}
+
+.item-added {
+  background-color: var(--coral);
+  color: var(--baby-powder);
+  padding: 0.3rem;
+  border-radius: 1rem;
+  font-size: 0.7rem;
+  font-weight: var(--font-weight-bold);
+  text-align: center;
+  margin-right: 1rem;
 }
 
 .top-tracks-list {
@@ -350,6 +377,7 @@ position: relative;
 
 ul li {
   font-size: 0.8rem;
+  line-height: 2rem;
 }
 
 .list-name {
