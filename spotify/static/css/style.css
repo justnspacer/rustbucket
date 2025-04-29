@@ -175,16 +175,6 @@ button {
   font-size: 0.8rem;
 }
 
-.user-top-track-item, 
-.user-top-track-item .item-name, 
-.saved-track-item, 
-.saved-track-item .item-name {
-}
-
-.user-top-track-item .item-artist, 
-.saved-track-item .item-artist {
-}
-
 .top-artists-list {
   display: flex;
   flex-wrap: wrap;
