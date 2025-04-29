@@ -377,6 +377,9 @@ position: relative;
 
 ul li {
   font-size: 0.8rem;
+}
+
+.column-list li {
   line-height: 2rem;
 }
 
