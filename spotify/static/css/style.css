@@ -150,7 +150,6 @@ button {
 .lists {
   display: flex;
   flex-wrap: wrap;
-  gap: 2rem;
 }
 
 #user-lists h2, #user-top-artists h2, #user-top-tracks h2, #user-saved-tracks h2  {
@@ -205,7 +204,6 @@ button {
 }
 
 .list-item {
-  border-radius: 5px;
   background-repeat: no-repeat;
   background-size: cover;
   font-size: 0.8rem;
@@ -218,7 +216,6 @@ button {
 
 .list-item a, .list-item .list-info {
   padding: 5px;
-  border-radius: 5px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   color: var(--raisin-black);
   display: flex;
@@ -343,7 +340,6 @@ position: relative;
 
 ul li {
   font-size: 0.8rem;
-  text-transform: capitalize;
 }
 
 .list-name {
@@ -363,7 +359,6 @@ ul li {
   font-weight: var(--font-weight);
   font-size: 0.9rem;
   color: var(--baby-powder) !important;
-  text-transform: capitalize;
   text-align: center;
   white-space: nowrap;
   overflow: hidden;
@@ -410,6 +405,7 @@ ul li {
 
 .track-name {
   padding: 1rem 0;
+  font-size: 1rem !important;
 }
 
 .artist-line {
@@ -441,9 +437,8 @@ margin-bottom: 2rem;
 
 .modal-content {
   background: var(--baby-powder);
-  padding: 2rem;
-  border-radius: 1rem;
-  width: 90%;
+  padding: 1rem;
+  width: 100%;
   max-width: 600px;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
   position: relative;
@@ -457,7 +452,6 @@ margin-bottom: 2rem;
   font-weight: var(--font-weight-bold);
   margin-bottom: 1rem;
   color: var(--raisin-black);
-  text-align: center;
 }
 
 .modal-content ul {
@@ -467,12 +461,7 @@ margin-bottom: 2rem;
 }
 
 .modal-content ul li {
-  margin-bottom: 1rem;
-  font-size: 1rem;
   color: var(--raisin-black);
-  background: var(--yellow-green);
-  padding: 0.5rem;
-  border-radius: 0.5rem;
 }
 
 .modal-content ul li p {
@@ -483,9 +472,9 @@ margin-bottom: 2rem;
   position: absolute;
   top: 1rem;
   right: 1rem;
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   font-weight: var(--font-weight-bold);
-  color: var(--coral);
+  color: var(--raisin-black);
   cursor: pointer;
   background: none;
   border: none;

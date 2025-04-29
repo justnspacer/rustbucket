@@ -94,17 +94,22 @@ def top_artists_and_tracks():
 def user_saved_tracks():
     all_tracks = [] # List to hold all tracks
     sp, token_info = get_spotify() # Get the Spotify client
-    saved_tracks = sp.current_user_saved_tracks(limit=50) # Get the first page of saved tracks
-    while saved_tracks: # Loop through all pages of saved tracks
-        # Extract relevant information from each track
-        tracks = [{"name": item["track"]["name"], 
+    saved_tracks = sp.current_user_saved_tracks(limit=20) # Get the first page of saved tracks
+    tracks = [{"name": item["track"]["name"], 
                "artist": item["track"]["artists"][0]["name"], 
                "added_at": datetime.datetime.strptime(item["added_at"], "%Y-%m-%dT%H:%M:%SZ").strftime("%m/%d/%Y"),
                "url": item["track"]["external_urls"]["spotify"]} 
               for item in saved_tracks["items"]]
-        all_tracks.extend(tracks) # Add the tracks to the list
-        saved_tracks = sp.next(saved_tracks) # Get the next page of tracks        
-    return jsonify(all_tracks) # Return the list of all tracks
+    # while saved_tracks: # Loop through all pages of saved tracks
+    #     # Extract relevant information from each track
+    #     tracks = [{"name": item["track"]["name"], 
+    #            "artist": item["track"]["artists"][0]["name"], 
+    #            "added_at": datetime.datetime.strptime(item["added_at"], "%Y-%m-%dT%H:%M:%SZ").strftime("%m/%d/%Y"),
+    #            "url": item["track"]["external_urls"]["spotify"]} 
+    #           for item in saved_tracks["items"]]
+    #     all_tracks.extend(tracks) # Add the tracks to the list
+    #     saved_tracks = sp.next(saved_tracks) # Get the next page of tracks        
+    return jsonify(tracks) # Return the list of all tracks
 
 # get current user currently playing track
 @app.route("/currently-playing")
@@ -120,7 +125,7 @@ def currently_playing():
 @app.route("/top-tracks")
 def top_tracks():
     sp, token_info = get_spotify()
-    top_tracks = sp.current_user_top_tracks()
+    top_tracks = sp.current_user_top_tracks(limit=20)
     return jsonify(top_tracks)
 
 # Get user's recently played tracks
@@ -134,14 +139,14 @@ def recently_played():
 @app.route("/saved-tracks")
 def saved_tracks():
     sp, token_info = get_spotify()
-    saved_tracks = sp.current_user_saved_tracks()
+    saved_tracks = sp.current_user_saved_tracks(limit=20)
     return jsonify(saved_tracks)
 
 # Get user's playlists
 @app.route("/playlists")
 def playlists():
     sp, token_info = get_spotify()
-    playlists = sp.current_user_playlists()
+    playlists = sp.current_user_playlists(limit=20)
     return jsonify(playlists)
 
 #Get playlist tracks

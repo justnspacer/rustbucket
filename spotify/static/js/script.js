@@ -132,7 +132,6 @@ async function fetchUserTopItems() {
       data.top_artists.forEach((artist) => {
         const li = document.createElement('li');
         li.classList.add('list-item');
-        li.classList.add('circle-image');
 
         // Set a random image from the artist's images
         if (artist.images.length > 0) {
@@ -241,11 +240,10 @@ async function fetchUserPlaylists() {
             const modal = document.createElement('div');
             modal.classList.add('modal');
             modal.innerHTML = `
-              <div class="modal-content" style="background-image: url(${
-                playlist.images[0].url
-              }); background-size: cover;">
+              <div class="modal-content">
             <span class="close-button">&times;</span>
-            <h2>${playlist.name}'s Tracks</h2>
+            <h2>${playlist.name}</h2>
+            <img src="${playlist.images[0].url}"/>
             <ul class="list-tracks">
             ${data.items
               .map(
@@ -289,8 +287,6 @@ async function fetchUserPlaylists() {
       });
       container.appendChild(ul);
     }
-
-    document.body.appendChild(container);
   } catch (error) {
     console.error('Error fetching user playlists:', error);
   }
