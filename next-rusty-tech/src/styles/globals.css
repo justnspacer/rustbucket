@@ -292,13 +292,13 @@ footer {
   width: 100%;
 }
 
-.slide.left .image-container {
+.slide.left-arrow-shape .image-container {
   clip-path: polygon(100% 0%, 75% 50%, 100% 100%, 25% 100%, 0% 50%, 25% 0%);
   margin-right: 200px;
   transition: margin-right 0.3s ease-out;
 }
 
-.slide.right .image-container {
+.slide.right-arrow-shape .image-container {
   order: 1;
   clip-path: polygon(75% 0%, 100% 50%, 75% 100%, 0% 100%, 25% 50%, 0% 0%);
   margin-right: -200px;

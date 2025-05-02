@@ -11,28 +11,46 @@ export interface Slide {
 
 interface SlideShowProps {
   slides: Slide[];
+  slideClasses?: {
+    even: string;
+    odd: string;
+  };
+  autoplay?: boolean;
+  autoplayInterval?: number;
 }
 
-export const SlideShow: React.FC<SlideShowProps> = ({ slides }) => {
+export const SlideShow: React.FC<SlideShowProps> = ({ 
+  slides, 
+  slideClasses = { even: '', odd: '' }, 
+  autoplay = true, 
+  autoplayInterval = 1000 
+ }) => {
+
   const [currentSlide, setCurrentSlide] = useState(0);
 
+  const nextSlide = () => {
+    setCurrentSlide((prevSlide) => (prevSlide + 1) % slides.length);
+  };
+
   useEffect(() => {
-    
+    if (!autoplay) return;
+
     const interval = setInterval(() => {
-      setCurrentSlide((prevSlide) => (prevSlide + 1) % slides.length);
-    }, 8000);
+      nextSlide();
+      }, autoplayInterval);
 
     return () => clearInterval(interval);
-  }, []);
 
+  }, [autoplay, autoplayInterval, slides.length]);
+
+  const appliedSlideClasses =
+    currentSlide % 2 === 0 ? slideClasses.even || '' : slideClasses.odd || '';
 
   const handleDotClick = (index: number) => {
     setCurrentSlide(index);
   };
 
-  const nextSlide = () => {
-    setCurrentSlide((prevSlide) => (prevSlide + 1) % slides.length);
-  };
+
 
   const prevSlide = () => {
     setCurrentSlide((prevSlide) => (prevSlide - 1 + slides.length) % slides.length);
@@ -42,7 +60,7 @@ export const SlideShow: React.FC<SlideShowProps> = ({ slides }) => {
 <section className="slideshow">
   <div className='container'>
     <button className='previous' onClick={prevSlide}><FontAwesomeIcon icon={faAngleLeft} /></button>
-      <div className={`slide ${currentSlide % 2 === 0 ? 'left' : 'right'}`}>
+      <div className={`slide ${appliedSlideClasses}`}>
         <div className="image-container">
           <img src={slides[currentSlide].image} alt="slide image" />
         </div>

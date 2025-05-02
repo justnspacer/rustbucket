@@ -47,8 +47,8 @@ const HomePage = () => {
       }
     ];
   return <>
-  <SlideShow slides={homeSlides}/>
-  <SlideShow slides={newSlides}/>
+  <SlideShow slides={homeSlides} slideClasses={{even: 'left-arrow-shape', odd: 'right-arrow-shape',}} autoplay={true} autoplayInterval={20000}/>
+  <SlideShow slides={newSlides} slideClasses={{even: '', odd: '',}} autoplay={false} autoplayInterval={0}/>
 
   </>
   ;
