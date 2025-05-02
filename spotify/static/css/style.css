@@ -30,7 +30,7 @@ display: flex;
 background: var(--raisin-black);
 color: var(--baby-powder);
 padding: 1rem;
-font-weight: var(--font-weight-bold);
+font-weight: var(--font-weight);
 }
 h1 {
   font-weight: var(--font-weight-bold);
@@ -195,6 +195,7 @@ button {
   font-weight: var(--font-weight-bold);
   text-align: center;
   margin-right: 1rem;
+  letter-spacing: 1px;;
 }
 
 .item-added {
@@ -206,6 +207,7 @@ button {
   font-weight: var(--font-weight-bold);
   text-align: center;
   margin-right: 1rem;
+  letter-spacing: 2px;
 }
 
 .top-tracks-list {
@@ -264,14 +266,10 @@ button {
   backdrop-filter: blur(7px);
   color: var(--baby-powder);
   box-shadow: none;
+  transition: all 0.3s ease-in-out;
+  transform: scale(1.1);
 
-
-  .list-image{
-    transform: scale(1.1);
-    border-radius: 5px;
-  }
-
-  ul{
+  ul {
     display: block;
   }
 }
@@ -353,7 +351,7 @@ position: relative;
   color: var(--baby-powder);
   width: 100%;
   transition: all 0.3s;
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--font-weight);
   font-size: 1rem;
   letter-spacing: 1px;
   text-transform: capitalize;
@@ -422,16 +420,12 @@ ul li {
   color: white;
   margin-right: 4px;
   font-size: 0.7rem;
-  color: var(--tufts-blue);
+  color: var(--yellow-green);
 }
 
 .artist-line, .album-line {        
   display: flex;
   flex-direction: column;
-}
-
-.track-name, .artist-line, .album-line {  
-  font-weight: var(--font-weight-bold);
 }
 
 .track-name {

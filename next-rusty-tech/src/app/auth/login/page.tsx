@@ -2,6 +2,8 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { useRouter } from 'next/navigation';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleRight } from '@fortawesome/free-solid-svg-icons';
 
 
 export default function Login() {
@@ -46,7 +48,7 @@ export default function Login() {
     <a className='reset-password-link' href="/resetPassword">Reset Password</a>
     <div className="mt-2">
     <span className="register-text">Don't have an account? </span>
-    <a className="register-link" href="/register">Register<i className="fa-regular fa-circle-right"></i></a>
+    <a className="register-link" href="/register">Register<FontAwesomeIcon icon={faCircleRight}/></a>
     </div>
     {error && <p style={{ color: "red" }}>{error}</p>}
     {success && <p style={{ color: "green" }}>{success}</p>}

@@ -75,6 +75,18 @@ nav .username:hover {
   text-decoration: none;
 }
 
+.nav-left {
+  display: flex;
+  gap: 2rem;;
+}
+
+.nav-links {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
 .bg-gradient {
   display: inline-block;
   background: linear-gradient(90deg, #f12711 0%, #f5af19 100%);
@@ -263,6 +275,10 @@ footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.slideshow {
+  margin-bottom: 2rem;
 }
 
 .slideshow .container {

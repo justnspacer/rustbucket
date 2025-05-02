@@ -1,12 +1,17 @@
-import HomePageImage from '@/components/HomePageImage';
-import HomePageMessage from '@/components/HomePageMessage';
-import SlideShow from '@/components/SlideShow';
+"use client";
+import { useEffect } from "react";
+import { useRouter } from 'next/navigation';
 
-const HomePage = () => {  
-  return <>
-  <SlideShow/>
-  </>
-  ;
+
+const Landing = () => {
+  const router = useRouter();
+
+  useEffect(() => {
+    // address any issues with this redirect in the future maybe
+    router.push("/home");
+  }, [router]);
+
+  return null;
 };
 
-export default HomePage;
+export default Landing;

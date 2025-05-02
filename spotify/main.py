@@ -97,7 +97,7 @@ def user_saved_tracks():
     saved_tracks = sp.current_user_saved_tracks(limit=20) # Get the first page of saved tracks
     tracks = [{"name": item["track"]["name"], 
                "artist": item["track"]["artists"][0]["name"], 
-               "added_at": datetime.datetime.strptime(item["added_at"], "%Y-%m-%dT%H:%M:%SZ").strftime("%m/%d/%Y"),
+               "added_at": datetime.datetime.strptime(item["added_at"], "%Y-%m-%dT%H:%M:%SZ").strftime("%m.%d.%y"),
                "url": item["track"]["external_urls"]["spotify"]} 
               for item in saved_tracks["items"]]
     # while saved_tracks: # Loop through all pages of saved tracks

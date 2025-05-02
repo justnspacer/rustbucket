@@ -1,8 +1,10 @@
 "use client";
 import { useEffect, useRef, useState } from 'react';
 import { useAuth } from "@/app/context/AuthContext";
-import Image from 'next/image';
 import LogoutButton from "@/components/LogoutButton";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleRight } from '@fortawesome/free-solid-svg-icons';
+import Link from 'next/link';
 
 export const NavBar = () => {
   const { user, loading } = useAuth();
@@ -28,8 +30,17 @@ useEffect(() => {
 
   return (
     <nav className='main-nav'>
-        <h1 className='logo-link'><a href="/"> <span className='bg-gradient'></span>
+      <div className='nav-left'>
+      <h1 className='logo-link'><a href="/"> <span className='bg-gradient'></span>
         Rust Bucket</a></h1>
+        <ul className='nav-links'>
+        <li><Link href="/business/about">About</Link></li>
+          <li><Link href="/business/contact">Contact</Link></li>
+          <li><Link href="/business/services">Services</Link></li>
+          <li><Link href="/business/terms">Terms</Link></li>
+          </ul>
+      </div>
+       
         {loading ? (
           <span>Loading...</span>
         ) : user ? (
@@ -47,7 +58,7 @@ useEffect(() => {
           <>
           <div className='auth-links'>
             <a className="login-link" href="/login">
-            Login<i className="fa-regular fa-circle-right"></i></a>
+            Login<FontAwesomeIcon icon={faCircleRight}/></a>
           </div>
           </>
         )}       
