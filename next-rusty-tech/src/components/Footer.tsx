@@ -32,7 +32,7 @@ useEffect(() => {
         <p>something else</p>
       </div>
       <div>
-      <h1 className='logo-link'><a href="/">Rust Bucket</a></h1>
+      <h1 className='logo-link'><a href="/home">Rust Bucket</a></h1>
       </div>
     </footer>
   ); 

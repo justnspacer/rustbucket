@@ -45,10 +45,10 @@ export default function Login() {
     </form>
     
 
-    <a className='reset-password-link' href="/resetPassword">Reset Password</a>
+    <a className='reset-password-link' href="/auth/resetPassword">Reset Password</a>
     <div className="mt-2">
     <span className="register-text">Don't have an account? </span>
-    <a className="register-link" href="/register">Register<FontAwesomeIcon icon={faCircleRight}/></a>
+    <a className="register-link" href="/auth/register">Register<FontAwesomeIcon icon={faCircleRight}/></a>
     </div>
     {error && <p style={{ color: "red" }}>{error}</p>}
     {success && <p style={{ color: "green" }}>{success}</p>}

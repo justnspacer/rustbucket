@@ -31,7 +31,7 @@ useEffect(() => {
   return (
     <nav className='main-nav'>
       <div className='nav-left'>
-      <h1 className='logo-link'><a href="/"> <span className='bg-gradient'></span>
+      <h1 className='logo-link'><a href="/home"> <span className='bg-gradient'></span>
         Rust Bucket</a></h1>
         <ul className='nav-links'>
         <li><Link href="/business/about">About</Link></li>
@@ -48,7 +48,7 @@ useEffect(() => {
           <div className='username' onClick={handleDropdownClick}>Welcome, { user.user_metadata.displayName || user.email }!
           <ul className='dropdown' ref={dropdownRef}>
           {showDropdown && (<>
-          <li className='dropdown-item'><a href="/myprofile">Profile</a></li>
+          <li className='dropdown-item'><a href="/auth/myprofile">Profile</a></li>
           <li className='dropdown-item'><LogoutButton /></li>
           </>
           )}
@@ -57,7 +57,7 @@ useEffect(() => {
         </>):(
           <>
           <div className='auth-links'>
-            <a className="login-link" href="/login">
+            <a className="login-link" href="/auth/login">
             Login<FontAwesomeIcon icon={faCircleRight}/></a>
           </div>
           </>
