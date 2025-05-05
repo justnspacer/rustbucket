@@ -30,7 +30,6 @@ html, body {
 
 .content {
   flex: 1;
-  padding: 4rem 1rem;
   background: var(--foreground);
   color: var(--background);
 }
@@ -330,6 +329,7 @@ footer {
   height: 100%;
   background-size: cover;
   background-position: center;
+  filter: brightness(0.8);
   opacity: 0;
   transition: opacity 0.5s ease;
   z-index: 1;
@@ -352,10 +352,11 @@ footer {
 
 .messageplus {
   position: absolute;
-  width: 50%;
+  width: 75%;
   color: white;
   font-weight: 700;
   z-index: 3;
+  margin-left: 2rem;
 }
 
 .header {
@@ -376,7 +377,7 @@ footer {
   cursor: pointer;
   z-index: 4;
   background-size: cover;
-  margin: 10px;
+  margin: 2rem;
   border-radius: 1rem;
 }
 

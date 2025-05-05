@@ -50,23 +50,21 @@ export const SlideShowPlus: React.FC<SlideShowProps> = ({
     setCurrentSlide(index);
   };
 
-  const randomizePositions = () => {
-    const positions = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
-    const randomIndex = Math.floor(Math.random() * positions.length);
-    const messagePosition = positions[randomIndex];
-    const clickAreaPosition = positions[(randomIndex + 1) % positions.length]; // Opposite position
+  // const randomizePositions = () => {
+  //   const positions = ['bottom-left', 'bottom-right'];
+  //   const randomIndex = Math.floor(Math.random() * positions.length);
+  //   const clickAreaPosition = positions[(randomIndex + 1) % positions.length]; // Opposite position
 
-    const messageElement = document.querySelector('.messageplus') as HTMLElement;
-    const clickAreaElement = document.querySelector('.click-area') as HTMLElement;
+  //   const clickAreaElement = document.querySelector('.click-area') as HTMLElement;
 
-    if (clickAreaElement) {
-      clickAreaElement.className = `click-area ${clickAreaPosition}`;
-    }
-  };
+  //   if (clickAreaElement) {
+  //     clickAreaElement.className = `click-area ${clickAreaPosition}`;
+  //   }
+  // };
 
-  useEffect(() => {
-    randomizePositions();
-  }, [currentSlide]);
+  // useEffect(() => {
+  //   randomizePositions();
+  // }, [currentSlide]);
 
   const prevSlide = () => {
     setCurrentSlide((prevSlide) => (prevSlide - 1 + slides.length) % slides.length);
@@ -76,15 +74,14 @@ export const SlideShowPlus: React.FC<SlideShowProps> = ({
 <section className="slideshowplus">
   <div className='slideshow-containerplus'>
   <button className='previous' onClick={prevSlide}><FontAwesomeIcon icon={faAngleLeft} /></button>
-      <div className={`slideplus ${appliedSlideClasses}`} style={{ backgroundImage: `url(${slides[currentSlide].image})` }}>
-
-        <div className="messageplus">
+  <div className="messageplus">
           <h1 className="header">{slides[currentSlide].header}</h1>
           <p className="description">{slides[currentSlide].description}</p>
         </div>
-        <div className="click-area" style={{ backgroundImage: `url(${slides[(currentSlide + 1) % slides.length].image})` }} onClick={nextSlide}></div>
+      <div className={`slideplus ${appliedSlideClasses}`} style={{ backgroundImage: `url(${slides[currentSlide].image})` }}>
       </div>
       <button className='next' onClick={nextSlide}><FontAwesomeIcon icon={faAngleRight} /></button>
+      <div className="click-area bottom-right" style={{ backgroundImage: `url(${slides[(currentSlide + 1) % slides.length].image})` }} onClick={nextSlide}></div>
   </div>   
       <div className="dots-container">
         {slides.map((_, index) => (

@@ -70,8 +70,8 @@ const HomePage = () => {
       }
     ];
   return <>
+    <SlideShowPlus slides={additionalSlides} slideClasses={{even: 'active', odd: 'active',}} autoplay={true} autoplayInterval={20000}/>
   <SlideShow slides={homeSlides} slideClasses={{even: 'left-arrow-shape', odd: 'right-arrow-shape',}} autoplay={true} autoplayInterval={20000}/>
-  <SlideShowPlus slides={additionalSlides} slideClasses={{even: 'active', odd: 'active',}} autoplay={false}/>
 
 
   </>
