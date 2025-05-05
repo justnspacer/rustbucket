@@ -19,7 +19,7 @@ interface SlideShowProps {
   autoplayInterval?: number;
 }
 
-export const SlideShow: React.FC<SlideShowProps> = ({ 
+export const SlideShowPlus: React.FC<SlideShowProps> = ({ 
   slides, 
   slideClasses = { even: '', odd: '' }, 
   autoplay = true, 
@@ -50,24 +50,39 @@ export const SlideShow: React.FC<SlideShowProps> = ({
     setCurrentSlide(index);
   };
 
+  const randomizePositions = () => {
+    const positions = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
+    const randomIndex = Math.floor(Math.random() * positions.length);
+    const messagePosition = positions[randomIndex];
+    const clickAreaPosition = positions[(randomIndex + 1) % positions.length]; // Opposite position
 
+    const messageElement = document.querySelector('.messageplus') as HTMLElement;
+    const clickAreaElement = document.querySelector('.click-area') as HTMLElement;
+
+    if (clickAreaElement) {
+      clickAreaElement.className = `click-area ${clickAreaPosition}`;
+    }
+  };
+
+  useEffect(() => {
+    randomizePositions();
+  }, [currentSlide]);
 
   const prevSlide = () => {
     setCurrentSlide((prevSlide) => (prevSlide - 1 + slides.length) % slides.length);
   };
 
   return (
-<section className="slideshow">
-  <div className='slideshow-container'>
+<section className="slideshowplus">
+  <div className='slideshow-containerplus'>
   <button className='previous' onClick={prevSlide}><FontAwesomeIcon icon={faAngleLeft} /></button>
-      <div className={`slide ${appliedSlideClasses}`}>
-        <div className="image-container">
-          <img src={slides[currentSlide].image} alt="slide image" />
-        </div>
-        <div className="message">
+      <div className={`slideplus ${appliedSlideClasses}`} style={{ backgroundImage: `url(${slides[currentSlide].image})` }}>
+
+        <div className="messageplus">
           <h1 className="header">{slides[currentSlide].header}</h1>
           <p className="description">{slides[currentSlide].description}</p>
         </div>
+        <div className="click-area" style={{ backgroundImage: `url(${slides[(currentSlide + 1) % slides.length].image})` }} onClick={nextSlide}></div>
       </div>
       <button className='next' onClick={nextSlide}><FontAwesomeIcon icon={faAngleRight} /></button>
   </div>   
@@ -84,4 +99,4 @@ export const SlideShow: React.FC<SlideShowProps> = ({
   );
 };
 
-export default SlideShow;
+export default SlideShowPlus;

@@ -1,7 +1,30 @@
 import SlideShow from '@/components/SlideShow';
+import SlideShowPlus from '@/components/SlideShowPlus';
 
 const HomePage = () => {  
-  
+  // Create a new list of slides
+  const additionalSlides = [
+    {
+      image: "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?q=80&w=2000&auto=format&fit=crop&ixlib=rb-4.0.3",
+      header: "Innovative Solutions",
+      description: "Discover cutting-edge technology and innovative solutions tailored for your needs."
+    },
+    {
+      image: "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?q=80&w=2000&auto=format&fit=crop&ixlib=rb-4.0.3",
+      header: "Seamless Integration",
+      description: "Experience seamless integration with our state-of-the-art tools and services."
+    },
+    {
+      image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=2000&auto=format&fit=crop&ixlib=rb-4.0.3",
+      header: "Unparalleled Support",
+      description: "Our team is here to provide unparalleled support every step of the way."
+    },
+    {
+      image: "https://images.unsplash.com/photo-1652202090716-819995ac42fe?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      header: "Your Success, Our Mission",
+      description: "Partner with us to achieve your goals and drive success."
+    }
+  ];
     const homeSlides = [
       {
         image: "https://images.unsplash.com/photo-1652202090716-819995ac42fe?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
@@ -48,7 +71,8 @@ const HomePage = () => {
     ];
   return <>
   <SlideShow slides={homeSlides} slideClasses={{even: 'left-arrow-shape', odd: 'right-arrow-shape',}} autoplay={true} autoplayInterval={20000}/>
-  <SlideShow slides={newSlides} slideClasses={{even: '', odd: '',}} autoplay={false} autoplayInterval={0}/>
+  <SlideShowPlus slides={additionalSlides} slideClasses={{even: 'active', odd: 'active',}} autoplay={false}/>
+
 
   </>
   ;

@@ -14,6 +14,10 @@
   }
 }
 
+.nextjs-static-indicator-toast-wrapper, .toast {
+  display: none !important;
+}
+
 html, body {
   height: 100%; /* Ensure the full height is respected */
   margin: 0; /* Remove default margin */
@@ -220,7 +224,7 @@ form button, .button-update-profile {
 }
 
 form button:hover {
-  background: greenyellow;
+  background: linear-gradient(90deg, #f12711 0%, #f5af19 100%);
   color: var(--background);
 }
 
@@ -230,14 +234,17 @@ form button:hover {
   width: 60px;
   font-size: 2rem;
   font-weight: 100;
+  z-index: 2;
+  border: 1px dotted #000;
+  flex: 1;
 }
 
 .previous:hover .fa-angle-left {
-  color: greenyellow;
+  color: #f12711;
 } 
 
 .next:hover .fa-angle-right {
-  color: greenyellow;
+  color: #f12711;
 } 
 
 .button-logout {
@@ -258,7 +265,7 @@ form button:hover {
 }
 
 .reset-password-link:hover {
-  color: greenyellow;
+  color: linear-gradient(90deg, #f12711 0%, #f5af19 100%);
   background: var(--background);
 }
 
@@ -279,16 +286,18 @@ footer {
 
 .slideshow {
   margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
 }
 
-.slideshow .container {
+.slideshow-container {
   display: flex;
 }
 .slide {
   display: flex;
   align-items: center;
   justify-content: center;
-  flex: 1;
+  flex: 2;
   width: 100%;
 }
 
@@ -303,6 +312,96 @@ footer {
   clip-path: polygon(75% 0%, 100% 50%, 75% 100%, 0% 100%, 25% 50%, 0% 0%);
   margin-right: -200px;
   transition: margin-right 0.3s ease-out;
+}
+
+.slideshowplus {
+  position: relative;
+  width: 100%;
+  height: 70vh;
+  overflow: hidden;
+}
+
+
+.slideplus {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  padding: 3rem;
+}
+
+.slideplus.active {
+  opacity: 1;
+  z-index: 2;
+}
+
+.overlay {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3); /* semi-transparent overlay */
+}
+
+.messageplus {
+  position: absolute;
+  width: 50%;
+  color: white;
+  font-weight: 700;
+  z-index: 3;
+}
+
+.header {
+  font-size: 3rem;
+}
+
+
+
+.description {
+  font-size: 1.5rem;
+  font-weight: 100;
+}
+
+.click-area {
+  position: absolute;
+  width: 130px;
+  height: 130px;
+  cursor: pointer;
+  z-index: 4;
+  background-size: cover;
+  margin: 10px;
+  border-radius: 1rem;
+}
+
+.top-left {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.top-right {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.bottom-left {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+.bottom-right {
+  position: absolute;
+  bottom: 0;
+  right: 0;
 }
 
 .slide .image-container {
@@ -366,6 +465,14 @@ footer {
   .slide .image-container {
     max-width: 400px;
     height: 400px;
+  }
+  .slide.left-arrow-shape .image-container, .slide.right-arrow-shape .image-container {
+    margin-right: 0;
+
+  }
+
+  .previous, .next {
+    flex: none;
   }
 }
 
