@@ -3,26 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>spotify</title>
+    <title>spotify user profile</title>
     <script src="https://kit.fontawesome.com/8e13a44ce3.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/animation.css') }}">
 </head>  
 
 <body>
   <nav>Spotify Ui</nav>
     {% if user %}  
       <div id="user-background">
-        <div class="user-image">    
+        <div class="user-image animate animate-from-right">    
           <img id="user-profile-picture" src="{{ user.images[0].url }}" crossOrigin="anonymous" alt="{{ user.display_name }}" />
         </div>
-        <div class="user-info">
+        <div class="user-info animate animate-from-left">
           <h1 class="custom-color-item">{{ user.display_name }}<i class="fa-solid fa-headphones icon"></i></h1>
           <span><span class="follower-count custom-color-item">{{ user.followers.total }}</span> followers</span>
           <p>{{ user.id }}</p>
         </div>
       </div>
 
-      <ul id="content-list">
+      <ul id="content-list animate animate-from-center">
         <li>
           <div id="user-top-artists">
             <h2>Current Top Artists</h2>
@@ -46,7 +47,8 @@
       </ul>
     <div id="currently-playing" class="currently-playing-container"></div>
   
-  <script src="{{ url_for('static', filename='js/script.js') }}" type="text/javascript"></script>
+  <script type="module" src="{{ url_for('static', filename='js/script.js') }}"></script>
+  <script type="module" src="{{ url_for('static', filename='js/animation.js') }}"></script>
     {% else %}
         <p>No token information available. Please <a href="{{ url_for('login') }}">login</a>.</p>
     {% endif %}

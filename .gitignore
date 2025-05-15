@@ -25,3 +25,4 @@ __pycache__/
 
 # Ignore these packages
 packages/animations
+spotify/.cache

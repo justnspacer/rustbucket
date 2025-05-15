@@ -1,0 +1,57 @@
+/* ===== BASE ANIMATION ===== */
+.animate {
+  opacity: 0;
+  transform: translate(0, 0) scale(1) rotate(0deg);
+  transition: all 0.6s ease-out;
+  will-change: opacity, transform;
+}
+
+.animate.show {
+  opacity: 1;
+  transform: translate(0, 0) scale(1) rotate(0deg);
+}
+
+/* ===== DIRECTIONAL ===== */
+.animate-from-top {
+  transform: translateY(-50px);
+}
+.animate-from-bottom {
+  transform: translateY(50px);
+}
+.animate-from-left {
+  transform: translateX(-50px);
+}
+.animate-from-right {
+  transform: translateX(50px);
+}
+.animate-from-center {
+  transform: scale(0.8);
+}
+
+/* ===== ROTATION ===== */
+.animate-rotate-left {
+  transform: rotate(-15deg);
+}
+.animate-rotate-right {
+  transform: rotate(15deg);
+}
+.animate-rotate-center {
+  transform: scale(0.8) rotate(0deg);
+}
+
+/* ===== STAGGER (optional) ===== */
+[data-animate-stagger] > * {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s ease-out;
+}
+[data-animate-stagger].show > * {
+  opacity: 1;
+  transform: translateY(0);
+}
+[data-animate-stagger].show > *:nth-child(1) { transition-delay: 0s; }
+[data-animate-stagger].show > *:nth-child(2) { transition-delay: 0.1s; }
+[data-animate-stagger].show > *:nth-child(3) { transition-delay: 0.2s; }
+[data-animate-stagger].show > *:nth-child(4) { transition-delay: 0.3s; }
+[data-animate-stagger].show > *:nth-child(5) { transition-delay: 0.4s; }
+/* Add more as needed */

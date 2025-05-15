@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap');
+
 :root {
   --tufts-blue: #3c91e6ff;
   --yellow-green: #9fd356ff;
@@ -21,6 +22,10 @@ body {
   background: var(--baby-powder);
   transition: background 0.3s ease-in;
 }
+
+
+
+
 ul {
   list-style: none;
 }
