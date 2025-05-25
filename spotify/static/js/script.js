@@ -1,3 +1,8 @@
+const list = document.querySelector('[data-animate-stagger]');
+if (list) {
+  console.log('Stagger group found');
+}
+
 function applyUserImageColor() {
   document.addEventListener('DOMContentLoaded', (event) => {
     console.log('DOM fully loaded and parsed');
@@ -121,18 +126,17 @@ async function fetchUserTopItems() {
     const data = await response.json();
     const topArtistsContainer = document.getElementById('user-top-artists');
     const topTracksContainer = document.getElementById('user-top-tracks');
+    const artistsList = document.getElementById('top-artists-list');
+    const tracksList = document.getElementById('top-tracks-list');
 
     if (data.error) {
       topArtistsContainer.innerText = data.error;
       topTracksContainer.innerText = data.error;
     } else {
       // Display top artists
-      const artistsList = document.createElement('ul');
-      artistsList.classList.add('top-artists-list');
       data.top_artists.forEach((artist) => {
         const li = document.createElement('li');
         li.classList.add('list-item');
-
         // Set a random image from the artist's images
         if (artist.images.length > 0) {
           const randomIndex = Math.floor(Math.random() * artist.images.length);
@@ -148,12 +152,11 @@ async function fetchUserTopItems() {
                     </a>
         `;
         artistsList.appendChild(li);
+        observeElement(li);
       });
       topArtistsContainer.appendChild(artistsList);
 
       // Display top tracks
-      const tracksList = document.createElement('ul');
-      tracksList.classList.add('column-list');
       data.top_tracks.forEach((track) => {
         const li = document.createElement('li');
         li.classList.add('user-top-track-item');
@@ -169,6 +172,7 @@ async function fetchUserTopItems() {
           .join(', ')}</span></span></p>     
         `;
         tracksList.appendChild(li);
+        observeElement(li);
       });
       topTracksContainer.appendChild(tracksList);
     }
@@ -182,11 +186,11 @@ async function fetchUserSavedTracks() {
     const response = await fetch('/user-saved-tracks');
     const data = await response.json();
     const savedTracksContainer = document.getElementById('user-saved-tracks');
+    const tracksList = document.getElementById('saved-tracks');
 
     if (data.error) {
       savedTracksContainer.innerText = data.error;
     } else {
-      const tracksList = document.createElement('ul');
       tracksList.classList.add('column-list');
       data.forEach((item) => {
         const track = item;
@@ -196,6 +200,7 @@ async function fetchUserSavedTracks() {
           <p><span class="item-name"><span class="item-added">${track.added_at}</span><a href="${track.url}" target="_blank">${track.name}</a></span> - <span class="item-artist">${track.artist}</span></p>                 
         `;
         tracksList.appendChild(li);
+        observeElement(li);
       });
       savedTracksContainer.appendChild(tracksList);
     }
@@ -209,12 +214,11 @@ async function fetchUserPlaylists() {
     const response = await fetch('/playlists');
     const data = await response.json();
     const container = document.getElementById('user-lists');
+    const ul = document.getElementById('playlist-list');
 
     if (data.error) {
       container.innerText = data.error;
     } else {
-      const ul = document.createElement('ul');
-      ul.classList.add('lists');
       data.items.forEach((playlist) => {
         const li = document.createElement('li');
         li.classList.add('list-item');
@@ -282,6 +286,7 @@ async function fetchUserPlaylists() {
           }
         });
         ul.appendChild(li);
+        observeElement(li);
       });
       container.appendChild(ul);
     }
@@ -295,3 +300,7 @@ fetchUserTopItems();
 fetchUserSavedTracks();
 fetchUserPlaylists();
 applyUserImageColor();
+
+window.addEventListener('load', () => {
+  setupIntersectionAnimations();
+});

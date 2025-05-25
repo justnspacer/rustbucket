@@ -15,8 +15,6 @@ node_modules/
 # Ignore build output for React
 /build/
 /dist/
-spotify/.cache
-spotify/.cache
 
 __pycache__/
 *.pyc
@@ -25,4 +23,3 @@ __pycache__/
 
 # Ignore these packages
 packages/animations
-spotify/.cache
