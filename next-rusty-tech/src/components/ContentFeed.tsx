@@ -1,3 +1,4 @@
+"use client"
 import { useEffect, useState } from 'react';
 import { supabase } from '../app/utils/supabaseClient';
 import { ContentBlock } from './ContentBlock';

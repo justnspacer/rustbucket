@@ -3,8 +3,9 @@ import { useEffect, useRef, useState } from 'react';
 import { useAuth } from "@/app/context/AuthContext";
 import LogoutButton from "@/components/LogoutButton";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleRight } from '@fortawesome/free-solid-svg-icons';
+import { faCircleRight, faEllipsis } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
+import { faBars } from '@fortawesome/free-solid-svg-icons/faBars';
 
 export const NavBar = () => {
   const { user, loading } = useAuth();
@@ -33,15 +34,26 @@ useEffect(() => {
       <div className='nav-left'>
       <h1 className='logo-link'><a href="/home"> <span className='bg-gradient'></span>
         Rust Bucket</a></h1>
-        <ul className='nav-links'>
+       
+      </div>
+       <button
+          className="hamburger"
+          aria-label="Toggle navigation"
+          aria-expanded={showDropdown}
+          onClick={handleDropdownClick}
+        >
+          <FontAwesomeIcon icon={faBars}/>
+        </button>        
+        <div className='nav-right'>
+ <ul className='nav-links'>
         <li><Link href="/business/about">About</Link></li>
           <li><Link href="/business/contact">Contact</Link></li>
           <li><Link href="/business/services">Services</Link></li>
           <li><Link href="/business/terms">Terms</Link></li>
+                    <li><Link href="/admin">Admin</Link></li>
+
           </ul>
-      </div>
-       
-        {loading ? (
+            {loading ? (
           <span>Loading...</span>
         ) : user ? (
           <>
@@ -62,6 +74,7 @@ useEffect(() => {
           </div>
           </>
         )}       
+        </div>
     </nav>
   ); 
 };

@@ -1,13 +1,12 @@
 import AssignRole from "@/components/AssignRole";
 import { AdminForm } from "@/components/AdminForm";
+import { ContentFeed } from "@/components/ContentFeed";
 
 const AdminPage = () => {
   return (
-    <div>
-      <h1>Admin Page</h1>
-      <p>Manage your content and user roles here.</p>
+    <div className="admin-page">
       <AdminForm />
-      
+      <ContentFeed />
     </div>
   );
 };
