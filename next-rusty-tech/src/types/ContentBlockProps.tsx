@@ -1,5 +1,5 @@
 export type LayoutType = 'media-left' | 'media-right' | 'stacked' | 'media-background';
-export type MediaType = 'image' | 'video' | 'youtube';
+export type MediaType = 'image' | 'video';
 
 export interface ContentBlockProps {
   id?: string; // optional for now unless you're doing updates

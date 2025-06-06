@@ -14,8 +14,8 @@
   }
 }
 
-.nextjs-static-indicator-toast-wrapper, .toast {
-  display: none !important;
+.nextjs-toast  {
+  display: none !important; /* Hide the Next.js static indicator toast */
 }
 
 html, body {
@@ -200,7 +200,6 @@ form {
 
 form input, form textarea, form select {
   width: 100%;
-  max-width: 300px;
   padding: 0.5rem;
   border-radius: 40px;
   border: 2px solid var(--background);
@@ -553,7 +552,6 @@ footer {
 /* Content Block */
 .content-block {
   display: flex;
-  flex-wrap: wrap;
   flex-direction: column;
 }
 
@@ -587,10 +585,6 @@ footer {
   order: 0;
 }
 
-.layout-stacked {
-  flex-direction: column;
-}
-
 .media-background {
   background-size: cover;
   background-position: center;
@@ -607,12 +601,17 @@ footer {
 
 /* admin */
 .admin-form {
-  max-width: 600px;
   display: flex;
   flex-direction: column;
   gap: 1rem;
     padding: 2rem;
     width: 100%;
+}
+
+.admin-form h2 {
+  font-size: 2rem;
+  font-weight: 500;
+  margin-bottom: 0;
 }
 
 .admin-form input,
@@ -642,7 +641,7 @@ footer {
 
 
 /* youtube container */
-.youtube-container {
+.youtube-container, .media-video {
   position: relative;
   padding-bottom: 56.25%; /* 16:9 */
   width: 100%;
@@ -663,6 +662,17 @@ footer {
   display: flex;
   gap: 2rem;
   flex: 1;
+}
+
+@media screen and (max-width: 768px) {
+  .admin-page {
+    flex-direction: column;
+  }
+
+  .admin-form {
+    width: 100%;
+  }
+  
 }
 /* nav menu */
  .hamburger {

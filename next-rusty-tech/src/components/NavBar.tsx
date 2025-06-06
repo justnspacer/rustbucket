@@ -47,12 +47,12 @@ useEffect(() => {
         <div className='nav-right'>
  <ul className='nav-links'>
         <li><Link href="/business/about">About</Link></li>
-          <li><Link href="/business/contact">Contact</Link></li>
-          <li><Link href="/business/services">Services</Link></li>
-          <li><Link href="/business/terms">Terms</Link></li>
-                    <li><Link href="/admin">Admin</Link></li>
-
-          </ul>
+        <li><Link href="/business/contact">Contact</Link></li>
+        <li><Link href="/business/projects">Projects</Link></li>
+        <li><Link href="/business/services">Services</Link></li>
+        <li><Link href="/business/terms">Terms</Link></li>
+        <li><Link href="/admin">Admin</Link></li>
+  </ul>
             {loading ? (
           <span>Loading...</span>
         ) : user ? (
