@@ -25,10 +25,12 @@ export const ContentFeed = () => {
   }, []);
 
   return (
+    <div className='container'><h2 className='header-2'>Content Feed</h2>
     <div className="content-feed">
       {blocks.map((block) => (
         <ContentBlock key={block.id} {...block} />
       ))}
+    </div>
     </div>
   );
 };

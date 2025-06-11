@@ -23,3 +23,7 @@ __pycache__/
 
 # Ignore these packages
 packages/animations
+
+
+#projects to ignore
+job-engine/

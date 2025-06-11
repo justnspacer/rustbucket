@@ -126,9 +126,7 @@ const uploadFile = async () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="admin-form">
-      <h2>Create Content Block</h2>
-
+          <div className='container'><h2 className='header-2'>Create Content Item</h2><form onSubmit={handleSubmit} className="admin-form">
       <input type="text" name="title" value={formData.title} onChange={handleChange} placeholder="Title" required />
 
       <textarea name="body" value={formData.body} onChange={handleChange} placeholder="Body text" required />
@@ -148,6 +146,7 @@ const uploadFile = async () => {
       <div>
         <button
           type="button"
+          className='button-1'
           onClick={toggleFileUpload}
           style={{ marginBottom: '1rem' }}
         >
@@ -155,13 +154,13 @@ const uploadFile = async () => {
         </button>
         {showFileUpload ? (
           <div className="file-upload">
-        <input type="file" onChange={handleFileChange} key="upload" />
-        <button type="button" onClick={uploadFile}>Upload File</button>
+            <input type="file" onChange={handleFileChange} key="upload" />
+            <button type="button" className='button-1' onClick={uploadFile}>Upload File</button>
           </div>
         ) : (
           <div className="media-url-input">
-        <input type="text" value={mediaInput} onChange={handleMediaUrlChange} placeholder="Media URL" />
-        <button type="button" onClick={addMediaUrl}>Add Media</button>
+            <input type="text" value={mediaInput} onChange={handleMediaUrlChange} placeholder="Media URL" />
+            <button type="button" className='button-1' onClick={addMediaUrl}>Add Media</button>
           </div>
         )}
       </div>
@@ -172,8 +171,8 @@ const uploadFile = async () => {
         ))}
       </ul>
 
-      <button type="submit">Save Content Block</button>
+      <button type="submit" className='button-2'>Create Item</button>
       <p>{statusMsg}</p>
-    </form>
+    </form></div>
   );
 };
