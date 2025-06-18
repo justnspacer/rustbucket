@@ -25,5 +25,5 @@ __pycache__/
 packages/animations
 
 
-#projects to ignore
-job-engine/
+#projects
+git-r-done/
