@@ -8,3 +8,5 @@ app.include_router(user.router)
 @app.get("/")
 def root():
     return {"message": "API Gateway Live"}
+
+print("Gatekeeper is running...")
