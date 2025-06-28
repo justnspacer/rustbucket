@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Request, Depends, HTTPException
 from starlette.status import HTTP_404_NOT_FOUND
-from auth import retrieve_user
+from auth import verify_token
 
 router = APIRouter()
 
 @router.get("/user")
-async def get_user(user_response=Depends(retrieve_user)):
+async def get_user(user_response=Depends(verify_token)):
     if not user_response or not hasattr(user_response, 'user') or not user_response.user:
         raise HTTPException(
             status_code=HTTP_404_NOT_FOUND, 

@@ -1,12 +1,9 @@
+import os
 from jose import jwt
-import requests
-from fastapi import HTTPException, Request, Depends
+from fastapi import HTTPException, Depends
 from fastapi.security import HTTPBearer
 from starlette.status import HTTP_401_UNAUTHORIZED
 import logging
-import time
-import os
-from typing import Optional
 import supabase
 from supabase import create_client, Client
 from dotenv import load_dotenv
@@ -20,8 +17,7 @@ supabase: Client = create_client(url, key)
 
 security = HTTPBearer()
 
-def retrieve_user(credentials=Depends(security)):
-    """Retrieve user information from Supabase using the provided token"""
+async def verify_token(credentials=Depends(security)):
     try:
         token = credentials.credentials
         response = supabase.auth.get_user(token)
