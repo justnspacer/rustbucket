@@ -54,6 +54,12 @@ h1 {
   vertical-align: top;
 }
 
+.content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
 #content-list {
   display: flex;
   flex-direction: column;

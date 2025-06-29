@@ -38,7 +38,7 @@ def create_app():
 
     CLIENT_ID = os.getenv("CLIENT_ID")
     CLIENT_SECRET = os.getenv("CLIENT_SECRET")
-    REDIRECT_URI = "http://127.0.0.1:5000/callback"
+    REDIRECT_URI = "http://127.0.0.1:5000/spotify/callback"
     TOKEN_URL = "https://accounts.spotify.com/api/token"
     SCOPE = "user-top-read user-read-recently-played user-read-currently-playing user-library-read ugc-image-upload streaming playlist-read-private streaming user-read-private user-read-email user-modify-playback-state user-read-playback-state"
     DEVICE_ID = "your_device_id"
@@ -80,9 +80,13 @@ def create_app():
             cache_handler.save_token_to_cache(token_info)
         return sp, token_info["access_token"], token_info["refresh_token"]
 
+    @app.route("/spotify")
+    def home():
+        sp, token_info, refresh_info = get_spotify()
+        return render_template("index.html", user=sp.current_user(), token_info=token_info)
 
-    @app.route("/profile")
-    def profile():
+    @app.route("/spotify/u/<spotify_id>")
+    def public_profile(spotify_id):
         sp, token_info, refresh_info = get_spotify()
         user_info = sp.current_user()
         user = User.query.filter_by(spotify_id=user_info['id']).first()
@@ -93,41 +97,29 @@ def create_app():
         user.refresh_token = token_info
         db.session.add(user)
         db.session.commit()
-        return render_template("index.html", user=sp.current_user(), token_info=token_info)
-
-    @app.route("/u/<spotify_id>")
-    def public_profile(spotify_id):
-        sp, token_info, refresh_info = get_spotify()
-        user = User.query.filter_by(spotify_id=spotify_id).first()
-        print(user)
         if not user:
             return jsonify({"error": "User not found"}), 404
-        return render_template("profile.html", user=sp.current_user(), token_info=token_info)
+        return render_template("user_profile.html", user=sp.current_user(), token_info=token_info)
 
-    @app.route("/")
-    def home():
-        sp, token_info, refresh_info = get_spotify()
-        return render_template("index.html", user=sp.current_user(), token_info=token_info)
-
-    @app.route("/login")
+    @app.route("/spotify/login")
     def login():
         auth_url = oauth.get_authorize_url()
         return redirect(auth_url)
 
-    @app.route("/request-token")
+    @app.route("/spotify/request-token")
     def request_token():
         code = request.args.get("code")
         token_info = oauth.get_access_token(code)
         return jsonify(token_info)
 
-    @app.route("/callback")
+    @app.route("/spotify/callback")
     def callback():
         code = request.args.get("code")
         token_info = oauth.get_access_token(code)
         session["token_info"] = token_info
         return jsonify(token_info)
 
-    @app.route("/top-artists-and-tracks")
+    @app.route("/spotify/top-artists-and-tracks")
     def top_artists_and_tracks():
         sp, token_info, refresh_info = get_spotify()
         top_artists = sp.current_user_top_artists(limit=20)
@@ -137,7 +129,7 @@ def create_app():
             "top_tracks": top_tracks['items']
         })
 
-    @app.route("/user-saved-tracks")
+    @app.route("/spotify/user-saved-tracks")
     def user_saved_tracks():
         all_tracks = [] # List to hold all tracks
         sp, token_info, refresh_info = get_spotify() # Get the Spotify client
@@ -159,7 +151,7 @@ def create_app():
         return jsonify(tracks) # Return the list of all tracks
 
     # get current user currently playing track
-    @app.route("/currently-playing")
+    @app.route("/spotify/currently-playing")
     def currently_playing():
         sp, token_info, refresh_info = get_spotify()
         current_playback = sp.current_playback(market="US", additional_types=['episode'])
@@ -169,41 +161,41 @@ def create_app():
             return jsonify({'message': 'nothing playing 🎵'})
 
     # Get user's top tracks
-    @app.route("/top-tracks")
+    @app.route("/spotify/top-tracks")
     def top_tracks():
         sp, token_info, refresh_info = get_spotify()
         top_tracks = sp.current_user_top_tracks(limit=20)
         return jsonify(top_tracks)
 
     # Get user's recently played tracks
-    @app.route("/recently-played")
+    @app.route("/spotify/recently-played")
     def recently_played():
         sp, token_info, refresh_info = get_spotify()
         recently_played = sp.current_user_recently_played()
         return jsonify(recently_played)
 
     # Get user's saved tracks
-    @app.route("/saved-tracks")
+    @app.route("/spotify/saved-tracks")
     def saved_tracks():
         sp, token_info, refresh_info = get_spotify()
         saved_tracks = sp.current_user_saved_tracks(limit=20)
         return jsonify(saved_tracks)
 
     # Get user's playlists
-    @app.route("/playlists")
+    @app.route("/spotify/playlists")
     def playlists():
         sp, token_info, refresh_info = get_spotify()
         playlists = sp.current_user_playlists(limit=20)
         return jsonify(playlists)
 
     #Get playlist tracks
-    @app.route("/playlist-tracks/<playlist_id>")
+    @app.route("/spotify/playlist-tracks/<playlist_id>")
     def playlist_tracks(playlist_id):
         sp, token_info, refresh_info = get_spotify()
         playlist_tracks = sp.playlist_tracks(playlist_id)
         return jsonify(playlist_tracks)
 
-    @app.route("/devices")
+    @app.route("/spotify/devices")
     def get_devices():
         sp, access_token, refresh_info = get_spotify()
         url = "https://api.spotify.com/v1/me/player/devices"

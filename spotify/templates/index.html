@@ -11,54 +11,12 @@
 
 <body>
   <nav>Spotify Ui</nav>
-    {% if user %}  
-      <div id="user-background">
-        <div class="user-image animate animate-from-left">    
-          <img id="user-profile-picture" src="{{ user.images[0].url }}" crossOrigin="anonymous" alt="{{ user.display_name }}" />
-        </div>
-        <div class="user-info animate animate-from-right">
-          <h1 class="custom-color-item">{{ user.display_name }}<i class="fa-solid fa-headphones icon"></i></h1>
-          <span><span class="follower-count custom-color-item">{{ user.followers.total }}</span> followers</span>
-          <p>{{ user.id }}</p>
-        </div>
-      </div>
-
-      <ul id="content-list">
-        <li>
-          <div id="user-top-artists">
-            <h2 class="animate animate-from-top">Current Top Artists</h2>
-            <ul id="top-artists-list" class="top-artists-list"></ul>
-          </div>
-        </li>
-        <li>
-          <div id="user-top-tracks">
-            <h2 class="animate animate-from-top">Latest Top Tracks <span>(popularity)</span></h2>
-            <ul id="top-tracks-list" data-animate-stagger class="column-list"></ul>
-          </div>
-        </li>
-        <li>
-          <div id="user-lists">
-            <h2 class="animate animate-from-top">Shared Playlists</h2>
-            <ul id="playlist-list" class="lists"></ul>
-          </div>
-        </li>
-        <li>
-          <div id="user-saved-tracks">
-            <h2 class="animate animate-from-top">Latest Saved Tracks <span>(dated added)</span></h2>  
-            <ul id="saved-tracks" data-animate-stagger class="column-list"></ul>          
-          </div>
-        </li>
-      </ul>
-    <div id="currently-playing" class="currently-playing-container"></div>
-    
-
-    <script src="{{ url_for('static', filename='js/animation.js') }}" type="text/javascript"></script>
-      <script src="{{ url_for('static', filename='js/script.js') }}" type="text/javascript"></script>
-
-
-    {% else %}
-        <p>No token information available. Please <a href="{{ url_for('login') }}">login</a>.</p>
-    {% endif %}
-
+  <div class="content">
+    <div class="header">
+      <h1>Welcome to Spotify App</h1>
+      <p>Search spotify user profiles</p>
+    </div>
+  </div>
+  <script src="{{ url_for('static', filename='js/animation.js') }}" type="text/javascript"></script>
 </body>
 </html>

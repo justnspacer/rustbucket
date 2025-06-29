@@ -16,11 +16,12 @@ def root():
     "Welcome to the API Gateway. Use the /api/{service}/{path} endpoint to access services."}   
 
 ROUTING_TABLE = {
-    "git-r-done": "http://127.0.0.1:8000/git-r-done",
-    "hue-dashboard": "http://127.0.0.1:8000/hue-dashboard",
+    "git-r-done": "http://127.0.0.1:5000/git-r-done",
+    "hue-dashboard": "http://127.0.0.1:5000/hue-dashboard",
     "next-rusty-tech": "http://localhost:3000",
-    "nothing": "http://127.0.0.1:8000/nothing",                
-    "operator": "http://127.0.0.1:8000/operator",                    "spotify": "http://127.0.0.1:8000/spotify",
+    "nothing": "http://127.0.0.1:5000/nothing",                
+    "operator": "http://127.0.0.1:5000/operator",                    
+    "spotify": "http://127.0.0.1:5000/spotify",
 }
 
 @app.api_route("/api/{service}/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH"])

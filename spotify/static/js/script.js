@@ -74,7 +74,7 @@ function applyUserImageColor() {
 
 async function fetchUserCurrentlyPlaying() {
   try {
-    const response = await fetch('/currently-playing');
+    const response = await fetch('/spotify/currently-playing');
     const data = await response.json();
     const container = document.getElementById('currently-playing');
 
@@ -122,7 +122,7 @@ async function fetchUserCurrentlyPlaying() {
 
 async function fetchUserTopItems() {
   try {
-    const response = await fetch('/top-artists-and-tracks');
+    const response = await fetch('/spotify/top-artists-and-tracks');
     const data = await response.json();
     const topArtistsContainer = document.getElementById('user-top-artists');
     const topTracksContainer = document.getElementById('user-top-tracks');
@@ -183,7 +183,7 @@ async function fetchUserTopItems() {
 
 async function fetchUserSavedTracks() {
   try {
-    const response = await fetch('/user-saved-tracks');
+    const response = await fetch('/spotify/user-saved-tracks');
     const data = await response.json();
     const savedTracksContainer = document.getElementById('user-saved-tracks');
     const tracksList = document.getElementById('saved-tracks');
@@ -211,7 +211,7 @@ async function fetchUserSavedTracks() {
 
 async function fetchUserPlaylists() {
   try {
-    const response = await fetch('/playlists');
+    const response = await fetch('/spotify/playlists');
     const data = await response.json();
     const container = document.getElementById('user-lists');
     const ul = document.getElementById('playlist-list');
@@ -236,7 +236,9 @@ async function fetchUserPlaylists() {
           const playlistId = playlist.id;
 
           try {
-            const response = await fetch(`/playlist-tracks/${playlistId}`);
+            const response = await fetch(
+              `/spotify/playlist-tracks/${playlistId}`
+            );
             const data = await response.json();
             const body = document.querySelector('body');
             const modal = document.createElement('div');
