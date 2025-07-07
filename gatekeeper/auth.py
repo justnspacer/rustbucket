@@ -21,7 +21,13 @@ async def verify_token(credentials=Depends(security)):
     try:
         token = credentials.credentials
         response = supabase.auth.get_user(token)
-        return response
+        if response.user:
+            return response
+        else:
+            raise HTTPException(
+                status_code=HTTP_401_UNAUTHORIZED, 
+                detail="Invalid token: No user found"
+            )
     except Exception as e:
         logging.error(f"Failed to retrieve user: {e}")
         raise HTTPException(

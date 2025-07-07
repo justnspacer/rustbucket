@@ -3,3 +3,5 @@ requests
 spotipy
 Flask-SQLAlchemy
 python-dotenv
+supabase
+Flask-Migrate

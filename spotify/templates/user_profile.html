@@ -7,45 +7,128 @@
     <script src="https://kit.fontawesome.com/8e13a44ce3.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/animation.css') }}">
+    <style>
+    .public-profile-info {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .info-card {
+      background: #f5f5f5;
+      padding: 15px;
+      border-radius: 5px;
+      margin: 15px 0;
+    }
+    
+    .info-card p {
+      margin: 8px 0;
+    }
+    
+    .info-card strong {
+      color: #1db954;
+    }
+    
+    .public-profile-info em {
+      color: #666;
+      font-size: 14px;
+    }
+  </style>
 </head>  
 
 <body>
-  <nav>Spotify Ui</nav>
-    {% if user %}  
+  <nav>
+    <a href="/spotify">Spotify Ui</a> 
+    <a href="/spotify">Search Users</a>
+    <a href="/spotify/auth/link">Save My Profile</a>
+  </nav>    {% if user %}  
       <div id="user-background">
         <div class="user-image animate animate-from-right">    
-          <img id="user-profile-picture" src="{{ user.images[0].url }}" crossOrigin="anonymous" alt="{{ user.display_name }}" />
+          <img id="user-profile-picture" src="{% if user.images and user.images|length > 0 %}{{ user.images[0].url if user.images[0].url else user.images[0] }}{% else %}/static/default-avatar.png{% endif %}" crossOrigin="anonymous" alt="{{ user.display_name or user.spotify_id }}" />
         </div>
         <div class="user-info animate animate-from-left">
-          <h1 class="custom-color-item">{{ user.display_name }}<i class="fa-solid fa-headphones icon"></i></h1>
-          <span><span class="follower-count custom-color-item">{{ user.followers.total }}</span> followers</span>
-          <p>{{ user.id }}</p>
+          <h1 class="custom-color-item">{{ user.display_name or user.spotify_id }}<i class="fa-solid fa-headphones icon"></i></h1>
+          <span><span class="follower-count custom-color-item">{{ user.followers.total if user.followers and user.followers.total else user.followers or 0 }}</span> followers</span>
+          <p>{{ user.id or user.spotify_id }}</p>
+          {% if is_public %}
+            <p><em>Public Profile</em></p>
+          {% endif %}
         </div>
-      </div>
-
+      </div>      {% if not is_public %}
+      <!-- Only show detailed data for authenticated users -->
       <ul id="content-list animate animate-from-center">
         <li>
           <div id="user-top-artists">
             <h2>Current Top Artists</h2>
+            <ul id="top-artists-list"></ul>
           </div>
         </li>
         <li>
           <div id="user-top-tracks">
             <h2>Latest Top Tracks <span>(popularity)</span></h2>
+            <ul id="top-tracks-list"></ul>
           </div>
         </li>
         <li>
           <div id="user-lists">
             <h2>Shared Playlists</h2>
+            <ul id="playlist-list"></ul>
           </div>
         </li>
         <li>
           <div id="user-saved-tracks">
-            <h2>Latest Saved Tracks <span>(dated added)</span></h2>            
+            <h2>Latest Saved Tracks <span>(dated added)</span></h2>
+            <ul id="saved-tracks"></ul>            
           </div>
         </li>
       </ul>
-    <div id="currently-playing" class="currently-playing-container"></div>
+      <div id="currently-playing" class="currently-playing-container"></div>
+      {% else %}
+      <!-- Public profile with limited information and some Spotify data -->
+      <ul id="content-list animate animate-from-center">
+        <li>
+          <div id="user-top-artists">
+            <h2>Top Artists</h2>
+            <ul id="top-artists-list"></ul>
+          </div>
+        </li>
+        <li>
+          <div id="user-top-tracks">
+            <h2>Top Tracks <span>(popularity)</span></h2>
+            <ul id="top-tracks-list"></ul>
+          </div>
+        </li>
+        <li>
+          <div id="user-lists">
+            <h2>Public Playlists</h2>
+            <ul id="playlist-list"></ul>
+          </div>
+        </li>
+      </ul>
+      <div id="currently-playing" class="currently-playing-container"></div>
+      
+      <div class="public-profile-info">
+        <h2>Profile Information</h2>
+        <div class="info-card">
+          <p><strong>Country:</strong> {{ user.country or 'Not specified' }}</p>
+          <p><strong>Spotify Product:</strong> {{ user.product or 'Not specified' }}</p>
+          <p><strong>Profile Last Updated:</strong> {{ user.last_updated or 'Unknown' }}</p>
+          {% if user.external_urls and user.external_urls.spotify %}
+            <p><a href="{{ user.external_urls.spotify }}" target="_blank">View on Spotify</a></p>
+          {% endif %}
+        </div>
+        <p><em>This is a public profile. Some information may be limited to protect user privacy.</em></p>
+      </div>      {% endif %}
+
+  <!-- Pass user data to JavaScript via data attributes -->
+  <div id="user-data" 
+       data-spotify-id="{{ user.spotify_id or user.id }}" 
+       data-is-public="{% if is_public %}true{% else %}false{% endif %}" 
+       data-display-name="{{ user.display_name or '' }}" 
+       style="display: none;"></div>
   
   <script type="module" src="{{ url_for('static', filename='js/script.js') }}"></script>
   <script type="module" src="{{ url_for('static', filename='js/animation.js') }}"></script>

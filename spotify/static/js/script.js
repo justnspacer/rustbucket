@@ -72,42 +72,102 @@ function applyUserImageColor() {
   });
 }
 
+// Get user ID from the page (either from current user or public profile)
+function getUserSpotifyId() {
+  // // Try to get from data attributes first
+  // const userDataElement = document.getElementById('user-data');
+  // if (userDataElement && userDataElement.dataset.spotifyId) {
+  //   return userDataElement.dataset.spotifyId;
+  // }
+
+  // Try to get from global window data (fallback)
+  if (window.spotifyUserData && window.spotifyUserData.spotify_id) {
+    return window.spotifyUserData.spotify_id;
+  }
+
+  // Try to get from URL path for public profiles (/spotify/u/USER_ID)
+  const pathMatch = window.location.pathname.match(/\/spotify\/u\/([^\/]+)/);
+  if (pathMatch) {
+    return pathMatch[1];
+  }
+
+  // For authenticated users, get from user info element
+  const userIdElement = document.querySelector('.user-info p');
+  if (userIdElement) {
+    return userIdElement.textContent.trim();
+  }
+
+  return null;
+}
+
+// Check if this is a public profile
+function isPublicProfile() {
+  // Try to get from data attributes first
+  const userDataElement = document.getElementById('user-data');
+  if (userDataElement && userDataElement.dataset.isPublic) {
+    return userDataElement.dataset.isPublic === 'true';
+  }
+
+  // Try to get from global window data (fallback)
+  if (
+    window.spotifyUserData &&
+    typeof window.spotifyUserData.is_public !== 'undefined'
+  ) {
+    return window.spotifyUserData.is_public;
+  }
+
+  return window.location.pathname.includes('/spotify/u/');
+}
+
 async function fetchUserCurrentlyPlaying() {
   try {
-    const response = await fetch('/spotify/currently-playing');
+    const userId = getUserSpotifyId();
+    const isPublic = isPublicProfile();
+
+    let url;
+    if (isPublic && userId) {
+      url = `/spotify/u/${userId}/currently-playing`;
+    } else {
+      url = '/spotify/currently-playing';
+    }
+
+    const response = await fetch(url);
     const data = await response.json();
     const container = document.getElementById('currently-playing');
 
-    if (data.message) {
+    if (data.message || data.error) {
       container.classList.add('no-hover');
-      container.innerHTML = `<span class="cp-message">${data.message}</span>`;
+      container.innerHTML = `<span class="cp-message">${
+        data.message || data.error
+      }</span>`;
     } else {
+      const item = data.currently_playing || data;
       container.innerHTML = `
       <div>
         <h2>Currently Playing</h2>
         <img class='spotify-album-image' src="${
-          data.currently_playing_type === 'episode'
-            ? data.item.show.images[0].url
-            : data.item.album.images[0].url
+          item.currently_playing_type === 'episode'
+            ? item.item.show.images[0].url
+            : item.item.album.images[0].url
         }" alt="${
-        data.currently_playing_type === 'episode'
-          ? data.item.show.name
-          : data.item.album.name
+        item.currently_playing_type === 'episode'
+          ? item.item.show.name
+          : item.item.album.name
       }"/>
         <ul class="track-info">
-        <li class="track-name">${data.item.name}</li>
+        <li class="track-name">${item.item.name}</li>
         ${
-          data.currently_playing_type === 'episode'
+          item.currently_playing_type === 'episode'
             ? `
-        <li class="artist-line"><span class="label">Show</span> ${data.item.show.name}</li>
-        <li class="album-line"><span class="label">Publisher</span> ${data.item.show.publisher}</li>
+        <li class="artist-line"><span class="label">Show</span> ${item.item.show.name}</li>
+        <li class="album-line"><span class="label">Publisher</span> ${item.item.show.publisher}</li>
         `
             : `
-        <li class="artist-line"><span class="label">Artists</span> ${data.item.artists
+        <li class="artist-line"><span class="label">Artists</span> ${item.item.artists
           .map((artist) => artist.name)
           .join(', ')}</li>
         <li class="album-line"><span class="label">Album</span> ${
-          data.item.album.name
+          item.item.album.name
         }</li>
         `
         }
@@ -122,59 +182,139 @@ async function fetchUserCurrentlyPlaying() {
 
 async function fetchUserTopItems() {
   try {
-    const response = await fetch('/spotify/top-artists-and-tracks');
-    const data = await response.json();
+    const userId = getUserSpotifyId();
+    const isPublic = isPublicProfile();
+
+    let artistsUrl, tracksUrl;
+    if (isPublic && userId) {
+      artistsUrl = `/spotify/u/${userId}/top-artists`;
+      tracksUrl = `/spotify/u/${userId}/top-tracks`;
+    } else {
+      artistsUrl = '/spotify/top-artists-and-tracks';
+      tracksUrl = '/spotify/top-artists-and-tracks';
+    }
+
     const topArtistsContainer = document.getElementById('user-top-artists');
     const topTracksContainer = document.getElementById('user-top-tracks');
     const artistsList = document.getElementById('top-artists-list');
     const tracksList = document.getElementById('top-tracks-list');
 
-    if (data.error) {
-      topArtistsContainer.innerText = data.error;
-      topTracksContainer.innerText = data.error;
-    } else {
+    if (isPublic && userId) {
+      // Fetch artists and tracks separately for public profiles
+      const [artistsResponse, tracksResponse] = await Promise.all([
+        fetch(artistsUrl),
+        fetch(tracksUrl),
+      ]);
+
+      const artistsData = await artistsResponse.json();
+      const tracksData = await tracksResponse.json();
+
+      if (artistsData.error || tracksData.error) {
+        topArtistsContainer.innerText =
+          artistsData.error || 'Error loading artists';
+        topTracksContainer.innerText =
+          tracksData.error || 'Error loading tracks';
+        return;
+      }
+
       // Display top artists
-      data.top_artists.forEach((artist) => {
-        const li = document.createElement('li');
-        li.classList.add('list-item');
-        // Set a random image from the artist's images
-        if (artist.images.length > 0) {
-          const randomIndex = Math.floor(Math.random() * artist.images.length);
-          li.style.backgroundImage = `url(${artist.images[randomIndex].url})`;
-        } else {
-          li.style.backgroundImage = `url(${artist.images[0].url})`;
-        }
-        li.innerHTML = `
-        <a id="spotify_artist_url_${artist.id}" href="${artist.external_urls.spotify}" target="_blank">
-          <ul>
-          <li class="list-name">${artist.name}</li>
-            </ul>
-                    </a>
-        `;
-        artistsList.appendChild(li);
-        observeElement(li);
-      });
-      topArtistsContainer.appendChild(artistsList);
+      if (artistsData.top_artists) {
+        artistsData.top_artists.forEach((artist) => {
+          const li = document.createElement('li');
+          li.classList.add('list-item');
+          if (artist.images.length > 0) {
+            const randomIndex = Math.floor(
+              Math.random() * artist.images.length
+            );
+            li.style.backgroundImage = `url(${artist.images[randomIndex].url})`;
+          }
+          li.innerHTML = `
+          <a id="spotify_artist_url_${artist.id}" href="${artist.external_urls.spotify}" target="_blank">
+            <ul>
+            <li class="list-name">${artist.name}</li>
+              </ul>
+          </a>
+          `;
+          artistsList.appendChild(li);
+          observeElement(li);
+        });
+        topArtistsContainer.appendChild(artistsList);
+      }
 
       // Display top tracks
-      data.top_tracks.forEach((track) => {
-        const li = document.createElement('li');
-        li.classList.add('user-top-track-item');
-        li.innerHTML = `
-          <p><span><span class="item-name"><span class="popularity">${
-            track.popularity
-          }</span><a id="spotify_track_url_${track.id}" href="${
-          track.external_urls.spotify
-        }" target="_blank">${
-          track.name
-        }</a></span> - <span class="item-artist">${track.artists
-          .map((artist) => artist.name)
-          .join(', ')}</span></span></p>     
-        `;
-        tracksList.appendChild(li);
-        observeElement(li);
-      });
-      topTracksContainer.appendChild(tracksList);
+      if (tracksData.top_tracks) {
+        tracksData.top_tracks.forEach((track) => {
+          const li = document.createElement('li');
+          li.classList.add('user-top-track-item');
+          li.innerHTML = `
+            <p><span><span class="item-name"><span class="popularity">${
+              track.popularity
+            }</span><a id="spotify_track_url_${track.id}" href="${
+            track.external_urls.spotify
+          }" target="_blank">${
+            track.name
+          }</a></span> - <span class="item-artist">${track.artists
+            .map((artist) => artist.name)
+            .join(', ')}</span></span></p>     
+          `;
+          tracksList.appendChild(li);
+          observeElement(li);
+        });
+        topTracksContainer.appendChild(tracksList);
+      }
+    } else {
+      // Original combined endpoint for authenticated users
+      const response = await fetch(artistsUrl);
+      const data = await response.json();
+
+      if (data.error) {
+        topArtistsContainer.innerText = data.error;
+        topTracksContainer.innerText = data.error;
+      } else {
+        // Display top artists
+        data.top_artists.forEach((artist) => {
+          const li = document.createElement('li');
+          li.classList.add('list-item');
+          if (artist.images.length > 0) {
+            const randomIndex = Math.floor(
+              Math.random() * artist.images.length
+            );
+            li.style.backgroundImage = `url(${artist.images[randomIndex].url})`;
+          } else {
+            li.style.backgroundImage = `url(${artist.images[0].url})`;
+          }
+          li.innerHTML = `
+          <a id="spotify_artist_url_${artist.id}" href="${artist.external_urls.spotify}" target="_blank">
+            <ul>
+            <li class="list-name">${artist.name}</li>
+              </ul>
+          </a>
+          `;
+          artistsList.appendChild(li);
+          observeElement(li);
+        });
+        topArtistsContainer.appendChild(artistsList);
+
+        // Display top tracks
+        data.top_tracks.forEach((track) => {
+          const li = document.createElement('li');
+          li.classList.add('user-top-track-item');
+          li.innerHTML = `
+            <p><span><span class="item-name"><span class="popularity">${
+              track.popularity
+            }</span><a id="spotify_track_url_${track.id}" href="${
+            track.external_urls.spotify
+          }" target="_blank">${
+            track.name
+          }</a></span> - <span class="item-artist">${track.artists
+            .map((artist) => artist.name)
+            .join(', ')}</span></span></p>     
+          `;
+          tracksList.appendChild(li);
+          observeElement(li);
+        });
+        topTracksContainer.appendChild(tracksList);
+      }
     }
   } catch (error) {
     console.error('Error fetching user top items:', error);
@@ -211,7 +351,17 @@ async function fetchUserSavedTracks() {
 
 async function fetchUserPlaylists() {
   try {
-    const response = await fetch('/spotify/playlists');
+    const userId = getUserSpotifyId();
+    const isPublic = isPublicProfile();
+
+    let url;
+    if (isPublic && userId) {
+      url = `/spotify/u/${userId}/playlists`;
+    } else {
+      url = '/spotify/playlists';
+    }
+
+    const response = await fetch(url);
     const data = await response.json();
     const container = document.getElementById('user-lists');
     const ul = document.getElementById('playlist-list');
@@ -219,10 +369,13 @@ async function fetchUserPlaylists() {
     if (data.error) {
       container.innerText = data.error;
     } else {
-      data.items.forEach((playlist) => {
+      const playlists = data.playlists || data.items || [];
+      playlists.forEach((playlist) => {
         const li = document.createElement('li');
         li.classList.add('list-item');
-        li.style.backgroundImage = `url(${playlist.images[0].url})`;
+        if (playlist.images && playlist.images.length > 0) {
+          li.style.backgroundImage = `url(${playlist.images[0].url})`;
+        }
         li.innerHTML = `
         <div class="list-info">
           <ul>
@@ -247,7 +400,11 @@ async function fetchUserPlaylists() {
               <div class="modal-content">
             <span class="close-button">&times;</span>
             <h2>${playlist.name}</h2>
-            <img src="${playlist.images[0].url}"/>
+            ${
+              playlist.images && playlist.images.length > 0
+                ? `<img src="${playlist.images[0].url}"/>`
+                : ''
+            }
             <ul class="list-tracks">
             ${data.items
               .map(
@@ -297,11 +454,33 @@ async function fetchUserPlaylists() {
   }
 }
 
-fetchUserCurrentlyPlaying();
-fetchUserTopItems();
-fetchUserSavedTracks();
-fetchUserPlaylists();
-applyUserImageColor();
+// Initialize page based on profile type
+function initializePage() {
+  const isPublic = isPublicProfile();
+  const userId = getUserSpotifyId();
+
+  if (!userId) {
+    console.error('No user ID found');
+    return;
+  }
+
+  console.log('Initializing page for user:', userId, 'Public:', isPublic);
+
+  // Always fetch these for both public and private profiles
+  fetchUserCurrentlyPlaying();
+  fetchUserTopItems();
+  fetchUserPlaylists();
+
+  // Only fetch saved tracks for non-public profiles (private authenticated users)
+  if (!isPublic) {
+    fetchUserSavedTracks();
+  }
+
+  applyUserImageColor();
+}
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', initializePage);
 
 window.addEventListener('load', () => {
   setupIntersectionAnimations();
