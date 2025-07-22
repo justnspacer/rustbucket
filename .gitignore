@@ -27,3 +27,5 @@ packages/animations
 
 #projects
 git-r-done/
+*.cache
+spotify/.cache

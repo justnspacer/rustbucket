@@ -1,6 +1,6 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+
+/* Import Spotify-specific styles */
+@import './spotify.css';
 
 :root {
   --background: #ffffff;
@@ -28,6 +28,29 @@ html, body {
   font-family: var(--font-fredoka);
 }
 
+body {
+  overflow-x: hidden; /* Prevent horizontal overflow */
+}
+
+body, html {
+  width: 100%;
+}
+
+body > div {
+  flex: 1; /* Allow the main content to grow and fill the available space */
+}
+
+h1, h2, h3, h4, h5, h6, p {
+  margin: 0;
+  padding: 0;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
 .content {
   flex: 1;
   background: var(--foreground);
@@ -48,17 +71,15 @@ input {
   align-items: center;
 
 }
-.nav-right {
-  display: flex;
-  gap: 1rem;
-}
+
 .main-nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
   background: var(--background);
   color: var(--foreground);
-  padding: 2rem 1rem;
+  padding: 0.5rem 1rem;
+  font-weight: 200;
 }
 
 .logo-link {
@@ -71,6 +92,8 @@ input {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  color: var(--foreground);
+  text-decoration: none;
 }
 
 .auth-links {
@@ -85,9 +108,17 @@ nav .username:hover {
   text-decoration: none;
 }
 
-.nav-left {
+.username {
   display: flex;
-  gap: 2rem;;
+  align-items: center;
+
+  img {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin-right: 1rem;
+    object-fit: cover;
+  }
 }
 
 .nav-links {
@@ -95,6 +126,11 @@ nav .username:hover {
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
+}
+
+.nav-links a {
+  color: var(--foreground);
+  text-decoration: none;
 }
 
 .bg-gradient {
@@ -108,13 +144,13 @@ nav .username:hover {
 .dropdown {
   top: 0;
   right: 0;
-  margin-top: 2.5rem;
-  padding: 1rem;
+  margin-top: 3rem;
   position: absolute;
   display: flex;
   flex-direction: column;
   z-index: 2;
   width: 180px;
+  list-style: none;
 }
 
 .dropdown a:link, .dropdown a:visited, .dropdown button {
@@ -265,10 +301,6 @@ form button:hover {
 .next:hover .fa-angle-right {
   color: #f12711;
 } 
-
-.button-logout {
-  font-weight: lighter;
-}
 
 .reset-password-link {
   padding: 0.5rem;
@@ -701,12 +733,12 @@ footer {
   display: none;
   flex-direction: column;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  font-size: 1.6rem;
   background: none;
   border: none;
   cursor: pointer;
   z-index: 1001;
+  color: var(--foreground);
 }
 .bar {
   height: 4px;
@@ -720,7 +752,7 @@ footer {
   .hamburger {
     display: flex;
   }
-  .nav-right {
+  .nav-links, .username {
     position: fixed;
     left: 0;
     right: 0;
@@ -766,7 +798,7 @@ footer {
 
 .project-list{
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   gap: 2rem;
 }
 
@@ -785,6 +817,7 @@ footer {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   display: flex;
   gap: 2rem;
+  width: 300px;
 
   div { 
     display: flex;
@@ -802,12 +835,8 @@ footer {
 }
 
 .project-container:hover {
-  background: linear-gradient(180deg, #000 50%, var(--foreground) 50%);
   box-shadow: none;
-  transform: translateY(-5px);
-  max-height: 800px;
   transition: transform 0.3s ease, box-shadow 0.3s ease, max-height 0.5s cubic-bezier(.4,0,.2,1);
-  overflow: visible;
 
   div h2 {
     color: linear-gradient(90deg, #f12711 0%, var(--background) 100%);
@@ -818,35 +847,110 @@ footer {
   }
 }
 .project-container .project-image {
-  max-height: 0;
-  opacity: 0;
-  transition: max-height 0.5s cubic-bezier(.4,0,.2,1), opacity 0.3s;
-  overflow: hidden;
-}
-
-.project-container:hover > div .project-image,
-.project-container:focus-within div .project-image,
-.project-container.active div .project-image {
   max-height: 400px;
   opacity: 1;
-}
-
-.project-container p {
+  transition: max-height 0.5s cubic-bezier(.4,0,.2,1), opacity 0.3s;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.project-container:hover > p,
-.project-container:focus-within p,
-.project-container.active p {
-  white-space: normal;
-  overflow: visible;
-  text-overflow: unset;
 }
 
 .project-image {
   width: 100%;
   height: 300px;
   object-fit: cover;
-  border-radius: 10px;
+}
+
+/* Mobile Menu Styles */
+.mobile-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  z-index: 998;
+}
+
+.mobile-menu-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.mobile-menu {
+  position: fixed;
+  top: 0;
+  right: -300px; /* Hidden off-screen */
+  width: 300px;
+  height: 100%;
+  background-color: white;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+  transition: right 0.3s ease;
+  z-index: 999;
+  overflow-y: auto;
+}
+
+.mobile-menu.active {
+  right: 0; /* Slide in from right */
+}
+
+.mobile-nav-links {
+  list-style: none;
+  padding: 60px 20px 20px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.mobile-nav-links li {
+  border-bottom: 1px solid #eee;
+  padding-bottom: 15px;
+}
+
+.mobile-nav-links li:last-child {
+  border-bottom: none;
+}
+
+.mobile-nav-links a {
+  text-decoration: none;
+  color: #333;
+  font-size: 18px;
+  font-weight: 500;
+  display: block;
+  padding: 10px 0;
+  transition: color 0.2s ease;
+}
+
+.mobile-menu .button-logout {
+  text-decoration: none;
+  color: #333;
+  font-size: 18px;
+  font-weight: 500;
+  display: block;
+  padding: 10px 0;
+  transition: color 0.2s ease;
+  background-color: transparent;
+  outline: none;
+  user-select: none;
+  border: none;
+  font-family: inherit;
+  cursor: pointer;
+  width: 100%;
+}
+
+.mobile-nav-links a:hover, .mobile-menu .button-logout:hover {
+  color: #0070f3;
+}
+
+/* Show hamburger menu on mobile */
+@media (max-width: 768px) {
+  
+  .nav-links,
+  .username,
+  .auth-links {
+    display: none;
+  }
 }

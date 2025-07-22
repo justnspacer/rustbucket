@@ -1,5 +1,8 @@
-
-export default function BusinessLayout({ children }: { children: React.ReactNode }) {
+export default function BusinessLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <div>
       <main>{children}</main>

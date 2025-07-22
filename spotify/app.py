@@ -1,14 +1,12 @@
 import datetime
-from flask import Flask, request, redirect, session, jsonify, render_template, url_for
+from flask import Flask, request, redirect, session, jsonify, render_template
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth, CacheFileHandler
 from dotenv import load_dotenv
 import requests, os
-from models import User
-from flask_sqlalchemy import SQLAlchemy
-from extensions import db, migrate
 from supabase_client import supabase
 import json
+from datetime import datetime
 
 
 load_dotenv()
@@ -36,34 +34,10 @@ def get_authenticated_user_from_headers():
         return user_data
     return None
 
-def link_supabase_user_to_spotify(supabase_user_id, spotify_id):
-    """Link a Supabase user to a Spotify account"""
-    try:
-        # Check if mapping already exists
-        existing_mapping = supabase.table('user_spotify_mapping').select('*').eq('supabase_user_id', supabase_user_id).execute()
-        
-        mapping_data = {
-            'supabase_user_id': supabase_user_id,
-            'spotify_id': spotify_id,
-            'linked_at': datetime.datetime.utcnow().isoformat()
-        }
-        
-        if existing_mapping.data:
-            # Update existing mapping
-            result = supabase.table('user_spotify_mapping').update(mapping_data).eq('supabase_user_id', supabase_user_id).execute()
-        else:
-            # Create new mapping
-            result = supabase.table('user_spotify_mapping').insert(mapping_data).execute()
-        
-        return result
-    except Exception as e:
-        print(f"Error linking Supabase user to Spotify: {e}")
-        return None
-
 def get_spotify_id_for_supabase_user(supabase_user_id):
     """Get Spotify ID for a Supabase user"""
     try:
-        result = supabase.table('user_spotify_mapping').select('spotify_id').eq('supabase_user_id', supabase_user_id).execute()
+        result = supabase.table('app_spotify').select('spotify_id').eq('supabase_user_id', supabase_user_id).execute()
         if result.data:
             return result.data[0]['spotify_id']
         return None
@@ -71,31 +45,22 @@ def get_spotify_id_for_supabase_user(supabase_user_id):
         print(f"Error getting Spotify ID for Supabase user: {e}")
         return None
 
-def save_or_update_user_supabase(spotify_id, display_name, access_token, refresh_token, user_data=None):
-    """Save or update user data in Supabase app_spotify table"""
+def save_or_update_user_supabase(spotify_id, supabase_user_id):
+    """Save or update user mapping in Supabase app_spotify table"""
     try:
         # First check if user exists
         existing_user = supabase.table('app_spotify').select('*').eq('spotify_id', spotify_id).execute()
         
         user_record = {
             'spotify_id': spotify_id,
-            'display_name': display_name,
-            'access_token': access_token,
-            'refresh_token': refresh_token,
-            'last_updated': datetime.datetime.utcnow().isoformat(),
-            'app_authorized': True
+            'supabase_user_id': supabase_user_id,
+            'linked_at': datetime.now(datetime.timezone.utc).isoformat(),
+            'updated_at': datetime.now(datetime.timezone.utc).isoformat()
         }
         
-        # Add additional user data if provided
-        if user_data:
-            user_record.update({
-                'email': user_data.get('email'),
-                'country': user_data.get('country'),
-                'followers': user_data.get('followers', {}).get('total', 0),
-                'images': user_data.get('images', []),
-                'product': user_data.get('product'),
-                'external_urls': user_data.get('external_urls', {})
-            })
+        # Only set created_at for new records
+        if not existing_user.data:
+            user_record['created_at'] = datetime.now(datetime.timezone.utc).isoformat()
         
         if existing_user.data:
             # Update existing user
@@ -113,13 +78,11 @@ def search_users_supabase(query=None, limit=20):
     """Search for users in Supabase app_spotify table"""
     try:
         if query:
-            # Search by display name or spotify ID
-            result = supabase.table('app_spotify').select('*').or_(
-                f'display_name.ilike.%{query}%,spotify_id.ilike.%{query}%'
-            ).eq('app_authorized', True).limit(limit).execute()
+            # Search by spotify ID only
+            result = supabase.table('app_spotify').select('*').ilike('spotify_id', f'%{query}%').limit(limit).execute()
         else:
-            # Get all authorized users
-            result = supabase.table('app_spotify').select('*').eq('app_authorized', True).limit(limit).execute()
+            # Get all users
+            result = supabase.table('app_spotify').select('*').not_.is_('spotify_id', 'null').not_.is_('linked_at', 'null').limit(limit).execute()
         
         return result.data
     except Exception as e:
@@ -129,27 +92,11 @@ def search_users_supabase(query=None, limit=20):
 def get_user_from_supabase(spotify_id):
     """Get a specific user from Supabase by spotify_id"""
     try:
-        result = supabase.table('app_spotify').select('*').eq('spotify_id', spotify_id).eq('app_authorized', True).execute()
+        result = supabase.table('app_spotify').select('*').eq('spotify_id', spotify_id).not_.is_('spotify_id', 'null').not_.is_('linked_at', 'null').execute()
         return result.data[0] if result.data else None
     except Exception as e:
         print(f"Error getting user from Supabase: {e}")
         return None
-
-def save_or_update_user(spotify_id, display_name, access_token, refresh_token):
-    user = User.query.filter_by(spotify_id=spotify_id).first()
-    if user:
-        user.display_name = display_name
-        user.access_token = access_token
-        user.refresh_token = refresh_token
-    else:
-        user = User(
-            spotify_id=spotify_id,
-            display_name=display_name,
-            access_token=access_token,
-            refresh_token=refresh_token
-        )
-        db.session.add(user)
-    db.session.commit()
 
 def require_authenticated_user(f):
     """Decorator to require authenticated user from gatekeeper"""
@@ -164,11 +111,6 @@ def require_authenticated_user(f):
 def create_app():
     app = Flask(__name__)
     app.secret_key = "thisisasecret"
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-    db.init_app(app)
-    migrate.init_app(app, db)
 
     CLIENT_ID = os.getenv("CLIENT_ID")
     CLIENT_SECRET = os.getenv("CLIENT_SECRET")
@@ -277,11 +219,9 @@ def create_app():
                     
                     # Update Supabase with fresh data
                     save_or_update_user_supabase(
-                        user_id,
-                        fresh_user_info.get('display_name'),
-                        access_token,
-                        refresh_token,
-                        fresh_user_info
+                        fresh_user_info.get('spotify_id', user_id),
+                        fresh_user_info.get('supabase_user_id', user_id),
+                        linked_at=datetime.datetime.utcnow().isoformat()
                     )
                     
                     return fresh_user_info
@@ -299,8 +239,7 @@ def create_app():
 
     @app.route("/spotify")
     def home():
-        sp, token_info, refresh_info = get_spotify_for_current_user()
-        return render_template("index.html")    
+        return "Welcome to the Spotify API integration! Use the endpoints to interact with your Spotify data."    
     
     @app.route("/spotify/u/<spotify_id>")
     def public_profile(spotify_id):
@@ -310,23 +249,21 @@ def create_app():
             return jsonify({"error": "User not found or hasn't authorized this app"}), 404
         
         # Handle both fresh Spotify data and cached Supabase data
-        if 'display_name' in user_data:
+        if 'spotify_id' in user_data:
             # Fresh Spotify data
             public_data = {
                 'spotify_id': user_data.get('id', spotify_id),
-                'display_name': user_data.get('display_name'),
                 'followers': user_data.get('followers', {}).get('total', 0) if isinstance(user_data.get('followers'), dict) else user_data.get('followers', 0),
                 'images': user_data.get('images', []),
                 'country': user_data.get('country'),
                 'product': user_data.get('product'),
                 'external_urls': user_data.get('external_urls', {}),
-                'last_updated': datetime.datetime.utcnow().isoformat()
+                'last_updated': datetime.now().isoformat()
             }
         else:
             # Cached Supabase data
             public_data = {
                 'spotify_id': user_data['spotify_id'],
-                'display_name': user_data['display_name'],
                 'followers': user_data.get('followers', 0),
                 'images': user_data.get('images', []),
                 'country': user_data.get('country'),
@@ -349,7 +286,6 @@ def create_app():
         for user in users:
             public_users.append({
                 'spotify_id': user['spotify_id'],
-                'display_name': user['display_name'],
                 'followers': user.get('followers', 0),
                 'images': user.get('images', []),
                 'country': user.get('country'),
@@ -373,7 +309,6 @@ def create_app():
         for user in users:
             public_users.append({
                 'spotify_id': user['spotify_id'],
-                'display_name': user['display_name'],
                 'followers': user.get('followers', 0),
                 'images': user.get('images', []),
                 'country': user.get('country'),
@@ -488,29 +423,7 @@ def create_app():
                 return jsonify(data["devices"])
         else:
             print("No devices found. Make sure Spotify is open on a device.")
-            return jsonify({"error": "No devices found"}), 404    
-        
-    @app.route('/spotify/save_user')
-    def save_user():
-        sp, token_info, refresh_info = get_spotify_for_current_user()
-        user_info = sp.current_user()
-        
-        # Save to local SQLite database (existing functionality)
-        save_or_update_user(user_info["id"], user_info["display_name"], token_info, refresh_info)
-        
-        # Also save to Supabase
-        supabase_result = save_or_update_user_supabase(
-            user_info["id"], 
-            user_info["display_name"], 
-            token_info, 
-            refresh_info,
-            user_info  # Pass full user data for additional fields
-        )
-        
-        if supabase_result:
-            return f"User {user_info['display_name']} saved to both local and Supabase databases!"
-        else:
-            return f"User {user_info['display_name']} saved locally, but failed to save to Supabase."
+            return jsonify({"error": "No devices found"}), 404        
 
     @app.route("/spotify/u/<spotify_id>/top-tracks")
     def user_top_tracks(spotify_id):
@@ -593,11 +506,10 @@ def create_app():
             "user_info_available": user_info is not None,
             "spotify_client_available": sp is not None,
             "has_valid_tokens": access_token is not None
-        }
-        
+        }        
         if user_info:
-            response["user_display_name"] = user_info.get('display_name', 'Unknown')
             response["user_country"] = user_info.get('country', 'Unknown')
+            response["spotify_id_confirmed"] = user_info.get('id', spotify_id)
         
         return jsonify(response)
 
@@ -637,9 +549,8 @@ def create_app():
         spotify_user = get_user_from_supabase(spotify_id)
         if not spotify_user:
             return jsonify({"error": "Spotify user not found. Please authorize with Spotify first."}), 404
-        
-        # Link the accounts
-        result = link_supabase_user_to_spotify(user['id'], spotify_id)
+          # Link the accounts using simplified structure
+        result = save_or_update_user_supabase(spotify_id, user['id'])
         if result:
             return jsonify({
                 "message": "Successfully linked Spotify account",

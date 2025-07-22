@@ -1,8 +1,5 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  /* config options here */
-  
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   // Add rewrites for API calls to avoid CORS issues during development
   async rewrites() {
     return [
@@ -14,4 +11,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+module.exports = nextConfig;
