@@ -1,0 +1,51 @@
+services:
+  next-app:
+    build:
+      context: ./next-rusty-tech
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./next-rusty-tech:/app
+      - /app/node_modules
+    environment:
+      - NEXT_PUBLIC_GATEKEEPER_URL=http://gatekeeper:8000
+      - PYTHON_API_URL=http://spotify:5000
+    depends_on:
+      - gatekeeper
+      - spotify
+    networks:
+      - rustbucket-network
+
+  gatekeeper:
+    build:
+      context: ./gatekeeper
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./gatekeeper:/app
+    environment:
+      - SPOTIFY_SERVICE_URL=http://spotify:5000
+    depends_on:
+      - spotify
+    networks:
+      - rustbucket-network
+
+  spotify:
+    build:
+      context: ./spotify
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./spotify:/app
+    environment:
+      - FLASK_ENV=production
+      - FLASK_APP=run.py
+    networks:
+      - rustbucket-network
+
+networks:
+  rustbucket-network:
+    driver: bridge
