@@ -1,22 +1,49 @@
-"use client";
-import { useAuth } from "@/app/context/AuthContext";
-import SpotifyDashboardSafe from "@/components/SpotifyDashboardSafe";
-import SpotifyConnectionTest from "@/components/SpotifyConnectionTest";
-import SpotifyLayout from "@/components/SpotifyLayout";
-import SpotifySearch from "@/components/SpotifySearch";
-import { useState, useEffect } from "react";
-import { setupIntersectionAnimations } from "@/hooks/useIntersectionAnimation";
-import "@/styles/spotify.css";
+'use client';
+import { useAuth } from '@/app/context/AuthContext';
+import SpotifyDashboardSafe from '@/components/SpotifyDashboardSafe';
+import SpotifyConnectionTest from '@/components/SpotifyConnectionTest';
+import SpotifyLayout from '@/components/SpotifyLayout';
+import SpotifySearch from '@/components/SpotifySearch';
+import { useState, useEffect } from 'react';
+import { setupIntersectionAnimations } from '@/hooks/useIntersectionAnimation';
+import '@/styles/spotify.css';
 
 export default function SpotifyPage() {
-  const { user, loading } = useAuth();
+  const { user, loading, getAuthToken } = useAuth();
   const [showTest, setShowTest] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
+  const [spotifyData, setData] = useState<any>(null);
 
   useEffect(() => {
     // Initialize animations when the page loads
     setupIntersectionAnimations();
-  }, []);
+
+    const fetchSpotifyData = async () => {
+      const token = getAuthToken();
+      if (!token) {
+        console.error('No token found');
+        return;
+      }
+      try {
+        const response = await fetch('http://localhost:8000/api/spotify', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) throw new Error('Failed to fetch');
+
+        const result = await response.json();
+        setData(result);
+        console.log('Spotify result:', result);
+      } catch (error) {
+        console.error('Spotify API error:', error);
+      }
+    };
+    if (user) {
+      fetchSpotifyData();
+    }
+  }, [user, getAuthToken]);
 
   if (loading) {
     return (
@@ -31,9 +58,11 @@ export default function SpotifyPage() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Authentication Required</h1>
-          <p className="text-gray-600 mb-4">Please log in to access your Spotify data.</p>
-          <a 
-            href="/login" 
+          <p className="text-gray-600 mb-4">
+            Please log in to access your Spotify data.
+          </p>
+          <a
+            href="/login"
             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
           >
             Go to Login
@@ -47,6 +76,7 @@ export default function SpotifyPage() {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold">Spotify Integration</h1>
+          <p>{spotifyData?.message}</p>
           <div className="space-x-2">
             <button
               onClick={() => setShowSearch(!showSearch)}
@@ -62,15 +92,15 @@ export default function SpotifyPage() {
             </button>
           </div>
         </div>
-        
+
         {showSearch && (
           <div className="bg-white p-6 rounded-lg shadow">
             <SpotifySearch />
           </div>
         )}
-        
+
         {showTest && <SpotifyConnectionTest />}
-        
+
         <SpotifyDashboardSafe />
       </div>
     </SpotifyLayout>

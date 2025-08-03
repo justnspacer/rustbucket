@@ -189,6 +189,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Get auth token for use with services
   const getAuthToken = () => {
     const token = parseCookies()['token'];
+    console.log('Auth token:', token);
     return token || null;
   };
 

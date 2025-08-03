@@ -12,15 +12,15 @@ export const NavBar = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const dropdownRef = useRef<HTMLUListElement>(null);
-  const hamburger = document.querySelector('.hamburger') as HTMLElement;
 
   const handleDropdownClick = () => {
     setShowDropdown(!showDropdown);
   };
 
   const handleMobileMenuToggle = () => {
+    const hamburger = document.querySelector('.hamburger') as HTMLElement;
     setShowMobileMenu(!showMobileMenu);
-    if (showMobileMenu) {
+    if (showMobileMenu && hamburger) {
       hamburger.style.color = 'var(--foreground)';
     } else {
       hamburger.style.color = 'var(--background)';
