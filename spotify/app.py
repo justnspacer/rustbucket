@@ -1,19 +1,34 @@
 import datetime
-from flask import Flask, request, redirect, session, jsonify, render_template
+from flask import request, redirect, session, jsonify
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth, CacheFileHandler
 from dotenv import load_dotenv
-import requests, os
+import requests
 from supabase_client import supabase
 import json
 from datetime import datetime
-from flask_cors import CORS
+from response_helpers import success_response, error_response, paginated_response
 
 load_dotenv()
 
-def register_spotify_routes(app, CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, TOKEN_URL, SCOPE, DEVICE_ID):
-    """helper function to register Spotify-related routes"""
+def register_spotify_routes(app, CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, TOKEN_URL, SCOPE):
 
+    # Authentication errors
+    AUTH_REQUIRED = "AUTH_REQUIRED"
+    INVALID_TOKEN = "INVALID_TOKEN"
+    TOKEN_EXPIRED = "TOKEN_EXPIRED"
+
+    # Spotify API errors
+    SPOTIFY_API_ERROR = "SPOTIFY_API_ERROR"
+    SPOTIFY_USER_NOT_FOUND = "SPOTIFY_USER_NOT_FOUND"
+    SPOTIFY_UNAUTHORIZED = "SPOTIFY_UNAUTHORIZED"
+
+    # General errors
+    VALIDATION_ERROR = "VALIDATION_ERROR"
+    NOT_FOUND = "NOT_FOUND"
+    INTERNAL_ERROR = "INTERNAL_ERROR"
+    
+    """helper function to register Spotify-related routes"""
     def get_authenticated_user_from_headers():
         """Extract authenticated user info from gatekeeper headers"""
         user_id = request.headers.get('x-user-id')
@@ -103,10 +118,22 @@ def register_spotify_routes(app, CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, TOKEN_U
         def decorated_function(*args, **kwargs):
             user = get_authenticated_user_from_headers()
             if not user:
-                return jsonify({"error": "Authentication required"}), 401
+                return jsonify({"error": "Authentication required. Please log in with your Supabase account."}), 401
             return f(user, *args, **kwargs)
         decorated_function.__name__ = f.__name__
         return decorated_function
+
+    def get_public_user_data(user):
+        """Return only public fields for user data"""
+        return {
+            'spotify_id': user['spotify_id'],
+            'followers': user.get('followers', 0),
+            'images': user.get('images', []),
+            'country': user.get('country'),
+            'product': user.get('product'),
+            'last_updated': user.get('last_updated'),
+            'linked_at': user.get('linked_at')
+        }
 
 
     cache_handler = CacheFileHandler(cache_path=".cache")
@@ -135,8 +162,8 @@ def register_spotify_routes(app, CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, TOKEN_U
         token_info = oauth.get_access_token()
         sp = spotipy.Spotify(auth=token_info["access_token"])    
         # Check if the token has expired
-        now = datetime.datetime.now()
-        expires_at = datetime.datetime.fromtimestamp(token_info['expires_at'])
+        now = datetime.now()
+        expires_at = datetime.fromtimestamp(token_info['expires_at'])
         if now >= expires_at:
             # Refresh the token
             refresh_token = token_info['refresh_token']
@@ -154,7 +181,8 @@ def register_spotify_routes(app, CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, TOKEN_U
             if not user_data:
                 return None, None, None
             
-            access_token = user_data.get('access_token')
+            # access_token = user_data.get('access_token')
+            access_token = "BQCcyOlwFQZlvD6z46hIbuNK0xN_uaYdKhBNDb8qlelspCcwPJGnCk5yFJ2T3ceeOEAbd3ueFl07kkyxWifdm4IEkNTG0zDGyZG4WUGZX939UnpbNRRH9Xc_tBRre1KvivGTj-Na39AoUayIGZfq9EMyPMSQAm8HE19mPnaF4LYdIVBEAIkGA3gML6hl7-jFsy3FVOpT4ufbQ7BRszvum_YLm-IaWz5bYVA4_knwsmViWFGaYON9QMtW_XjSNSmDBQIbsF5EwrNoziaB60Gi"
             refresh_token = user_data.get('refresh_token')
             
             if not access_token:
@@ -225,74 +253,6 @@ def register_spotify_routes(app, CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, TOKEN_U
             return None
         
     """Register Spotify-related routes"""
-    @app.route("/api/spotify")
-    def home():
-        return jsonify({"message": "Welcome to the Spotify API integration! Use the endpoints to interact with your Spotify data."})
-    
-    # Get spotify id by user id
-    @app.route("/api/spotify/u/<user_id>")
-    def get_spotify_id(user_id):
-
-        user_data = get_user_spotify_id(user_id)
-        print(f"User data for {user_id}: {user_data}")
-        if not user_data:
-            return jsonify({"error": "User not found or hasn't authorized this app"}), 404
-        
-        # Get user info from Spotify
-        user_info = get_user_info_by_id(user_data)
-        if not user_info:
-            return jsonify({"error": "Spotify user data not found"}), 404
-        
-        
-        return jsonify({"spotify_id": user_data})
-
-    @app.route("/api/spotify/search-users")
-    def search_spotify_users():
-        query = request.args.get('q', '')
-        limit = int(request.args.get('limit', 20))
-        
-        users = search_users(query, limit)
-        
-        # Return only public data
-        public_users = []
-        for user in users:
-            public_users.append({
-                'spotify_id': user['spotify_id'],
-                'followers': user.get('followers', 0),
-                'images': user.get('images', []),
-                'country': user.get('country'),
-                'product': user.get('product'),
-                'last_updated': user.get('last_updated')
-            })
-        
-        return jsonify({
-            'users': public_users,
-            'total': len(public_users),
-            'query': query
-        })
-
-    @app.route("/api/spotify/users")
-    def list_users():
-        limit = int(request.args.get('limit', 20))
-        users = search_users(limit=limit)
-        
-        # Return only public data
-        public_users = []
-        for user in users:
-            public_users.append({
-                'spotify_id': user['spotify_id'],
-                'followers': user.get('followers', 0),
-                'images': user.get('images', []),
-                'country': user.get('country'),
-                'product': user.get('product'),
-                'last_updated': user.get('last_updated')
-            })
-        
-        return jsonify({
-            'users': public_users,
-            'total': len(public_users)
-        })
-
     @app.route("/api/spotify/login")
     def login():
         auth_url = oauth.get_authorize_url()
@@ -306,163 +266,213 @@ def register_spotify_routes(app, CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, TOKEN_U
 
     @app.route("/api/spotify/callback")
     def callback():
-        code = request.args.get("code")
-        token_info = oauth.get_access_token(code)
-        session["token_info"] = token_info
-        return jsonify(token_info)
+        try:
+            if 'token_info' in session:
+                return jsonify(session['token_info'])
+        except Exception as e:
+            print(f"Error retrieving token from session: {e}")
+    
+    @app.route("/api/spotify")
+    def home():
+        return success_response(
+            data={
+            "public_endpoints": [
+                "/api/spotify/search-users - Search for users (public access)",
+                "/api/spotify/users - List all users (public access)"
+            ],
+            "authenticated_endpoints": [
+                "/api/spotify/u/<user_id> - Get specific user data (requires authentication)",
+                "/api/spotify/u/<spotify_id>/top-tracks - User top tracks (requires authentication)",
+                "/api/spotify/u/<spotify_id>/top-artists - User top artists (requires authentication)",
+                "/api/spotify/u/<spotify_id>/playlists - User playlists (requires authentication)",
+                "/api/spotify/u/<spotify_id>/currently-playing - Currently playing (requires authentication)"
+            ]
+        },
+            message="Welcome to the Spotify API integration!"
+        )
 
-    @app.route("/api/spotify/top-artists-and-tracks")
-    def top_artists_and_tracks():
-        sp, token_info, refresh_info = get_spotify_for_current_user()
-        top_artists = sp.current_user_top_artists(limit=20)
-        top_tracks = sp.current_user_top_tracks(limit=20)
-        return jsonify({
-            "top_artists": top_artists['items'],
-            "top_tracks": top_tracks['items']
-        })
+    @app.route("/api/spotify/search-users")
+    def search_spotify_users():
+        try:
+            query = request.args.get('q', '')
+            limit = int(request.args.get('limit', 20))
+            users = search_users(query, limit)
+            # Return only public data
+            public_users = [get_public_user_data(user) for user in users]
+            return success_response(
+                data={
+            'users': public_users,
+            'total': len(public_users),
+            'query': query,
+            },
+                message="To view detailed user data, authentication is required."
+            )
+        except Exception as e:
+            return error_response(
+                message="Failed to search users",
+                status_code=500,
+                error_code=SPOTIFY_API_ERROR,
+                details={"error": str(e)}
+            )
 
+    @app.route("/api/spotify/u/<user_id>")
+    @require_authenticated_user
+    def get_spotify_id(authenticated_user, user_id):
+        
+        try:
+            user_data = get_user_spotify_id(user_id)
+
+            if not user_data:
+                return error_response(
+                    message="User not found",
+                    status_code=404,
+                    error_code=SPOTIFY_USER_NOT_FOUND,
+                    details={"user_id": user_id}
+                )
+            
+            # Get user info from Spotify
+            user_info = get_user_info_by_id(user_data)
+            if not user_info:
+                return error_response(
+                    message="Failed to get user info from Spotify",
+                    status_code=500,
+                    error_code=SPOTIFY_API_ERROR,
+                    details={"user_id": user_data}
+                )
+            
+            return success_response(
+                data={
+                    "user_id": user_data,
+                    "spotify_info": user_info
+                },
+                message="User info retrieved successfully"
+            )
+        except Exception as e:
+            return error_response(
+                message="Failed to get user info",
+                status_code=500,
+                error_code=SPOTIFY_API_ERROR,
+                details={"error": str(e)}
+            )
+
+    @app.route("/api/spotify/top-artists")
+    @require_authenticated_user
+    def top_artists(authenticated_user):
+        try:
+            sp, token_info, refresh_info = get_spotify_for_current_user()
+            top_artists = sp.current_user_top_artists(limit=20)
+            return success_response(
+                data={
+                    "top_artists": top_artists['items'],
+                    "user": authenticated_user['id']
+                },
+                message="Top artists retrieved successfully"
+            )
+        except Exception as e:
+            return error_response(
+                message="Failed to retrieve top artists",
+                status_code=500,
+                error_code=SPOTIFY_API_ERROR,
+                details={"error": str(e)}
+            )
+    
     @app.route("/api/spotify/user-saved-tracks")
-    def user_saved_tracks():
-        all_tracks = [] # List to hold all tracks
+    @require_authenticated_user
+    def user_saved_tracks(authenticated_user):
         sp, token_info, refresh_info = get_spotify_for_current_user() # Get the Spotify client
         saved_tracks = sp.current_user_saved_tracks(limit=20) # Get the first page of saved tracks
         tracks = [{"name": item["track"]["name"], 
                 "artist": item["track"]["artists"][0]["name"], 
-                "added_at": datetime.datetime.strptime(item["added_at"], "%Y-%m-%dT%H:%M:%SZ").strftime("%m.%d.%y"),
+                "added_at": datetime.strptime(item["added_at"], "%Y-%m-%dT%H:%M:%SZ").strftime("%m.%d.%y"),
                 "url": item["track"]["external_urls"]["spotify"]} 
                 for item in saved_tracks["items"]]   
-        return jsonify(tracks) # Return the list of all tracks
+        return success_response(
+            data={
+                "tracks": tracks,
+                "user": authenticated_user['id']
+            },
+            message="User saved tracks retrieved successfully"
+        )
 
-    # get current user currently playing track
     @app.route("/api/spotify/currently-playing")
-    def currently_playing():
+    @require_authenticated_user
+    def currently_playing(authenticated_user):
         sp, token_info, refresh_info = get_spotify_for_current_user()
         current_playback = sp.current_playback(market="US", additional_types=['episode'])
         if current_playback and current_playback['is_playing']:
-            return jsonify(current_playback)
+            return success_response(
+                data={
+                    "currently_playing": current_playback,
+                    "user": authenticated_user['id']
+                },
+                message="Currently playing track retrieved successfully"
+            )
+        elif current_playback is None:
+            # If no track is currently playing, return a message
+            return success_response(
+                data={
+                    "message": "nothing playing 🎵",
+                    "user": authenticated_user['id']
+                },
+                message="No track currently playing"
+            )
         else:
-            return jsonify({'message': 'nothing playing 🎵'})
+            return error_response(
+                message="Failed to retrieve currently playing track",
+                status_code=500,
+                error_code=SPOTIFY_API_ERROR,
+                details={"error": "No track currently playing"}
+            )
 
-    # Get user's top tracks
     @app.route("/api/spotify/top-tracks")
-    def top_tracks():
+    @require_authenticated_user
+    def top_tracks(authenticated_user):
         sp, token_info, refresh_info = get_spotify_for_current_user()
         top_tracks = sp.current_user_top_tracks(limit=20)
-        return jsonify(top_tracks)
+        return success_response(
+            data={
+                "top_tracks": top_tracks['items'],
+                "user": authenticated_user['id']
+            },
+            message="Top tracks retrieved successfully"
+        )
 
-    # Get user's recently played tracks
     @app.route("/api/spotify/recently-played")
-    def recently_played():
+    @require_authenticated_user
+    def recently_played(authenticated_user):
         sp, token_info, refresh_info = get_spotify_for_current_user()
         recently_played = sp.current_user_recently_played()
-        return jsonify(recently_played)
+        return success_response(
+            data={
+                "recently_played": recently_played['items'],
+                "user": authenticated_user['id']
+            },
+            message="Recently played tracks retrieved successfully"
+        )
 
-    # Get user's saved tracks
-    @app.route("/api/spotify/saved-tracks")
-    def saved_tracks():
-        sp, token_info, refresh_info = get_spotify_for_current_user()
-        saved_tracks = sp.current_user_saved_tracks(limit=20)
-        return jsonify(saved_tracks)
-
-    # Get user's playlists
     @app.route("/api/spotify/playlists")
-    def playlists():
+    @require_authenticated_user
+    def playlists(authenticated_user):
         sp, token_info, refresh_info = get_spotify_for_current_user()
         playlists = sp.current_user_playlists(limit=20)
-        return jsonify(playlists)
+        return success_response(
+            data={
+                "playlists": playlists['items'],
+                "user": authenticated_user['id']
+            },
+            message="Playlists retrieved successfully"
+        )
 
-    #Get playlist tracks
     @app.route("/api/spotify/playlist-tracks/<playlist_id>")
-    def playlist_tracks(playlist_id):
+    @require_authenticated_user
+    def playlist_tracks(authenticated_user, playlist_id):
         sp, token_info, refresh_info = get_spotify_for_current_user()
         playlist_tracks = sp.playlist_tracks(playlist_id)
-        return jsonify(playlist_tracks)
-
-    @app.route("/api/spotify/devices")
-    def get_devices():
-        sp, access_token, refresh_info = get_spotify_for_current_user()
-        url = "https://api.spotify.com/v1/me/player/devices"
-        headers = {
-        "Authorization": f"Bearer {access_token}"
-        }
-
-        response = requests.get(url, headers=headers)
-        data = response.json()
-
-        if "devices" in data:
-            for device in data["devices"]:
-                print(f"Device Name: {device['name']}, ID: {device['id']}, Type: {device['type']}")
-                return jsonify(data["devices"])
-        else:
-            print("No devices found. Make sure Spotify is open on a device.")
-            return jsonify({"error": "No devices found"}), 404        
-
-    @app.route("/api/spotify/u/<spotify_id>/top-tracks")
-    def user_top_tracks(spotify_id):
-        """Get top tracks for a specific user by their Spotify ID"""
-        sp, access_token, refresh_token = get_spotify_by_user_id(spotify_id)
-        if not sp:
-            return jsonify({"error": "User not found or unable to access their data"}), 404
-        
-        try:
-            top_tracks = sp.current_user_top_tracks(limit=20)
-            return jsonify({
-                "user_id": spotify_id,
-                "top_tracks": top_tracks['items']
-            })
-        except Exception as e:
-            return jsonify({"error": f"Failed to get top tracks: {str(e)}"}), 500
-
-    @app.route("/api/spotify/u/<spotify_id>/top-artists")
-    def user_top_artists(spotify_id):
-        """Get top artists for a specific user by their Spotify ID"""
-        sp, access_token, refresh_token = get_spotify_by_user_id(spotify_id)
-        if not sp:
-            return jsonify({"error": "User not found or unable to access their data"}), 404
-        
-        try:
-            top_artists = sp.current_user_top_artists(limit=20)
-            return jsonify({
-                "user_id": spotify_id,
-                "top_artists": top_artists['items']
-            })
-        except Exception as e:
-            return jsonify({"error": f"Failed to get top artists: {str(e)}"}), 500
-
-    @app.route("/api/spotify/u/<spotify_id>/playlists")
-    def user_playlists(spotify_id):
-        """Get playlists for a specific user by their Spotify ID"""
-        sp, access_token, refresh_token = get_spotify_by_user_id(spotify_id)
-        if not sp:
-            return jsonify({"error": "User not found or unable to access their data"}), 404
-        
-        try:
-            playlists = sp.current_user_playlists(limit=20)
-            return jsonify({
-                "user_id": spotify_id,
-                "playlists": playlists['items']
-            })
-        except Exception as e:
-            return jsonify({"error": f"Failed to get playlists: {str(e)}"}), 500
-
-    @app.route("/api/spotify/u/<spotify_id>/currently-playing")
-    def user_currently_playing(spotify_id):
-        """Get currently playing track for a specific user by their Spotify ID"""
-        sp, access_token, refresh_token = get_spotify_by_user_id(spotify_id)
-        if not sp:
-            return jsonify({"error": "User not found or unable to access their data"}), 404
-        
-        try:
-            current_playback = sp.current_playback(market="US", additional_types=['episode'])
-            if current_playback and current_playback['is_playing']:
-                return jsonify({
-                    "user_id": spotify_id,
-                    "currently_playing": current_playback
-                })
-            else:
-                return jsonify({
-                    "user_id": spotify_id,
-                    "message": "nothing playing 🎵"
-                })
-        except Exception as e:
-            return jsonify({"error": f"Failed to get currently playing: {str(e)}"}), 500
+        return success_response(
+            data={
+                "playlist_id": playlist_id,
+                "tracks": playlist_tracks['items'],
+                "user": authenticated_user['id']
+            },
+            message="Playlist tracks retrieved successfully"
+        )

@@ -25,10 +25,9 @@ CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 REDIRECT_URI = os.getenv("REDIRECT_URI")
 TOKEN_URL = os.getenv("TOKEN_URL")
 SCOPE = "user-top-read user-read-recently-played user-read-currently-playing user-library-read ugc-image-upload streaming playlist-read-private streaming user-read-private user-read-email user-modify-playback-state user-read-playback-state"
-DEVICE_ID = "your_device_id"
 
 # Register Spotify routes
-register_spotify_routes(app, CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, TOKEN_URL, SCOPE, DEVICE_ID)
+register_spotify_routes(app, CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, TOKEN_URL, SCOPE)
 
 if __name__ == '__main__':
      # Enable debug mode for hot reloading
