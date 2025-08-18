@@ -1,4 +1,5 @@
-import datetime
+import base64
+from hashlib import sha256
 from flask import request, redirect, session, jsonify
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth, CacheFileHandler
@@ -7,7 +8,12 @@ import requests
 from supabase_client import supabase
 import json
 from datetime import datetime
-from response_helpers import success_response, error_response, paginated_response
+from spotify.helpers import success_response, error_response, paginated_response
+import random
+import string
+from functools import wraps
+import httpx
+import token_manager
 
 load_dotenv()
 
@@ -29,12 +35,12 @@ def register_spotify_routes(app, CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, TOKEN_U
     INTERNAL_ERROR = "INTERNAL_ERROR"
     
     """helper function to register Spotify-related routes"""
-    def get_authenticated_user_from_headers():
-        """Extract authenticated user info from gatekeeper headers"""
+    def get_authenticated_user(request):
+        """Extract authenticated user info from request headers"""
         user_id = request.headers.get('x-user-id')
         user_email = request.headers.get('x-user-email')
         user_metadata = request.headers.get('x-user-metadata')
-    
+        
         if user_id:
             user_data = {
                 'id': user_id,
@@ -54,7 +60,7 @@ def register_spotify_routes(app, CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, TOKEN_U
 
     def get_user_spotify_id(user_id):
         try:
-            result = supabase.table('app_spotify').select('spotify_id').eq('supabase_user_id', user_id).execute()
+            result = supabase.table('app_spotify').select('spotify_id').eq('user_id', user_id).execute()
             if result.data:
                 return result.data[0]['spotify_id']
             return None
@@ -69,7 +75,7 @@ def register_spotify_routes(app, CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, TOKEN_U
             
             user_record = {
                 'spotify_id': spotify_id,
-                'supabase_user_id': user_id,
+                'user_id': user_id,
                 'linked_at': datetime.now(datetime.timezone.utc).isoformat(),
                 'updated_at': datetime.now(datetime.timezone.utc).isoformat()
             }
@@ -113,16 +119,6 @@ def register_spotify_routes(app, CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, TOKEN_U
             print(f"Error getting user: {e}")
             return None
 
-    def require_authenticated_user(f):
-        """Decorator to require authenticated user from gatekeeper"""
-        def decorated_function(*args, **kwargs):
-            user = get_authenticated_user_from_headers()
-            if not user:
-                return jsonify({"error": "Authentication required. Please log in with your Supabase account."}), 401
-            return f(user, *args, **kwargs)
-        decorated_function.__name__ = f.__name__
-        return decorated_function
-
     def get_public_user_data(user):
         """Return only public fields for user data"""
         return {
@@ -135,8 +131,6 @@ def register_spotify_routes(app, CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, TOKEN_U
             'linked_at': user.get('linked_at')
         }
 
-
-    cache_handler = CacheFileHandler(cache_path=".cache")
     oauth = SpotifyOAuth(client_id=CLIENT_ID,
                         client_secret=CLIENT_SECRET,
                         redirect_uri=REDIRECT_URI, 
@@ -235,7 +229,7 @@ def register_spotify_routes(app, CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, TOKEN_U
                     # Update Supabase with fresh data
                     save_or_update_user(
                         fresh_user_info.get('spotify_id', user_id),
-                        fresh_user_info.get('supabase_user_id', user_id),
+                        fresh_user_info.get('user_id', user_id),
                         linked_at=datetime.datetime.utcnow().isoformat()
                     )
                     
@@ -252,7 +246,85 @@ def register_spotify_routes(app, CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, TOKEN_U
             print(f"Error getting user info for {user_id}: {e}")
             return None
         
+    def generate_random_string(length=16):
+        return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
+    
+    def base64_url_encode(data):
+        return base64.urlsafe_b64encode(data).decode('utf-8').rstrip('=')
+    
+    def store_temp_oauth_data(user_id, data):
+        """Store temporary OAuth data in Supabase"""
+        try:
+            result = supabase.table('app_spotify').insert({
+                'user_id': user_id,
+                'data': json.dumps(data),
+                'created_at': datetime.datetime.utcnow().isoformat()
+            }).execute()
+            return result
+        except Exception as e:
+            print(f"Error storing temporary OAuth data: {e}")
+            return None
+    
+    class TokenNotFoundError(Exception):
+        """Custom exception for when a token is not found."""
+        pass
+    
+    def require_spotify_auth(f):
+        @wraps(f)
+        async def decorated_function(*args, **kwargs):
+            # Get authenticated user from Supabase
+            user = await get_authenticated_user(request)
+            if not user:
+                return {"error": "Authentication required"}, 401
+            
+            # Get valid Spotify token
+            try:
+                spotify_token = await token_manager.get_valid_token(user['id'])
+            except TokenNotFoundError:
+                return {"error": "Spotify authorization required"}, 403
+            
+            # Add token to request context
+            request.spotify_token = spotify_token
+            return await f(*args, **kwargs)
+        
+        return decorated_function
+
+    @app.route('/api/spotify/profile/<spotify_user_id>')
+    @require_spotify_auth
+    async def get_spotify_profile(spotify_user_id):
+        headers = {'Authorization': f'Bearer {request.spotify_token}'}
+        
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                f'https://api.spotify.com/v1/users/{spotify_user_id}',
+                headers=headers
+            )
+        
+        return response.json()
+
     """Register Spotify-related routes"""
+    @app.route("/api/spotify/authorize")
+    async def spotify_authorize():
+        state = generate_random_string(16)
+        code_verifier = generate_random_string(128)
+        code_challenge = base64_url_encode(sha256(code_verifier))
+
+        await store_temp_oauth_data(user_id, {
+            'state': state,
+            'code_verifier': code_verifier
+        })
+
+        auth_url = f"https://accounts.spotify.com/authorize?" \
+               f"client_id={CLIENT_ID}&" \
+               f"response_type=code&" \
+               f"redirect_uri={REDIRECT_URI}&" \
+               f"code_challenge_method=S256&" \
+               f"code_challenge={code_challenge}&" \
+               f"state={state}&" \
+               f"scope=user-read-private user-read-email"
+    
+        return redirect(auth_url)
+
     @app.route("/api/spotify/login")
     def login():
         auth_url = oauth.get_authorize_url()
@@ -316,7 +388,7 @@ def register_spotify_routes(app, CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, TOKEN_U
             )
 
     @app.route("/api/spotify/u/<user_id>")
-    @require_authenticated_user
+    @require_spotify_auth
     def get_spotify_id(authenticated_user, user_id):
         
         try:
@@ -356,7 +428,7 @@ def register_spotify_routes(app, CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, TOKEN_U
             )
 
     @app.route("/api/spotify/top-artists")
-    @require_authenticated_user
+    @require_spotify_auth
     def top_artists(authenticated_user):
         try:
             sp, token_info, refresh_info = get_spotify_for_current_user()
@@ -377,7 +449,7 @@ def register_spotify_routes(app, CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, TOKEN_U
             )
     
     @app.route("/api/spotify/user-saved-tracks")
-    @require_authenticated_user
+    @require_spotify_auth
     def user_saved_tracks(authenticated_user):
         sp, token_info, refresh_info = get_spotify_for_current_user() # Get the Spotify client
         saved_tracks = sp.current_user_saved_tracks(limit=20) # Get the first page of saved tracks
@@ -395,7 +467,7 @@ def register_spotify_routes(app, CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, TOKEN_U
         )
 
     @app.route("/api/spotify/currently-playing")
-    @require_authenticated_user
+    @require_spotify_auth
     def currently_playing(authenticated_user):
         sp, token_info, refresh_info = get_spotify_for_current_user()
         current_playback = sp.current_playback(market="US", additional_types=['episode'])
@@ -425,7 +497,7 @@ def register_spotify_routes(app, CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, TOKEN_U
             )
 
     @app.route("/api/spotify/top-tracks")
-    @require_authenticated_user
+    @require_spotify_auth
     def top_tracks(authenticated_user):
         sp, token_info, refresh_info = get_spotify_for_current_user()
         top_tracks = sp.current_user_top_tracks(limit=20)
@@ -438,7 +510,7 @@ def register_spotify_routes(app, CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, TOKEN_U
         )
 
     @app.route("/api/spotify/recently-played")
-    @require_authenticated_user
+    @require_spotify_auth
     def recently_played(authenticated_user):
         sp, token_info, refresh_info = get_spotify_for_current_user()
         recently_played = sp.current_user_recently_played()
@@ -451,7 +523,7 @@ def register_spotify_routes(app, CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, TOKEN_U
         )
 
     @app.route("/api/spotify/playlists")
-    @require_authenticated_user
+    @require_spotify_auth
     def playlists(authenticated_user):
         sp, token_info, refresh_info = get_spotify_for_current_user()
         playlists = sp.current_user_playlists(limit=20)
@@ -464,7 +536,7 @@ def register_spotify_routes(app, CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, TOKEN_U
         )
 
     @app.route("/api/spotify/playlist-tracks/<playlist_id>")
-    @require_authenticated_user
+    @require_spotify_auth
     def playlist_tracks(authenticated_user, playlist_id):
         sp, token_info, refresh_info = get_spotify_for_current_user()
         playlist_tracks = sp.playlist_tracks(playlist_id)
