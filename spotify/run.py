@@ -1,10 +1,9 @@
 import os
 from flask import Flask
 from dotenv import load_dotenv
-from supabase_client import supabase
-from datetime import datetime
 from flask_cors import CORS
-from app import register_spotify_routes
+from endpoints import spotify_endpoints
+from auth import spotify_auth
 
 # Load environment variables from .env file
 load_dotenv()
@@ -20,14 +19,9 @@ CORS(app, origins=[
     "http://127.0.0.1:8000"
 ])
 
-CLIENT_ID = os.getenv("CLIENT_ID")
-CLIENT_SECRET = os.getenv("CLIENT_SECRET")
-REDIRECT_URI = os.getenv("REDIRECT_URI")
-TOKEN_URL = os.getenv("TOKEN_URL")
-SCOPE = "user-top-read user-read-recently-played user-read-currently-playing user-library-read ugc-image-upload streaming playlist-read-private streaming user-read-private user-read-email user-modify-playback-state user-read-playback-state"
-
-# Register Spotify routes
-register_spotify_routes(app, CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, TOKEN_URL, SCOPE)
+# Register routes
+spotify_auth(app)
+spotify_endpoints(app)
 
 if __name__ == '__main__':
      # Enable debug mode for hot reloading
