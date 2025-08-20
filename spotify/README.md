@@ -14,10 +14,6 @@ A Flask-based REST API for Spotify integration with Supabase authentication and 
 │   ├── errors.py          # Error codes and constants
 │   ├── helpers.py         # Response formatting utilities
 │   └── spotify_client.py  # Spotify API client utilities
-├── static/                # Static assets (CSS, JS)
-├── templates/             # HTML templates
-├── migrations/            # Database migration files
-├── _backup/               # Backup of original files
 ├── cli.py                 # Database utilities and testing
 ├── run.py                 # Main Flask application
 ├── requirements.txt       # Python dependencies
