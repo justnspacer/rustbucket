@@ -2,8 +2,8 @@ import os
 from flask import Flask
 from dotenv import load_dotenv
 from flask_cors import CORS
-from endpoints import spotify_endpoints
-from auth import spotify_auth
+from api.endpoints import register_spotify_routes
+from api.auth import register_auth_routes
 
 # Load environment variables from .env file
 load_dotenv()
@@ -20,15 +20,19 @@ CORS(app, origins=[
 ])
 
 # Register routes
-spotify_auth(app)
-spotify_endpoints(app)
+register_auth_routes(app)
+register_spotify_routes(app)
+
+@app.route("/")
+def hello():
+    return "<h1 style='color:green'>Spotify Helper API is running! 🎵</h1>"
 
 if __name__ == '__main__':
      # Enable debug mode for hot reloading
     debug_mode = os.getenv('FLASK_DEBUG', 'False').lower() == 'true'
     app.run(
         host='0.0.0.0', 
-        port=5000, 
+        port=5001, 
         debug=debug_mode,
         use_reloader=True,  # Enable auto-reload on file changes
         use_debugger=True   # Enable debugger

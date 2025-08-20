@@ -15,19 +15,33 @@ CREATE TABLE IF NOT EXISTS app_spotify (
     UNIQUE(spotify_id)
 );
 
+-- Create temporary OAuth state storage table
+CREATE TABLE IF NOT EXISTS temp_oauth_state (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    state_key TEXT NOT NULL UNIQUE,
+    user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    code_verifier TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    expires_at TIMESTAMP WITH TIME ZONE NOT NULL
+);
+
 -- Create indexes for better performance
 CREATE INDEX IF NOT EXISTS idx_app_spotify_user_id 
-ON app_spotify(supabase_user_id);
+ON app_spotify(user_id);
 
 CREATE INDEX IF NOT EXISTS idx_app_spotify_spotify_id 
 ON app_spotify(spotify_id);
 
 -- Index for faster user token lookups
-CREATE INDEX idx_app_spotify_user_id ON app_spotify(user_id);
-CREATE INDEX idx_app_spotify_expires_at ON app_spotify(expires_at);
+CREATE INDEX IF NOT EXISTS idx_app_spotify_expires_at ON app_spotify(expires_at);
+
+-- Indexes for temp OAuth state table
+CREATE INDEX IF NOT EXISTS idx_temp_oauth_state_key ON temp_oauth_state(state_key);
+CREATE INDEX IF NOT EXISTS idx_temp_oauth_expires_at ON temp_oauth_state(expires_at);
 
 -- Add RLS (Row Level Security) policies if needed
 ALTER TABLE app_spotify ENABLE ROW LEVEL SECURITY;
+ALTER TABLE temp_oauth_state ENABLE ROW LEVEL SECURITY;
 
 -- Policy to allow users to see their own mappings
 CREATE POLICY "Users can view their own spotify mapping" 
@@ -43,3 +57,19 @@ WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "Users can update their own spotify mapping" 
 ON app_spotify FOR UPDATE 
 USING (auth.uid() = user_id);
+
+-- Policies for temp OAuth state (more permissive since this is temporary data)
+CREATE POLICY "Users can manage their own oauth state" 
+ON temp_oauth_state FOR ALL 
+USING (auth.uid() = user_id);
+
+-- Create a function to clean up expired OAuth states
+CREATE OR REPLACE FUNCTION cleanup_expired_oauth_states()
+RETURNS void AS $$
+BEGIN
+    DELETE FROM temp_oauth_state WHERE expires_at < NOW();
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create a periodic job to clean up expired states (if using pg_cron)
+-- SELECT cron.schedule('cleanup-oauth-states', '*/5 * * * *', 'SELECT cleanup_expired_oauth_states();');
