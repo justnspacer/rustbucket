@@ -9,7 +9,7 @@ from api.auth import register_auth_routes
 load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = "thisisasecret"
+app.secret_key = os.getenv("SECRET_KEY")
 
 # Add CORS support
 CORS(app, origins=[
@@ -32,7 +32,7 @@ if __name__ == '__main__':
     debug_mode = os.getenv('FLASK_DEBUG', 'False').lower() == 'true'
     app.run(
         host='0.0.0.0', 
-        port=5001, 
+        port=5000, 
         debug=debug_mode,
         use_reloader=True,  # Enable auto-reload on file changes
         use_debugger=True   # Enable debugger

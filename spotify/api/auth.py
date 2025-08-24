@@ -1,7 +1,3 @@
-"""
-Spotify OAuth authentication and token management
-"""
-import os
 import base64
 from hashlib import sha256
 from flask import request, redirect, session
@@ -12,8 +8,7 @@ import requests
 import json
 from datetime import datetime, timedelta, timezone
 from functools import wraps
-
-from .database import get_user_by_spotify_id
+from .database import get_supabase_client
 from .helpers import success_response, error_response
 from .config import CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, TOKEN_URL, SCOPE
 from .errors import *
@@ -39,7 +34,6 @@ def require_spotify_auth(f):
     """Decorator to require Spotify authentication for endpoints"""
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        from .database import get_supabase_client
         
         # Get authenticated user from Supabase context (passed by Next.js middleware)
         user_data = get_authenticated_user(request)

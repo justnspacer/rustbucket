@@ -1,15 +1,12 @@
-"""
-Configuration settings for Spotify API integration
-"""
 import os
 from dotenv import load_dotenv
 
 load_dotenv()
 
 # Spotify API credentials
-CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID")
-CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET")
-REDIRECT_URI = os.getenv("SPOTIFY_REDIRECT_URI", "http://localhost:5001/api/spotify/callback")
+CLIENT_ID = os.getenv("CLIENT_ID")
+CLIENT_SECRET = os.getenv("CLIENT_SECRET")
+REDIRECT_URI = os.getenv("REDIRECT_URI")
 
 # Spotify API endpoints
 TOKEN_URL = "https://accounts.spotify.com/api/token"

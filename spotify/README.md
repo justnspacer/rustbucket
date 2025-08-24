@@ -153,7 +153,7 @@ GET /api/spotify/genres
 # Spotify API
 SPOTIFY_CLIENT_ID=your_client_id
 SPOTIFY_CLIENT_SECRET=your_client_secret
-SPOTIFY_REDIRECT_URI=http://localhost:5001/api/spotify/callback
+SPOTIFY_REDIRECT_URI=http://127.0.0.1:5000/api/spotify/callback
 
 # Supabase
 SUPABASE_URL=your_supabase_url

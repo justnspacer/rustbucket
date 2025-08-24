@@ -1,6 +1,3 @@
-"""
-Spotify API endpoints for user data retrieval
-"""
 import spotipy
 import base64
 from flask import request

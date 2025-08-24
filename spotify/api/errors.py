@@ -1,7 +1,3 @@
-"""
-Error codes and constants for API responses
-"""
-
 # Authentication errors
 AUTH_REQUIRED = "AUTH_REQUIRED"
 SPOTIFY_UNAUTHORIZED = "SPOTIFY_UNAUTHORIZED"

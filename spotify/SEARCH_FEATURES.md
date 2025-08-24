@@ -1,9 +1,3 @@
-# 🔍 Search Functionality Added!
-
-## ✅ New Search Features
-
-I've added comprehensive search functionality to your Spotify API project:
-
 ### 🧑‍🤝‍🧑 **User Discovery**
 - **`/api/spotify/search/users`** - Find other users who have linked Spotify accounts
 - Browse all users or search by Spotify username
