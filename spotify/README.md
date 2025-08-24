@@ -1,6 +1,6 @@
 # Spotify Helper API
 
-A Flask-based REST API for Spotify integration with Supabase authentication and Next.js frontend support.
+A Flask-based REST API for Spotify integration with Database authentication and Next.js frontend support.
 
 ## Project Structure
 
@@ -9,7 +9,7 @@ A Flask-based REST API for Spotify integration with Supabase authentication and 
 │   ├── __init__.py        # Package initialization
 │   ├── auth.py            # OAuth flow and authentication decorators
 │   ├── config.py          # Configuration and environment variables
-│   ├── database.py        # Supabase client and database utilities
+│   ├── database.py        # Database client and database utilities
 │   ├── endpoints.py       # Spotify API endpoints
 │   ├── errors.py          # Error codes and constants
 │   ├── helpers.py         # Response formatting utilities
@@ -26,7 +26,7 @@ A Flask-based REST API for Spotify integration with Supabase authentication and 
 - **OAuth 2.0 PKCE**: Secure Spotify authentication
 - **Next.js Integration**: Header-based user authentication
 - **Token Management**: Automatic refresh with encrypted storage
-- **Supabase Storage**: Secure OAuth state and token management
+- **Database Storage**: Secure OAuth state and token management
 
 ### API Endpoints
 
@@ -155,9 +155,9 @@ SPOTIFY_CLIENT_ID=your_client_id
 SPOTIFY_CLIENT_SECRET=your_client_secret
 SPOTIFY_REDIRECT_URI=http://127.0.0.1:5000/api/spotify/callback
 
-# Supabase
-SUPABASE_URL=your_supabase_url
-SUPABASE_KEY=your_supabase_key
+# Database
+Database_URL=your_Database_url
+Database_KEY=your_Database_key
 
 # Flask
 FLASK_DEBUG=true
@@ -249,7 +249,7 @@ python cli.py list-users
 
 ### Next.js Integration
 The API expects these headers for authenticated requests:
-- `x-user-id` - Supabase user ID
+- `x-user-id` - Database user ID
 - `x-user-email` - User email
 - `x-user-metadata` - User metadata (JSON string)
 
@@ -257,7 +257,7 @@ The API expects these headers for authenticated requests:
 1. User clicks "Connect Spotify" in Next.js app
 2. Frontend redirects to `/api/spotify/authorize`
 3. User completes OAuth flow on Spotify
-4. Callback stores encrypted tokens in Supabase
+4. Callback stores encrypted tokens in Database
 5. Subsequent API calls use stored tokens automatically
 6. Tokens refresh automatically when expired
 
