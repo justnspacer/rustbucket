@@ -1,5 +1,5 @@
 import AssignRole from "@/components/role/AssignRole";
-import { AdminForm } from "@/components/AdminForm";
+import { AdminForm } from "@/components/admin/AdminForm";
 import { ContentFeed } from "@/components/content/ContentFeed";
 
 const AdminPage = () => {

@@ -1,5 +1,5 @@
-import SlideShow from '@/components/SlideShow';
-import SlideShowPlus from '@/components/SlideShowPlus';
+import SlideShow from '@/components/slides/SlideShow';
+import SlideShowPlus from '@/components/slides/SlideShowPlus';
 
 const HomePage = () => {  
   // Create a new list of slides

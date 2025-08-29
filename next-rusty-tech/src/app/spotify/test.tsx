@@ -1,7 +1,7 @@
 'use client';
 import { useAuth } from '@/app/context/AuthContext';
-import SpotifyConnectionTest from '@/components/SpotifyConnectionTest';
-import SpotifyLayout from '@/components/spotify/SpotifyLayout';
+import SpotifyConnectionTest from '@/components/spotify/ConnectionTest';
+import SpotifyLayout from '@/components/spotify/Layout';
 import { useState, useEffect } from 'react';
 import { setupIntersectionAnimations } from '@/hooks/useIntersectionAnimation';
 import '@/styles/spotify.css';
@@ -9,6 +9,7 @@ import '@/styles/spotify.css';
 export default function SpotifyPage() {
   const { user, loading } = useAuth();
   const [showTest, setShowTest] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
 
   useEffect(() => {
     // Initialize animations when the page loads

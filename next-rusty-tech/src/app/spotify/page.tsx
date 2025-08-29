@@ -1,25 +1,23 @@
 'use client';
 import { useAuth } from '@/app/context/AuthContext';
-import SpotifyDashboard from '@/components/spotify/SpotifyDashboard';
-import SpotifyLayout from '@/components/spotify/SpotifyLayout';
-import SpotifySearch from '@/components/SpotifySearch';
+import SpotifyDashboard from '@/components/spotify/Dashboard';
+import SpotifyLayout from '@/components/spotify/Layout';
+import SpotifySearch from '@/components/spotify/Search';
 import { useState, useEffect } from 'react';
 import { setupIntersectionAnimations } from '@/hooks/useIntersectionAnimation';
 import '@/styles/globals.css';
 
 export default function SpotifyPage() {
   const { user, loading } = useAuth();
-  const [showSearch, setShowSearch] = useState(false);
 
   useEffect(() => {
-    // Initialize animations when the page loads
     setupIntersectionAnimations();
   }, []);
 
   if (loading) {
     return (
       <div className="content">
-        <div className="text-lg">Loading...</div>
+        <div>Loading...</div>
       </div>
     );
   }
@@ -33,9 +31,7 @@ export default function SpotifyPage() {
             Please log in to access your Spotify data.
           </p>
           <a
-            href="/auth/login"
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-          >
+            href="/auth/login">
             Go to Login
           </a>
         </div>
@@ -45,15 +41,7 @@ export default function SpotifyPage() {
 
   return (
     <SpotifyLayout>
-      <div className="space-y-6">        
-
-        {showSearch && (
-          <SpotifySearch />
-        )}
-
-        {/* Main Spotify Dashboard acting as profile page */}
-        <SpotifyDashboard />
-      </div>
+      <SpotifyDashboard />
     </SpotifyLayout>
   );
 }

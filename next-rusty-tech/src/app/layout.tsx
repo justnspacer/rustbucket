@@ -1,8 +1,8 @@
 import localFont from "next/font/local";
 import "@/styles/globals.css";
 import { AuthProvider } from "@/app/context/AuthContext";
-import NavBar from "@/components/NavBar";
-import Footer from "@/components/Footer";
+import NavBar from "@/components/layout/NavBar";
+import Footer from "@/components/layout/Footer";
 
 const fredoka  = localFont({
   src: "./fonts/Fredoka-VariableFont_wdth,wght.ttf",

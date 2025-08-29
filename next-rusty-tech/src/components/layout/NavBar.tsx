@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
-import LogoutButton from '@/components/LogoutButton';
+import LogoutButton from '@/components/auth/LogoutButton';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleRight, faEllipsis } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';

@@ -1,6 +1,6 @@
 "use client";
 import { useAuth } from "@/app/context/AuthContext";
-import ProfileUpdateForm from "@/components/ProfileUpdateForm";
+import ProfileUpdateForm from "@/components/form/ProfileUpdateForm";
 
 const ProfilePage = () => {
   const { user } = useAuth();
