@@ -15,10 +15,10 @@ export async function GET(
         { status: 400 }
       );
     }
-    
-    // This would call your Python backend
+
+    // This would call your Python backend through gatekeeper
     const response = await fetch(
-      `http://127.0.0.1:5000/spotify/user/${userId}`,
+      `${process.env.GATEKEEPER_URL || 'http://localhost:8000'}/api/spotify/user/${userId}`,
       {
         headers: {
           'Authorization': `Bearer ${process.env.API_KEY}`,

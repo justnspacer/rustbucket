@@ -1,0 +1,103 @@
+*{
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.nextjs-toast  {
+  display: none !important; /* Hide the Next.js static indicator toast */
+}
+
+html, body {
+  height: 100%; /* Ensure the full height is respected */
+  margin: 0; /* Remove default margin */
+  display: flex;
+  flex-direction: column; /* Stack content vertically */
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-fredoka);
+}
+
+body {
+  overflow-x: hidden; /* Prevent horizontal overflow */
+}
+
+body, html {
+  width: 100%;
+}
+
+body > div {
+  flex: 1; /* Allow the main content to grow and fill the available space */
+}
+
+h1, h2, h3, h4, h5, h6, p {
+  margin: 0;
+  padding: 0;
+}
+
+h1 {
+  font-weight: var(--font-weight-bold);
+  text-transform: capitalize;
+  font-size: 3rem;
+  z-index: 1;
+}
+
+h3{
+  display: inline;
+  font-size: 1rem;
+  font-weight: var(--font-weight-bold);
+  text-transform: capitalize;
+  color: var(--licorice);
+  background: white;
+  padding: 0.2rem;
+}
+
+
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+form {
+  display: flex;
+}
+
+input {
+  padding: 0.5rem;
+  font-weight: var(--font-weight-bold);
+}
+
+button {
+  background-color: var(--auburn);
+  outline: none;
+  padding: 0.5rem;
+  border: none;
+  cursor: pointer;
+  text-transform: capitalize;
+  font-weight: var(--font-weight);
+  text-align: start;
+}
+
+
+input {
+  color: black;
+}
+
+.container {
+  padding: 2rem;
+  width: 100%;
+}
+
+
+.content {
+  flex: 1;
+  background: var(--foreground);
+  color: var(--background);
+  padding: 2rem 1rem;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+

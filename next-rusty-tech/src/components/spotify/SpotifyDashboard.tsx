@@ -20,6 +20,7 @@ interface SpotifyProfile {
 
 interface SpotifyError {
   error: string;
+  message?: string;
   supabase_user?: any;
   link_spotify_url?: string;
 }
@@ -44,8 +45,10 @@ export default function SpotifyDashboard() {
 
   const [profile, setProfile] = useState<SpotifyProfile | null>(null);
   const [topTracks, setTopTracks] = useState<any[]>([]);
+  const [topArtists, setTopArtists] = useState<any[]>([]);
   const [playlists, setPlaylists] = useState<any[]>([]);
   const [currentlyPlaying, setCurrentlyPlaying] = useState<any>(null);
+  const [recentlyPlayed, setRecentlyPlayed] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [spotifyLinkId, setSpotifyLinkId] = useState("");
@@ -60,15 +63,72 @@ export default function SpotifyDashboard() {
     try {
       setLoading(true);
       setError(null);
-      const profileData = await spotifyService.getProfile();
-      setProfile(profileData);
       
-      // If profile loaded successfully, load other data
-      await Promise.all([
-        loadTopTracks(),
-        loadPlaylists(),
-        loadCurrentlyPlaying()
-      ]);
+      // Try to get all dashboard data in one call
+      try {
+        const dashboardData = await spotifyService.getDashboard();
+        const data = dashboardData.data;
+        
+        // Set profile (required)
+        if (data.profile) {
+          setProfile({
+            supabase_user: { id: user?.id || '', email: user?.email || '' },
+            spotify_data: data.profile
+          });
+        }
+        
+        // Set other data (optional)
+        if (data.top_tracks) {
+          setTopTracks(data.top_tracks.items || []);
+        }
+        if (data.top_artists) {
+          setTopArtists(data.top_artists.items || []);
+        }
+        if (data.playlists) {
+          setPlaylists(data.playlists.items || []);
+        }
+        if (data.currently_playing) {
+          setCurrentlyPlaying(data.currently_playing);
+        }
+        if (data.recently_played) {
+          setRecentlyPlayed(data.recently_played.items || []);
+        }
+        
+        return; // Success, exit early
+      } catch (dashboardError) {
+        console.log('Dashboard endpoint failed, falling back to individual calls:', dashboardError);
+      }
+      
+      // Fallback to individual calls if dashboard endpoint fails
+      const profileData = await spotifyService.getProfile();
+      setProfile(profileData.data);
+      
+      // If profile loaded successfully, load other data with error handling
+      if (profileData.data) {
+        // Use Promise.allSettled to handle individual failures gracefully
+        const results = await Promise.allSettled([
+          spotifyService.getTopTracks(),
+          spotifyService.getTopArtists(),
+          spotifyService.getPlaylists(),
+          spotifyService.getCurrentlyPlaying(),
+          spotifyService.getRecentlyPlayed()
+        ]);
+        
+        // Handle each result individually
+        results.forEach((result, index) => {
+          if (result.status === 'fulfilled') {
+            switch (index) {
+              case 0: setTopTracks(result.value.data?.items || []); break;
+              case 1: setTopArtists(result.value.data?.items || []); break;
+              case 2: setPlaylists(result.value.data?.items || []); break;
+              case 3: setCurrentlyPlaying(result.value.data || null); break;
+              case 4: setRecentlyPlayed(result.value.data?.items || []); break;
+            }
+          } else {
+            console.error(`Failed to load data at index ${index}:`, result.reason);
+          }
+        });
+      }
     } catch (err: any) {
       setError(err.message);
       console.error("Error loading profile:", err);
@@ -80,16 +140,25 @@ export default function SpotifyDashboard() {
   const loadTopTracks = async () => {
     try {
       const data = await spotifyService.getTopTracks();
-      setTopTracks(data.top_tracks || []);
+      setTopTracks(data.data?.top_tracks || []);
     } catch (err: any) {
       console.error("Error loading top tracks:", err);
+    }
+  };
+
+  const loadTopArtists = async () => {
+    try {
+      const data = await spotifyService.getTopArtists();
+      setTopArtists(data.data?.items || []);
+    } catch (err: any) {
+      console.error("Error loading top artists:", err);
     }
   };
 
   const loadPlaylists = async () => {
     try {
       const data = await spotifyService.getPlaylists();
-      setPlaylists(data.playlists || []);
+      setPlaylists(data.data?.playlists || []);
     } catch (err: any) {
       console.error("Error loading playlists:", err);
     }
@@ -98,9 +167,18 @@ export default function SpotifyDashboard() {
   const loadCurrentlyPlaying = async () => {
     try {
       const data = await spotifyService.getCurrentlyPlaying();
-      setCurrentlyPlaying(data.currently_playing || null);
+      setCurrentlyPlaying(data.data?.currently_playing || null);
     } catch (err: any) {
       console.error("Error loading currently playing:", err);
+    }
+  };
+
+  const loadRecentlyPlayed = async () => {
+    try {
+      const data = await spotifyService.getRecentlyPlayed();
+      setRecentlyPlayed(data.data?.items || []);
+    } catch (err: any) {
+      console.error("Error loading recently played:", err);
     }
   };
 
@@ -113,10 +191,10 @@ export default function SpotifyDashboard() {
     try {
       setLoading(true);
       setError(null);
-      await spotifyService.linkSpotifyAccount(spotifyLinkId.trim());
+      // TODO: Implement linkSpotifyAccount method
+      console.log("Linking Spotify account:", spotifyLinkId.trim());
+      setError("Spotify account linking not yet implemented");
       setSpotifyLinkId("");
-      // Reload profile after linking
-      await loadProfile();
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -133,8 +211,8 @@ export default function SpotifyDashboard() {
   }
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6">Spotify Dashboard</h1>
+    <div className="p-6 max-w-6xl mx-auto">
+      <h1 className="text-3xl font-bold mb-6">Spotify Profile Dashboard</h1>
       
       {loading && <div className="text-blue-500 mb-4">Loading...</div>}
       
@@ -170,13 +248,13 @@ export default function SpotifyDashboard() {
 
       {profile && (
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <h2 className="text-2xl font-semibold mb-4">Profile</h2>
           <div className="flex items-center gap-4">
             {profile.spotify_data.images?.[0] && (
               <img 
                 src={profile.spotify_data.images[0].url} 
                 alt="Profile" 
-                className="w-16 h-16 rounded-full"              />
+                className="w-16 h-16 rounded-full"
+              />
             )}
             <div>
               <h3 className="text-xl font-semibold">{profile.spotify_data.display_name}</h3>
@@ -211,7 +289,7 @@ export default function SpotifyDashboard() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-2xl font-semibold mb-4">Top Tracks</h2>
           <div className="space-y-2">
@@ -230,6 +308,30 @@ export default function SpotifyDashboard() {
         </div>
 
         <div className="bg-white rounded-lg shadow-md p-6">
+          <h2 className="text-2xl font-semibold mb-4">Top Artists</h2>
+          <div className="space-y-2">
+            {topArtists.slice(0, 5).map((artist, index) => (
+              <div key={artist.id} className="flex items-center gap-3">
+                <span className="text-gray-500 w-6">{index + 1}</span>
+                {artist.images?.[0] && (
+                  <img 
+                    src={artist.images[0].url} 
+                    alt="Artist" 
+                    className="w-10 h-10 rounded-full"
+                  />
+                )}
+                <div className="flex-1">
+                  <p className="font-medium">{artist.name}</p>
+                  <p className="text-sm text-gray-600">
+                    {artist.followers?.total?.toLocaleString()} followers
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-2xl font-semibold mb-4">Playlists</h2>
           <div className="space-y-2">
             {playlists.slice(0, 5).map((playlist) => (
@@ -240,7 +342,8 @@ export default function SpotifyDashboard() {
                     alt="Playlist cover" 
                     className="w-10 h-10 rounded"
                   />
-                )}                <div className="flex-1">
+                )}
+                <div className="flex-1">
                   <p className="font-medium">{playlist.name}</p>
                   <p className="text-sm text-gray-600">
                     {getTrackCount(playlist.tracks)}
@@ -251,6 +354,31 @@ export default function SpotifyDashboard() {
           </div>
         </div>
       </div>
+
+      {recentlyPlayed.length > 0 && (
+        <div className="bg-white rounded-lg shadow-md p-6 mt-6">
+          <h2 className="text-2xl font-semibold mb-4">Recently Played</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {recentlyPlayed.slice(0, 6).map((item, index) => (
+              <div key={index} className="flex items-center gap-3">
+                {item.track?.album?.images?.[0] && (
+                  <img 
+                    src={item.track.album.images[0].url} 
+                    alt="Album cover" 
+                    className="w-12 h-12 rounded"
+                  />
+                )}
+                <div className="flex-1">
+                  <p className="font-medium text-sm">{item.track?.name}</p>
+                  <p className="text-xs text-gray-600">
+                    {item.track?.artists?.map((artist: any) => artist.name).join(", ")}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

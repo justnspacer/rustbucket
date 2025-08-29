@@ -20,12 +20,6 @@ export default function SpotifyLayout({ children, className = '' }: SpotifyLayou
           >
             Spotify UI
           </Link>
-          <Link 
-            href="/spotify/auth/link" 
-            className="text-white hover:text-green-400 transition-colors"
-          >
-            Save My Profile
-          </Link>
         </div>
       </nav>
 

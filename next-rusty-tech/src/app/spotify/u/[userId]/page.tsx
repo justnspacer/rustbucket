@@ -2,8 +2,8 @@
 
 import React, { useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import SpotifyLayout from '@/components/SpotifyLayout';
-import SpotifyUserProfile from '@/components/SpotifyUserProfile';
+import SpotifyLayout from '@/components/spotify/SpotifyLayout';
+import SpotifyUserProfile from '@/components/spotify/SpotifyUserProfile';
 import { setupIntersectionAnimations } from '@/hooks/useIntersectionAnimation';
 import '@/styles/spotify.css';
 

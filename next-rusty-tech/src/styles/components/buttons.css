@@ -1,0 +1,27 @@
+
+.button-update-profile {
+  width: 200px;
+}
+
+
+.button-update-profile:hover {
+background: greenyellow;
+color: var(--background);
+}
+
+
+
+.icon {
+  margin-left: 6px;
+  font-size:0.7rem;
+  color:var(--baby-powder);
+  background-color:var(--tufts-blue);
+  padding:0.3rem;
+  border-radius:50%;
+  vertical-align: top;
+}
+
+
+
+
+

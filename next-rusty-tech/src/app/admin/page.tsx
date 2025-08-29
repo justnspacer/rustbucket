@@ -1,6 +1,6 @@
-import AssignRole from "@/components/AssignRole";
+import AssignRole from "@/components/role/AssignRole";
 import { AdminForm } from "@/components/AdminForm";
-import { ContentFeed } from "@/components/ContentFeed";
+import { ContentFeed } from "@/components/content/ContentFeed";
 
 const AdminPage = () => {
   return (

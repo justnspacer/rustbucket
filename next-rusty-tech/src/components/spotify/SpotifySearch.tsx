@@ -100,30 +100,30 @@ export default function SpotifySearch({ onUserSelect, className = '' }: SpotifyS
   };
 
   return (
-    <div className={`spotify-font ${className}`}>
+    <div className={`${className}`}>
       {/* Header */}
-      <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold mb-4 text-gray-800">
+      <div className="">
+        <h1 className="">
           Welcome to Spotify App
         </h1>
-        <p className="text-gray-600">Search Spotify Users</p>
+        <p className="">Search Spotify Users</p>
       </div>
 
       {/* Search Container */}
-      <div className="bg-white p-5 rounded-lg shadow-md mb-5">
+      <div className="search-container">
         <form onSubmit={handleSearch} className="flex gap-2">
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyPress={handleKeyPress}
-            className="flex-1 p-3 border border-gray-300 rounded-md text-base font-medium bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="search-box"
             placeholder="Search by username or Spotify ID..."
           />
           <button
             type="submit"
             disabled={loading}
-            className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-md font-medium transition-colors disabled:opacity-50"
+            className="search-btn"
           >
             <FontAwesomeIcon icon={faSearch} className="mr-2" />
             Search
@@ -134,15 +134,15 @@ export default function SpotifySearch({ onUserSelect, className = '' }: SpotifyS
       {/* Results */}
       <div id="results">
         {loading ? (
-          <div className="text-center py-5 text-gray-600">
+          <div>
             {query ? 'Searching...' : 'Loading users...'}
           </div>
         ) : results.length > 0 ? (
-          <div className="space-y-3">
+          <div>
             {results.map((user) => (
               <div
                 key={user.spotify_id}
-                className="bg-white p-4 rounded-lg shadow-md flex items-center cursor-pointer hover:shadow-lg transition-shadow"
+                className="user-card"
                 onClick={() => handleUserClick(user.spotify_id)}
               >
                 <img
@@ -152,16 +152,16 @@ export default function SpotifySearch({ onUserSelect, className = '' }: SpotifyS
                       : '/default-avatar.png'
                   }
                   alt={user.display_name || user.spotify_id}
-                  className="user-avatar mr-4 bg-gray-200"
+                  className="user-avatar"
                 />
-                <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-1">
+                <div className="user-info">
+                  <h3>
                     {user.display_name || user.spotify_id}
                   </h3>
-                  <p className="text-gray-600 text-sm">
+                  <p>
                     Followers: {user.followers || 0} | Country: {user.country || 'N/A'}
                   </p>
-                  <p className="text-gray-500 text-xs">
+                  <p>
                     Last updated: {new Date(user.last_updated).toLocaleDateString()}
                   </p>
                 </div>
@@ -169,7 +169,7 @@ export default function SpotifySearch({ onUserSelect, className = '' }: SpotifyS
             ))}
           </div>
         ) : (
-          <div className="text-center py-5 text-gray-600">
+          <div>
             {query 
               ? 'No users found.' 
               : 'No users found. Users need to authorize the app first.'

@@ -14,9 +14,9 @@ export async function GET(request: NextRequest) {
       );
     }
     
-    // This would call your Python backend
+    // This would call your Python backend through gatekeeper
     const response = await fetch(
-      `http://127.0.0.1:5000/spotify/search-users?q=${encodeURIComponent(query)}`,
+      `${process.env.GATEKEEPER_URL || 'http://localhost:8000'}/api/spotify/search-users?q=${encodeURIComponent(query)}`,
       {
         headers: {
           'Authorization': `Bearer ${process.env.API_KEY}`,

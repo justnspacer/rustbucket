@@ -8,7 +8,7 @@ import { SpotifySearchResponse } from '@/types/spotify';
 export async function GET(request: NextRequest) {
   try {
     // This would call your Python backend
-    const response = await fetch(`http://127.0.0.1:5000/spotify/users`, {
+    const response = await fetch(`${process.env.GATEKEEPER_URL || 'http://localhost:8000'}/api/spotify/users`, {
       headers: {
         'Authorization': `Bearer ${process.env.API_KEY}`,
       },

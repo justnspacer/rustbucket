@@ -1,5 +1,6 @@
 import spotipy
 import base64
+from datetime import datetime, timezone
 from flask import request
 from .auth import require_spotify_auth
 from .helpers import success_response, error_response, paginated_response
@@ -42,6 +43,12 @@ def register_spotify_routes(app):
                 status_code=500, 
                 error_code=INTERNAL_ERROR
             )
+
+    # Public user profile endpoint (shorter alias)
+    @app.route("/api/spotify/u/<spotify_id>")
+    def public_user_profile(spotify_id):
+        """Get public user profile by spotify_id (alias for /profile/<spotify_id>)"""
+        return spotify_profile(spotify_id)
 
     @app.route("/api/spotify/profile/<spotify_id>/playlists")
     def spotify_user_playlists(spotify_id):
@@ -352,6 +359,78 @@ def register_spotify_routes(app):
                 error_code=INTERNAL_ERROR
             )
 
+    @app.route("/api/spotify/my/dashboard")
+    @require_spotify_auth
+    def my_spotify_dashboard():
+        """Get all dashboard data in one request"""
+        try:
+            sp = spotipy.Spotify(auth=request.spotify_token)
+            
+            # Get all data - handle individual failures gracefully
+            dashboard_data = {}
+            
+            # Profile (required)
+            try:
+                dashboard_data['profile'] = sp.current_user()
+            except Exception as e:
+                return error_response(
+                    message=f"Failed to retrieve profile: {str(e)}", 
+                    status_code=400, 
+                    error_code=SPOTIFY_API_ERROR
+                )
+            
+            # Top tracks (optional)
+            try:
+                dashboard_data['top_tracks'] = sp.current_user_top_tracks(limit=20)
+            except Exception as e:
+                print(f"Error getting top tracks: {e}")
+                dashboard_data['top_tracks'] = None
+            
+            # Top artists (optional)
+            try:
+                dashboard_data['top_artists'] = sp.current_user_top_artists(limit=20)
+            except Exception as e:
+                print(f"Error getting top artists: {e}")
+                dashboard_data['top_artists'] = None
+            
+            # Playlists (optional)
+            try:
+                dashboard_data['playlists'] = sp.current_user_playlists(limit=20)
+            except Exception as e:
+                print(f"Error getting playlists: {e}")
+                dashboard_data['playlists'] = None
+            
+            # Recently played (optional)
+            try:
+                dashboard_data['recently_played'] = sp.current_user_recently_played(limit=20)
+            except Exception as e:
+                print(f"Error getting recently played: {e}")
+                dashboard_data['recently_played'] = None
+            
+            # Currently playing (optional)
+            try:
+                dashboard_data['currently_playing'] = sp.current_playback()
+            except Exception as e:
+                print(f"Error getting currently playing: {e}")
+                dashboard_data['currently_playing'] = None
+            
+            return success_response(
+                data=dashboard_data,
+                message="Dashboard data retrieved successfully"
+            )
+        except spotipy.SpotifyException as e:
+            return error_response(
+                message=f"Spotify API error: {str(e)}", 
+                status_code=400, 
+                error_code=SPOTIFY_API_ERROR
+            )
+        except Exception as e:
+            return error_response(
+                message="Failed to retrieve dashboard data", 
+                status_code=500, 
+                error_code=INTERNAL_ERROR
+            )
+
     @app.route("/api/spotify/my/following")
     @require_spotify_auth
     def my_following():
@@ -479,6 +558,7 @@ def register_spotify_routes(app):
             )
 
     # Search endpoints
+
     @app.route("/api/spotify/search/users")
     def search_users():
         """Search for users who have linked Spotify accounts"""
@@ -883,6 +963,32 @@ def register_spotify_routes(app):
         except Exception as e:
             return error_response(
                 message="Failed to get available genres", 
+                status_code=500, 
+                error_code=INTERNAL_ERROR
+            )
+
+    @app.route("/api/spotify/my/currently-playing")
+    @require_spotify_auth
+    def auth_currently_playing():
+        """Get current user's currently playing track"""
+        try:
+            sp = spotipy.Spotify(auth=request.spotify_token)
+            
+            currently_playing = sp.current_playback()
+            
+            return success_response(
+                data={'currently_playing': currently_playing},
+                message="Currently playing retrieved successfully"
+            )
+        except spotipy.SpotifyException as e:
+            return error_response(
+                message=f"Spotify API error: {str(e)}", 
+                status_code=400, 
+                error_code=SPOTIFY_API_ERROR
+            )
+        except Exception as e:
+            return error_response(
+                message="Failed to retrieve currently playing", 
                 status_code=500, 
                 error_code=INTERNAL_ERROR
             )

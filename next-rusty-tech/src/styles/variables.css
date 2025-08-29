@@ -1,0 +1,31 @@
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --font-fredoka: 'Fredoka', sans-serif;
+  
+  /* Spotify-specific variables from your old style.css */
+  --tufts-blue: #3c91e6ff;
+  --yellow-green: #9fd356ff;
+  --raisin-black: #342e37ff;
+  --baby-powder: #fafffdff;
+  --coral: #fa824cff;
+
+  --font-weight: 200;
+  --font-weight-bold: 700;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+
+.bg-gradient {
+  display: inline-block;
+  background: linear-gradient(90deg, #f12711 0%, #f5af19 100%);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}

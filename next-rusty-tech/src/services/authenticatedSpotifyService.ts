@@ -1,4 +1,5 @@
 // Service to handle authenticated requests through the gatekeeper
+import { useAuth } from '@/app/context/AuthContext';
 export class AuthenticatedSpotifyService {
   private baseUrl: string;
   private getAuthToken: () => string | null;
@@ -39,7 +40,7 @@ export class AuthenticatedSpotifyService {
 
     if (!response.ok) {
       const error = await response.json().catch(() => ({ error: 'Unknown error' }));
-      throw new Error(error.error || `Request failed with status ${response.status}`);
+      throw new Error(error.message || error.error || `Request failed with status ${response.status}`);
     }
 
     return response.json();
@@ -47,30 +48,22 @@ export class AuthenticatedSpotifyService {
 
   // Get user's Spotify profile
   async getProfile() {
-    return this.makeRequest('auth/profile');
-  }
-
-  // Link Spotify account to the authenticated user
-  async linkSpotifyAccount(spotifyId: string) {
-    return this.makeRequest('auth/link', {
-      method: 'POST',
-      body: JSON.stringify({ spotify_id: spotifyId })
-    });
+    return this.makeRequest('my/profile');
   }
 
   // Get user's top tracks
   async getTopTracks() {
-    return this.makeRequest('auth/top-tracks');
+    return this.makeRequest('my/top-tracks');
   }
 
   // Get user's playlists
   async getPlaylists() {
-    return this.makeRequest('auth/playlists');
+    return this.makeRequest('my/playlists');
   }
 
   // Get currently playing track
   async getCurrentlyPlaying() {
-    return this.makeRequest('auth/currently-playing');
+    return this.makeRequest('my/currently-playing');
   }
 
   // Get public user profile (doesn't require authentication)
@@ -87,24 +80,34 @@ export class AuthenticatedSpotifyService {
   async getUsers(limit: number = 20) {
     return this.makeRequest(`users?limit=${limit}`);
   }
+
+  // Get user's top artists
+  async getTopArtists() {
+    return this.makeRequest('my/top-artists');
+  }
+
+  // Get user's recently played tracks
+  async getRecentlyPlayed() {
+    return this.makeRequest('my/recently-played');
+  }
+
+  // Get user's saved tracks
+  async getSavedTracks() {
+    return this.makeRequest('my/saved-tracks');
+  }
+
+  // Get all dashboard data in one request
+  async getDashboard() {
+    return this.makeRequest('my/dashboard');
+  }
 }
 
 // Hook for using the service with Next.js
 export const useAuthenticatedSpotifyService = () => {
-  const getAuthToken = () => {
-    // This should get the token from your auth context
-    // You might need to adjust this based on how you store tokens
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('supabase-auth-token') || 
-             document.cookie.split('; ')
-               .find(row => row.startsWith('token='))
-               ?.split('=')[1] || null;
-    }
-    return null;
-  };
+  const { getAuthToken } = useAuth();
 
   return new AuthenticatedSpotifyService(
-    process.env.NEXT_PUBLIC_GATEKEEPER_URL || 'http://localhost:8000',
+    (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000').replace(':3000', ':8000'),
     getAuthToken
   );
 };

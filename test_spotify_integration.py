@@ -80,35 +80,6 @@ def test_authenticated_spotify_endpoints(token):
         print(f"❌ Error testing authenticated endpoints: {e}")
         return False
 
-def test_spotify_linking(token, spotify_id):
-    """Test linking Spotify account"""
-    print(f"\n🧪 Testing Spotify account linking with ID: {spotify_id}...")
-    
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "Content-Type": "application/json"
-    }
-    
-    try:
-        # Test linking endpoint
-        response = requests.post(
-            f"{GATEKEEPER_URL}/api/spotify/auth/link",
-            headers=headers,
-            json={"spotify_id": spotify_id}
-        )
-        
-        if response.status_code == 200:
-            print(f"✅ Spotify linking: {response.status_code} - Successfully linked!")
-            return True
-        else:
-            error_data = response.json()
-            print(f"❌ Spotify linking: {response.status_code} - {error_data}")
-            return False
-            
-    except Exception as e:
-        print(f"❌ Error testing Spotify linking: {e}")
-        return False
-
 def main():
     print("🚀 Starting Spotify Authentication Integration Tests")
     print("=" * 60)

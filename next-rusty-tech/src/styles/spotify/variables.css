@@ -1,0 +1,14 @@
+.icon {
+  margin-left: 6px;
+  font-size:0.7rem;
+  color:var(--baby-powder);
+  background-color:var(--tufts-blue);
+  padding:0.3rem;
+  border-radius:50%;
+  vertical-align: top;
+}
+
+
+i {
+  font-size: 1.7rem;
+}

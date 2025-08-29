@@ -87,7 +87,6 @@ Before users can access their Spotify data, they need to:
 #### Authenticated Endpoints (require Supabase auth)
 
 - `GET /api/spotify/auth/profile` - Get user's linked Spotify profile
-- `POST /api/spotify/auth/link` - Link Spotify account to authenticated user
 - `GET /api/spotify/auth/top-tracks` - Get user's top tracks
 - `GET /api/spotify/auth/playlists` - Get user's playlists
 - `GET /api/spotify/auth/currently-playing` - Get currently playing track
@@ -142,7 +141,6 @@ See `SpotifyDashboard.tsx` for a complete example of how to use the authenticate
 ## Testing
 
 1. **Test authentication:** Visit `/user` endpoint on gatekeeper
-2. **Test Spotify linking:** Use the POST `/api/spotify/auth/link` endpoint
 3. **Test data access:** Use any of the authenticated endpoints
 
 ## Troubleshooting

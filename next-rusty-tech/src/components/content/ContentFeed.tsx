@@ -1,8 +1,8 @@
 "use client"
 import { useEffect, useState } from 'react';
-import { supabase } from '../app/utils/supabaseClient';
+import { supabase } from '../../app/utils/supabaseClient';
 import { ContentBlock } from './ContentBlock';
-import { ContentBlockProps } from '../types/ContentBlockProps';
+import { ContentBlockProps } from '../../types/ContentBlockProps';
 
 export const ContentFeed = () => {
   const [blocks, setBlocks] = useState<ContentBlockProps[]>([]);

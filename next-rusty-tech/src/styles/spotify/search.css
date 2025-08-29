@@ -1,0 +1,66 @@
+ .search-container {
+            background: white;
+            padding: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        input.search-box {
+          font-weight: var(--font-weight);
+          background-color: var(--raisin-black);
+          color: var(--baby-powder);
+          border: none;
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+          transition: background-color 0.3s, color 0.3s;
+        }
+        .search-box {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            margin-bottom: 10px;
+            font-family: inherit;
+        }
+        .search-btn {
+            background-color: #1db954;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .search-btn:hover {
+            background-color: #1ed760;
+        }
+        .user-card {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+        }
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 15px;
+            background-color: #ccc;
+        }
+        .user-info h3 {
+            margin: 0 0 5px 0;
+            color: #333;
+        }
+        .user-info p {
+            margin: 0;
+            color: #666;
+            font-size: 14px;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }

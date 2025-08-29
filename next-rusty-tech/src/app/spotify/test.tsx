@@ -1,15 +1,14 @@
 'use client';
 import { useAuth } from '@/app/context/AuthContext';
-import SpotifyDashboard from '@/components/spotify/SpotifyDashboard';
+import SpotifyConnectionTest from '@/components/SpotifyConnectionTest';
 import SpotifyLayout from '@/components/spotify/SpotifyLayout';
-import SpotifySearch from '@/components/SpotifySearch';
 import { useState, useEffect } from 'react';
 import { setupIntersectionAnimations } from '@/hooks/useIntersectionAnimation';
-import '@/styles/globals.css';
+import '@/styles/spotify.css';
 
 export default function SpotifyPage() {
   const { user, loading } = useAuth();
-  const [showSearch, setShowSearch] = useState(false);
+  const [showTest, setShowTest] = useState(false);
 
   useEffect(() => {
     // Initialize animations when the page loads
@@ -18,7 +17,7 @@ export default function SpotifyPage() {
 
   if (loading) {
     return (
-      <div className="content">
+      <div className="flex items-center justify-center min-h-screen">
         <div className="text-lg">Loading...</div>
       </div>
     );
@@ -26,7 +25,7 @@ export default function SpotifyPage() {
 
   if (!user) {
     return (
-      <div className="content">
+      <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Welcome to Spotify Dashboard</h1>
           <p className="text-gray-600 mb-4">
@@ -45,14 +44,25 @@ export default function SpotifyPage() {
 
   return (
     <SpotifyLayout>
-      <div className="space-y-6">        
-
-        {showSearch && (
-          <SpotifySearch />
-        )}
-
-        {/* Main Spotify Dashboard acting as profile page */}
-        <SpotifyDashboard />
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold">Spotify Integration</h1>
+          <div className="space-x-2">
+            <button
+              onClick={() => setShowSearch(!showSearch)}
+              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+            >
+              {showSearch ? 'Hide Search' : 'Show User Search'}
+            </button>
+            <button
+              onClick={() => setShowTest(!showTest)}
+              className="bg-gray-500 text-white px-3 py-1 rounded text-sm hover:bg-gray-600"
+            >
+              {showTest ? 'Hide Test' : 'Show Connection Test'}
+            </button>
+          </div>
+        </div>
+        {showTest && <SpotifyConnectionTest />}
       </div>
     </SpotifyLayout>
   );

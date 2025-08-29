@@ -1,0 +1,42 @@
+.header {
+  font-size: 3rem;
+}
+
+
+
+.description {
+  font-size: 1.5rem;
+  font-weight: 100;
+}
+
+
+.message .header {
+  font-size: 3.5rem;
+  font-weight: 100;
+  text-transform: capitalize;
+  line-height: 0.9;
+  background: var(--foreground);
+  padding: 1rem;
+}
+
+.message {
+  max-width: 400px;
+  z-index: 1;
+  position: absolute;
+}
+
+.message .description {
+  margin-top: 1rem;
+  font-size: 1rem;
+  font-weight: 200;
+  background: var(--foreground);
+  padding: 0.5rem;
+}
+
+
+.header-2 {
+  font-size: 3rem;
+  font-weight: 300;
+  margin-bottom: 0;
+}
+
