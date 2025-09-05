@@ -1,0 +1,5 @@
+pandas
+plotly
+numpy
+nfl_data_py
+requests
