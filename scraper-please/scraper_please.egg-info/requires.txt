@@ -1,0 +1,10 @@
+requests
+urllib3
+beautifulsoup4
+lxml
+pydantic
+redis
+celery
+fastapi
+uvicorn
+python-dotenv

@@ -1,0 +1,21 @@
+# Web Scraping
+requests
+urllib3
+beautifulsoup4
+lxml
+
+# Data Models and Validation
+pydantic
+
+# Caching (optional - Redis)
+redis
+
+# Task Queue (optional - Celery)
+celery
+
+# API Framework
+fastapi
+uvicorn
+
+# Utilities
+python-dotenv
