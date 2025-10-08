@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug JSON Loading</title>
+</head>
+<body>
+    <h1>Debug JSON Loading</h1>
+    <div id="results"></div>
+    
+    <script>
+        async function testAPI() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<p>Testing API...</p>';
+            
+            try {
+                // Test API endpoint
+                console.log('Testing /api/teams endpoint...');
+                const apiResponse = await fetch('/api/teams');
+                console.log('API Response status:', apiResponse.status);
+                console.log('API Response headers:', apiResponse.headers);
+                
+                const apiText = await apiResponse.text();
+                console.log('API Response length:', apiText.length);
+                console.log('API Response first 200 chars:', apiText.substring(0, 200));
+                
+                results.innerHTML += `<h3>API Test</h3>
+                    <p>Status: ${apiResponse.status}</p>
+                    <p>Length: ${apiText.length}</p>
+                    <p>First 200 chars: <code>${apiText.substring(0, 200)}</code></p>`;
+                
+                // Try to parse API response
+                try {
+                    const apiData = JSON.parse(apiText);
+                    results.innerHTML += `<p>✅ API JSON parsed successfully. Items: ${apiData.length}</p>`;
+                } catch (apiParseError) {
+                    results.innerHTML += `<p>❌ API JSON parse error: ${apiParseError.message}</p>`;
+                }
+                
+            } catch (apiError) {
+                console.error('API test failed:', apiError);
+                results.innerHTML += `<p>❌ API test failed: ${apiError.message}</p>`;
+                
+                // Test JSON file fallback
+                try {
+                    console.log('Testing teams_data.json fallback...');
+                    const jsonResponse = await fetch('teams_data.json');
+                    console.log('JSON Response status:', jsonResponse.status);
+                    
+                    const jsonText = await jsonResponse.text();
+                    console.log('JSON Response length:', jsonText.length);
+                    console.log('JSON Response first 200 chars:', jsonText.substring(0, 200));
+                    
+                    results.innerHTML += `<h3>JSON File Test</h3>
+                        <p>Status: ${jsonResponse.status}</p>
+                        <p>Length: ${jsonText.length}</p>
+                        <p>First 200 chars: <code>${jsonText.substring(0, 200)}</code></p>`;
+                    
+                    // Try to parse JSON file
+                    try {
+                        const jsonData = JSON.parse(jsonText);
+                        results.innerHTML += `<p>✅ JSON file parsed successfully. Items: ${jsonData.length}</p>`;
+                    } catch (jsonParseError) {
+                        results.innerHTML += `<p>❌ JSON file parse error: ${jsonParseError.message}</p>`;
+                    }
+                    
+                } catch (jsonError) {
+                    console.error('JSON file test failed:', jsonError);
+                    results.innerHTML += `<p>❌ JSON file test failed: ${jsonError.message}</p>`;
+                }
+            }
+        }
+        
+        // Run test when page loads
+        testAPI();
+    </script>
+</body>
+</html>

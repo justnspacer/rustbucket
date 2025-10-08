@@ -7,7 +7,7 @@ seasonal_data = nfl.import_seasonal_data(years=[2024], s_type='POST')
 print(f'seasonal_data: {seasonal_data.head()}')
 
 
-seasonal_roster = nfl.import_seasonal_rosters(years=[2024], columns=['player_id', 'team', 'position', 'player_name'])
+seasonal_roster = nfl.import_seasonal_rosters(years=[2024], columns=['team', 'player_name', 'position'])
 print(f'seasonal_roster: {seasonal_roster.head()}')
 
 
