@@ -1,9 +1,11 @@
 # Scraper-Please
 
-A professional web scraping service for fetching real-time NFL player and team data with intelligent caching and rate limiting.
+A professional web scraping service for fetching real-time NFL player and team data with intelligent caching, rate limiting, and REST API endpoints.
 
 ## Features
 
+- **REST API**: FastAPI-based REST endpoints for easy integration
+- **Scraper Manager**: Centralized management with dynamic source switching
 - **Base Scraper Architecture**: Extensible base class with common scraping functionality
 - **Smart Caching**: Different cache TTL strategies
   - Team data: 24 hours (infrequent changes)
@@ -24,43 +26,130 @@ python -m venv venv_scraper_please
 
 # Activate virtual environment
 # Windows:
-venv_scraper-please\Scripts\activate
+venv_scraper_please\Scripts\activate
 # Linux/Mac:
-source venv_scraper-please/bin/activate
+source venv_scraper_please/bin/activate
 
 # Install dependencies
 pip install -r requirements.txt
 ```
 
-## Quick Start
+## Quick Start - REST API
+
+Start the API server:
+
+```bash
+python run.py
+```
+
+The API will be available at `http://localhost:8000`
+
+### API Endpoints
+
+#### Get all teams
+```bash
+curl http://localhost:8000/api/v1/teams
+
+# With specific source
+curl http://localhost:8000/api/v1/teams?source=espn
+```
+
+#### Get players
+```bash
+# All players
+curl http://localhost:8000/api/v1/players
+
+# Players for specific team
+curl http://localhost:8000/api/v1/players?team_id=1
+```
+
+#### Get player stats
+```bash
+curl http://localhost:8000/api/v1/players/{player_id}/stats?season=2024
+```
+
+#### Get live scores
+```bash
+curl http://localhost:8000/api/v1/scores
+```
+
+#### Switch data source
+```bash
+curl -X POST http://localhost:8000/api/v1/sources/switch \
+  -H "Content-Type: application/json" \
+  -d '{"scraper_type": "foolsball", "source": "nfl"}'
+```
+
+#### Get available sources
+```bash
+curl http://localhost:8000/api/v1/sources
+```
+
+#### Invalidate cache
+```bash
+# Invalidate all cache
+curl -X POST http://localhost:8000/api/v1/cache/invalidate \
+  -H "Content-Type: application/json" \
+  -d '{}'
+
+# Invalidate specific scraper
+curl -X POST http://localhost:8000/api/v1/cache/invalidate \
+  -H "Content-Type: application/json" \
+  -d '{"scraper_type": "foolsball"}'
+
+# Clear all cache
+curl -X DELETE http://localhost:8000/api/v1/cache
+```
+
+#### Get scraper stats
+```bash
+curl http://localhost:8000/api/v1/stats
+```
+
+### API Documentation
+
+Interactive API documentation available at:
+- Swagger UI: `http://localhost:8000/docs`
+- ReDoc: `http://localhost:8000/redoc`
+
+## Quick Start - Python SDK
 
 ```python
-from scrapers.foolsball_scraper import FoolsballScraper
+from scraper_please import ScraperManager, ScraperType
 
-# Initialize scraper
-scraper = FoolsballScraper(
-    source="espn",
-    cache_enabled=True,
-    rate_limit_enabled=True
-)
-
-# Fetch teams (cached for 24 hours)
-teams = scraper.get_teams()
-print(f"Found {len(teams)} teams")
-
-# Fetch players for a team (cached for 5 minutes)
-players = scraper.get_players(team_id="1")
-print(f"Found {len(players)} players")
-
-# Fetch live scores (real-time, not cached)
-scores = scraper.get_live_scores()
-print(f"Found {len(scores)} live games")
-
-# Clean up
-scraper.close()
+# Initialize scraper manager
+with ScraperManager() as manager:
+    # Get scraper
+    scraper = manager.get_scraper(ScraperType.FOOLSBALL, source="espn")
+    
+    # Fetch teams (cached for 24 hours)
+    teams = scraper.get_teams()
+    print(f"Found {len(teams)} teams")
+    
+    # Fetch players for a team (cached for 5 minutes)
+    players = scraper.get_players(team_id="1")
+    print(f"Found {len(players)} players")
+    
+    # Fetch live scores (real-time, not cached)
+    scores = scraper.get_live_scores()
+    print(f"Found {len(scores)} live games")
+    
+    # Switch data source
+    manager.switch_source(ScraperType.FOOLSBALL, "nfl")
+    
+    # Invalidate cache
+    manager.invalidate_cache(ScraperType.FOOLSBALL)
 ```
 
 ## Architecture
+
+### Scraper Manager (`scraper_manager.py`)
+
+Centralized manager for all scrapers:
+- Dynamic scraper instantiation
+- Source switching per scraper type
+- Unified cache management
+- Statistics and monitoring
 
 ### Base Scraper (`base_scraper.py`)
 
@@ -89,7 +178,7 @@ Type-safe Pydantic models:
 
 ## Configuration
 
-Edit `config.py` to customize:
+Edit `scraper_please/config.py` to customize:
 
 ```python
 # Cache TTL

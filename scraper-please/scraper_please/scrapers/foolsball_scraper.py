@@ -260,13 +260,13 @@ class FoolsballScraper(BaseScraper):
         
         return stats_data
     
-    def get_live_scores(self) -> List[GameScore]:
+    def get_live_scores(self) -> List[Dict[str, Any]]:
         """
         Fetch live game scores.
         No caching for live data - always fetch fresh.
         
         Returns:
-            List of GameScore objects
+            List of GameScore dictionaries
         """
         logger.info("Fetching live scores")
         
@@ -380,7 +380,7 @@ class FoolsballScraper(BaseScraper):
             stats=stats_data
         )
     
-    def _parse_espn_scores(self, data: Dict) -> List[GameScore]:
+    def _parse_espn_scores(self, data: Dict) -> List[Dict[str, Any]]:
         """Parse ESPN scoreboard data."""
         scores = []
         events = data.get("events", [])
@@ -392,7 +392,7 @@ class FoolsballScraper(BaseScraper):
             home_team = next((c for c in competitors if c.get("homeAway") == "home"), {})
             away_team = next((c for c in competitors if c.get("homeAway") == "away"), {})
             
-            scores.append(GameScore(
+            game_score = GameScore(
                 game_id=event.get("id", ""),
                 home_team=home_team.get("team", {}).get("abbreviation", ""),
                 away_team=away_team.get("team", {}).get("abbreviation", ""),
@@ -401,7 +401,8 @@ class FoolsballScraper(BaseScraper):
                 quarter=competitions.get("status", {}).get("period"),
                 time_remaining=competitions.get("status", {}).get("displayClock"),
                 status=competitions.get("status", {}).get("type", {}).get("name", "")
-            ))
+            )
+            scores.append(game_score.dict() if hasattr(game_score, 'dict') else game_score.__dict__)
         
         logger.info(f"Parsed {len(scores)} live scores")
         return scores
