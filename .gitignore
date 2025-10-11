@@ -29,5 +29,5 @@ packages/animations
 git-r-done/
 *.cache
 spotify/.cache
-foolsball/venv_foolsball/
+foolsball/
 scraper-please/venv_scraper_please/
