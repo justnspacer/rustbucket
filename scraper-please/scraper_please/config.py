@@ -17,6 +17,7 @@ RATE_LIMIT_PERIOD = 60  # per period in seconds
 # Cache settings (TTL in seconds)
 CACHE_TTL_TEAM_DATA = 86400  # 24 hours - team data changes infrequently
 CACHE_TTL_PLAYER_DATA = 300  # 5 minutes - player data updates frequently
+CACHE_TTL_JOB_DATA = 3600  # 1 hour - job data updates regularly
 CACHE_TTL_DEFAULT = 3600  # 1 hour - default cache
 
 # Redis settings (optional - falls back to in-memory cache)
@@ -40,6 +41,20 @@ NFL_DATA_SOURCES = {
 
 # Default data source
 DEFAULT_NFL_SOURCE = "espn"
+
+# Job Search API settings
+JSEARCH_API_KEY = os.getenv("JSEARCH_API_KEY", "")
+JSEARCH_API_HOST = "jsearch.p.rapidapi.com"
+
+# OpenAI settings for cover letter generation
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+
+# Job filtering settings
+TRUSTED_DOMAINS = ['linkedin.com', 'indeed.com', 'lever.co', 'greenhouse.io']
+RED_FLAG_TERMS = [
+    'quick cash', 'no experience', 'work from home', 
+    'earn money fast', 'investment required'
+]
 
 # Logging
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")

@@ -260,13 +260,13 @@ class FoolsballScraper(BaseScraper):
         
         return stats_data
     
-    def get_live_scores(self) -> List[Dict[str, Any]]:
+    def get_live_scores(self) -> List[GameScore]:
         """
         Fetch live game scores.
         No caching for live data - always fetch fresh.
         
         Returns:
-            List of GameScore dictionaries
+            List of GameScore objects
         """
         logger.info("Fetching live scores")
         
@@ -380,7 +380,7 @@ class FoolsballScraper(BaseScraper):
             stats=stats_data
         )
     
-    def _parse_espn_scores(self, data: Dict) -> List[Dict[str, Any]]:
+    def _parse_espn_scores(self, data: Dict) -> List[GameScore]:
         """Parse ESPN scoreboard data."""
         scores = []
         events = data.get("events", [])
@@ -392,17 +392,22 @@ class FoolsballScraper(BaseScraper):
             home_team = next((c for c in competitors if c.get("homeAway") == "home"), {})
             away_team = next((c for c in competitors if c.get("homeAway") == "away"), {})
             
+            # Get status info
+            status_info = competitions.get("status", {})
+            quarter = status_info.get("period")
+            time_remaining = status_info.get("displayClock")
+            
             game_score = GameScore(
                 game_id=event.get("id", ""),
                 home_team=home_team.get("team", {}).get("abbreviation", ""),
                 away_team=away_team.get("team", {}).get("abbreviation", ""),
                 home_score=int(home_team.get("score", 0)),
                 away_score=int(away_team.get("score", 0)),
-                quarter=competitions.get("status", {}).get("period"),
-                time_remaining=competitions.get("status", {}).get("displayClock"),
-                status=competitions.get("status", {}).get("type", {}).get("name", "")
+                quarter=str(quarter) if quarter is not None else None,
+                time_remaining=time_remaining,
+                status=status_info.get("type", {}).get("name", "")
             )
-            scores.append(game_score.dict() if hasattr(game_score, 'dict') else game_score.__dict__)
+            scores.append(game_score)
         
         logger.info(f"Parsed {len(scores)} live scores")
         return scores

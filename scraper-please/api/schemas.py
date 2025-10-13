@@ -116,3 +116,67 @@ class ErrorResponse(BaseModel):
     error: str
     detail: Optional[str] = None
     timestamp: datetime = Field(default_factory=datetime.now)
+
+
+# Job scraper schemas
+class JobSearchRequest(BaseModel):
+    """Request for job search."""
+    keywords: str = Field(..., description="Search keywords (e.g., 'Python developer')")
+    location: Optional[str] = Field(None, description="Job location (e.g., 'Chicago')")
+    page: int = Field(1, ge=1, description="Page number")
+    num_pages: int = Field(1, ge=1, le=10, description="Number of pages to fetch")
+    country: str = Field("us", description="Country code")
+    date_posted: str = Field("all", description="Date filter: all, today, 3days, week, month")
+    employment_type: Optional[str] = Field(None, description="Employment type: fulltime, parttime, contractor, intern")
+    remote_jobs_only: bool = Field(False, description="Filter for remote jobs only")
+
+
+class JobFilterRequest(BaseModel):
+    """Request for job filtering options."""
+    remove_duplicates: bool = Field(True, description="Remove duplicate postings")
+    check_red_flags: bool = Field(True, description="Check for suspicious terms")
+    trusted_only: bool = Field(True, description="Only include trusted domains")
+    validate_description: bool = Field(True, description="Validate description quality")
+
+
+class ResumeMatchRequest(BaseModel):
+    """Request for resume matching."""
+    resume_text: str = Field(..., description="Resume text content")
+    threshold: float = Field(0.2, ge=0.0, le=1.0, description="Minimum match score threshold")
+
+
+class CoverLetterRequest(BaseModel):
+    """Request for cover letter generation."""
+    job_title: str = Field(..., description="Job title")
+    company: str = Field(..., description="Company name")
+    job_description: str = Field(..., description="Job description")
+    resume_summary: str = Field(..., description="Brief summary of candidate's experience")
+
+
+class JobResponse(BaseModel):
+    """Job posting response."""
+    title: str
+    company: str
+    description: str
+    url: str
+    location: Optional[str] = None
+    salary: Optional[str] = None
+    date_posted: Optional[str] = None
+    employment_type: Optional[str] = None
+    experience_level: Optional[str] = None
+    match_score: Optional[float] = None
+
+
+class JobMatchResponse(BaseModel):
+    """Job match response with score."""
+    job: JobResponse
+    match_score: float
+    matched_keywords: List[str] = []
+
+
+class CoverLetterResponse(BaseModel):
+    """Cover letter response."""
+    job_title: str
+    company: str
+    content: str
+    generated_at: str

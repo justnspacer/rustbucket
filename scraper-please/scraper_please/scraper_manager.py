@@ -6,7 +6,7 @@ import logging
 from typing import Dict, Optional, Any, List
 from enum import Enum
 
-from .scrapers import BaseScraper, FoolsballScraper
+from .scrapers import BaseScraper, FoolsballScraper, JobsScraper
 from .config import DEFAULT_NFL_SOURCE, NFL_DATA_SOURCES
 
 logger = logging.getLogger(__name__)
@@ -15,8 +15,7 @@ logger = logging.getLogger(__name__)
 class ScraperType(str, Enum):
     """Available scraper types."""
     FOOLSBALL = "foolsball"
-    # Add more scraper types as needed
-    # GIT_R_DONE = "git_r_done"
+    JOBS = "jobs"
 
 
 class ScraperManager:
@@ -82,6 +81,11 @@ class ScraperManager:
             if scraper_type == ScraperType.FOOLSBALL:
                 self._scrapers[scraper_key] = FoolsballScraper(
                     source=source,
+                    cache_enabled=self.cache_enabled,
+                    rate_limit_enabled=self.rate_limit_enabled
+                )
+            elif scraper_type == ScraperType.JOBS:
+                self._scrapers[scraper_key] = JobsScraper(
                     cache_enabled=self.cache_enabled,
                     rate_limit_enabled=self.rate_limit_enabled
                 )

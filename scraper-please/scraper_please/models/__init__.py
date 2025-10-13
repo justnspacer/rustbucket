@@ -1,5 +1,14 @@
 """
 Models module.
 """
-# Import models as needed
-__all__ = []
+from .jobs_models import (
+    JobPosting, Resume, JobMatch, CoverLetter, JobSearchQuery
+)
+
+__all__ = [
+    'JobPosting',
+    'Resume',
+    'JobMatch',
+    'CoverLetter',
+    'JobSearchQuery',
+]
