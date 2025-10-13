@@ -28,7 +28,7 @@ scraper_manager: ScraperManager = None
 # Create FastAPI application
 app = FastAPI(
     title="Scraper-Please API",
-    description="A flexible web scraping API for NFL data with caching and rate limiting",
+    description="A flexible web scraping API",
     version=__version__,
     docs_url="/docs",
     redoc_url="/redoc",
@@ -94,7 +94,7 @@ async def root():
     return {
         "name": "Scraper-Please API",
         "version": __version__,
-        "description": "A flexible web scraping API for NFL data",
+        "description": "A flexible web scraping API",
         "docs": "/docs",
         "redoc": "/redoc",
         "health": "/health"
@@ -116,8 +116,7 @@ async def health_check():
 # Include API routes
 app.include_router(
     router,
-    prefix="/api/v1",
-    tags=["Scraper API"]
+    prefix="/api/v1"
 )
 
 
