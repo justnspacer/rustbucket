@@ -1,4 +1,0 @@
-models
-scraper_please
-scrapers
-utils

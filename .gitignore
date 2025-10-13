@@ -26,9 +26,7 @@ packages/animations
 
 
 #projects
-git-r-done/
 *.cache
 spotify/.cache
-foolsball/
-scraper-please/venv_scraper_please/
-/scraper-please/resumes
+squirrel/venv_squirrel/
+/squirrel/resumes
