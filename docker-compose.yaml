@@ -52,6 +52,40 @@ services:
     networks:
       - rustbucket-network
 
+  operator:
+    build:
+      context: ./operator
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5001:5000"
+    volumes:
+      - ./operator:/app
+    environment:
+      - FLASK_ENV=development
+      - GATEKEEPER_URL=http://gatekeeper:8000
+    env_file:
+      - ./operator/.env
+    depends_on:
+      - gatekeeper
+    networks:
+      - rustbucket-network
+
+  squirrel:
+    build:
+      context: ./squirrel
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8001:8000"
+    volumes:
+      - ./squirrel:/app
+    environment:
+      - LOG_LEVEL=INFO
+      - USE_REDIS=false
+    env_file:
+      - ./squirrel/squirrel/.env
+    networks:
+      - rustbucket-network
+
 networks:
   rustbucket-network:
     driver: bridge
