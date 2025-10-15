@@ -33,6 +33,7 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc",
     openapi_url="/openapi.json"
+
 )
 
 
@@ -92,7 +93,7 @@ async def global_exception_handler(request: Request, exc: Exception):
 async def root():
     """Root endpoint with API information."""
     return {
-        "name": "Squirrel API",
+        "name": "🐿️ Squirrel API",
         "version": __version__,
         "description": "A flexible web search API",
         "docs": "/docs",
