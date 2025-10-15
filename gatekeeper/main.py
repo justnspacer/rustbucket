@@ -33,12 +33,13 @@ app.add_middleware(
 
 # Service registry
 SERVICE_REGISTRY: Dict[str, str] = {
-    "git-r-done": "http://127.0.0.1:5000/api/git-r-done",
+    # "git-r-done": "http://127.0.0.1:5000/api/git-r-done",
     "hue-dashboard": "http://127.0.0.1:5000/api/hue-dashboard", 
     "next-rusty-tech": "http://localhost:3000",
     "nothing": "http://127.0.0.1:5000/api/nothing",
     "operator": "http://127.0.0.1:5000/api/operator",
     "spotify": "http://spotify:5000/api/spotify",
+    "squirrel": "http://localhost:8000/api/v1/",
 }
 
 # Include user routes
