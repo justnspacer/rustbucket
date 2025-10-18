@@ -14,7 +14,7 @@ html, body {
   display: flex;
   flex-direction: column; /* Stack content vertically */
   color: var(--foreground);
-  background: var(--background);
+  background: var(--foreground);
   font-family: var(--font-fredoka);
 }
 

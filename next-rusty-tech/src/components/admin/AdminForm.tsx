@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from 'react';
-import { supabase } from '../app/utils/supabaseClient';
-import { ContentBlockProps, LayoutType, MediaType } from '../types/ContentBlockProps';
+import { supabase } from '../../app/utils/supabaseClient';
+import { ContentBlockProps, LayoutType, MediaType } from '../../types/ContentBlockProps';
 
 const defaultLayout: LayoutType = 'media-left';
 const defaultMediaType: MediaType = 'image';
